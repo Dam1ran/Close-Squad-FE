@@ -1,9 +1,9 @@
-import { Box } from '@mui/system';
 import { Outlet } from 'react-router-dom';
+import { Box } from '../box';
 
-export const Layout = () => {
+export const Layout = (): JSX.Element => {
   return (
-    <Box>
+    <Box sx={{ height: '100vh' }}>
       <Outlet />
     </Box>
   );

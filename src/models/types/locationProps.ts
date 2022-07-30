@@ -1,5 +1,5 @@
-export type LocationProps = {
+export interface LocationProps {
   state: {
     from: Location;
   };
-};
+}

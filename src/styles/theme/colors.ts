@@ -1,26 +1,28 @@
 export const colors = {
-  // orange: {
-  //   main: '#EA650D',
-  //   light: '#EE7F00',
-  //   dark: '#E64415',
-  // },
+  orange: {
+    main: '#ED6C02',
+    light: '#FF9800',
+    dark: '#E65100',
+  },
   purple: {
-    main: '#605C96',
-    light: '#918CE3',
-    dark: '#504D7D',
+    main: '#9C27B0',
+    light: '#BA68C8',
+    dark: '#7B1FA2',
     // light: '#C6C6C6', //white color type
   },
   grey: {
     main: '#E5E5E5',
     darkLight: '#898989',
     dark: '#999999',
-    light: '#F4F4F4',
+    light: '#EEEEEE',
     whiteGray: '#dddddd',
     lightGray: '#F8F8F8',
     // dark: '#FAFAFA', // grey color type
   },
   red: {
-    main: '#E64415',
+    main: '#D32F2F',
+    light: '#EF5350',
+    dark: '#C62828',
   },
   green: {
     main: `#96B439`,

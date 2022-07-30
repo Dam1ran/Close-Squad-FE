@@ -10,6 +10,15 @@
 
 
 
+export interface ServerAnnouncementDto {
+    createdAt: Date;
+    message: string;
+}
+
+export interface CreateServerAnnouncementViewModel {
+    message: string;
+}
+
 export interface WeatherForecast {
     date: Date;
     temperatureC: number;
@@ -24,4 +33,17 @@ export interface Kkt {
 
 export interface Cartof {
     sort: string;
+}
+
+export interface UserRegisterDto {
+    nickname: string;
+    email: string;
+    repeatEmail: string;
+    password: string;
+    repeatPassword: string;
+}
+
+export interface ConfirmEmailDto {
+    guid: string;
+    token: string;
 }

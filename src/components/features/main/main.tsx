@@ -1,6 +1,6 @@
 import { Route, Routes } from 'react-router-dom';
 import { Layout } from '../../elements/templates';
-import { LoginPage, WelcomePage } from '../../pages';
+import { ConfirmEmailPage, RegisterPage, WelcomePage } from '../../pages';
 // import { mainStyles } from './styles';
 
 export const Main = () => {
@@ -10,7 +10,9 @@ export const Main = () => {
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route path="" element={<WelcomePage />} />
-        <Route path="login" element={<LoginPage />} />
+        <Route path="register" element={<RegisterPage />} />
+        <Route path="login" element={<RegisterPage />} />
+        <Route path="confirm-email" element={<ConfirmEmailPage />} />
       </Route>
     </Routes>
 

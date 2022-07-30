@@ -9,16 +9,16 @@ export const Header = () => {
   const [email, setEmail] = useState('');
   useEffect(() => {
     if (connectedRef.current) {
-      const connection = new HubConnectionBuilder()
+      const conn = new HubConnectionBuilder()
         .withUrl('https://localhost:7271/MainHub')
         .configureLogging(LogLevel.Warning)
         .build();
-      setConnection(connection);
-      connection.on('ReceiveMessage', (payload) => {
+      setConnection(conn);
+      conn.on('ReceiveMessage', (payload) => {
         console.log('ReceiveMessage: ', payload);
       });
 
-      const start = async () => await connection.start();
+      const start = async () => await conn.start();
       start();
     }
     return () => {

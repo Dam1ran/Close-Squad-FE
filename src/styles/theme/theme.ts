@@ -1,31 +1,24 @@
+import { grey } from '@mui/material/colors';
 import { createTheme } from '@mui/material/styles';
 import { colors } from './colors';
 
-let theme = createTheme({
+const theme = createTheme({
   palette: {
-    primary: {
-      main: colors.purple.main,
-      light: colors.purple.light,
-      dark: colors.purple.dark,
-    },
-    secondary: {
-      main: colors.green.main,
+    // primary: {
+    //   main: colors.purple.main,
+    //   light: colors.purple.light,
+    //   dark: colors.purple.dark,
+    // },
+    // secondary: {
+    //   main: colors.green.main,
+    // },
+    background: {
+      default: grey[200],
     },
   },
 });
-
-
-
+// const theme = createTheme();
 export default theme;
-
-
-
-
-
-
-
-
-
 
 // import { createTheme } from '@material-ui/core/styles';
 // import { Fonts } from '_assets';
