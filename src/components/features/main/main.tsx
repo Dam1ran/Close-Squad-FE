@@ -1,11 +1,10 @@
 import { Route, Routes } from 'react-router-dom';
 import { Layout } from '../../elements/templates';
 import { ConfirmEmailPage, RegisterPage, WelcomePage } from '../../pages';
-// import { mainStyles } from './styles';
+import { useCookiePolicyAgreement } from './useCookiesPolicyAgreement';
 
-export const Main = () => {
-  // const styles = mainStyles(1);
-
+export const Main = (): JSX.Element => {
+  useCookiePolicyAgreement();
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
@@ -15,17 +14,5 @@ export const Main = () => {
         <Route path="confirm-email" element={<ConfirmEmailPage />} />
       </Route>
     </Routes>
-
-    // <Box sx={styles.Wrapper}>
-    //   {Array.from(Array(9).keys()).map(v => {
-    //     return (
-    //       <Box key={v} sx={styles.Box}>
-    //         <div>EI PIZDETS</div>
-    //         <div>EI PIZDETS</div>
-    //         <div>EI PIZDETS</div>
-    //       </Box>
-    //     )
-    //   })}
-    // </Box>
   );
 };

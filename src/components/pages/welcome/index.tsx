@@ -1,68 +1,46 @@
-import axios from 'axios';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { serverClient } from '../../../api/serverClient';
+import { useServerClient } from '../../../api/useServerClient';
 import { ServerAnnouncementDto } from '../../../models/api.models';
-import { AppContext } from '../../../support/contexts/appContextProvider';
-import { Button, CircularProgress, Column, Paper, Row, Typography } from '../../elements';
+
+import { Box, Button, CircularProgress, Column, Paper, Row, Typography } from '../../elements';
 // import { LocationProps } from '../../../models/types';
 
-axios.defaults.withCredentials = true;
-
 export const WelcomePage = (): JSX.Element => {
-  const { getAnnouncements, login } = serverClient();
+  const { login, getAnnouncements } = useServerClient();
   const [announcements, setAnnouncements] = useState<ServerAnnouncementDto[] | null>();
 
   useEffect(() => {
-    let isMounted = true;
     const fetchAnnouncements = async (): Promise<void> => {
-      isMounted && setAnnouncements(await getAnnouncements());
+      //REWORK
+      setAnnouncements(await getAnnouncements());
     };
     fetchAnnouncements();
-    return () => {
-      isMounted = false;
-    };
   }, []);
 
   const navigate = useNavigate();
   // const location = useLocation() as unknown as LocationProps;
   // const from = location.state?.from?.pathname || '/';
 
-  const [antiforgeryToken, setAntiforgeryToken] = useState('');
-
-  const { setCookiesAccepted, appContextState } = useContext(AppContext);
-
-  // console.log(appContextState);
-
-  const logins = async (): Promise<void> => {
-    setCookiesAccepted(true);
-    setAntiforgeryToken(await login());
-  };
-
-  const antif = () => {
-    const ziu = axios.get('https://localhost:7271/antiforgery', {
-      // withCredentials: true,
-    }); //for GET
-    ziu.finally(() => {
-      console.log('ggggg');
-    });
-  };
-  const forecast = () => {
-    const ziu = axios.get('https://localhost:7271/weather-forecast', {}); //for GET
-    ziu.finally(() => {
-      console.log('ggggg');
-    });
-  };;
-  const registerHandler = async () => {
-    // await register({ nickname: 'JoraKardan', email: 'danunah@gmail.com' });
-  };
   return (
-    <Column alignItems="center" sx={{ paddingTop: 1, paddingBottom: 1, height: '100%' }}>
+    <Column
+      alignItems="center"
+      sx={{
+        paddingTop: 1,
+        paddingBottom: 1,
+        height: '100%',
+      }}
+    >
       <Paper
         elevation={0}
         sx={{ padding: (theme) => theme.spacing(2), minWidth: '320px', width: '80%', maxWidth: '1600px' }}
       >
-        <Typography align="center" variant="h2">
+        <Typography
+          mb={2}
+          align="center"
+          variant="h2"
+          sx={{ textShadow: (theme) => `0px 8px 16px ${theme.palette.secondary.light}` }}
+        >
           Close Squad
         </Typography>
         <Typography
@@ -71,18 +49,20 @@ export const WelcomePage = (): JSX.Element => {
           sx={{
             padding: (theme) => theme.spacing(2),
             border: (theme) => `1px solid ${theme.palette.secondary.main}`,
-            width: '50%',
+            width: 'max(50%, 288px)',
             margin: 'auto',
             borderRadius: (theme) => `${theme.shape.borderRadius}px`,
+            display: 'flex',
+            justifyContent: 'center',
           }}
         >
-          Browser MMORPG Game with chill mechanics.
+          <Box>&#128162;</Box> <Box mx={1}>Browser MMORPG Game with chill mechanics.</Box> <Box>&#128162;</Box>
         </Typography>
         <Typography
           align="center"
           sx={{ color: (theme) => theme.palette.error.main, margin: (theme) => theme.spacing(2), marginBottom: 0 }}
         >
-          UNDER DEVELOPMENT
+          &#128679; UNDER DEVELOPMENT &#128679;
         </Typography>
       </Paper>
       <Row
@@ -93,16 +73,23 @@ export const WelcomePage = (): JSX.Element => {
         <Paper
           sx={{
             minWidth: '320px',
+            height: '188px',
             flex: 1,
             padding: 1,
             outline: (theme) => `1px solid ${theme.palette.secondary.main}`,
             outlineOffset: '-5px',
+            boxShadow:
+              'inset 0 0 40px bisque, 0px 2px 1px -1px rgb(0 0 0 / 20%), 0px 1px 1px 0px rgb(0 0 0 / 14%), 0px 1px 3px 0px rgb(0 0 0 / 12%)',
           }}
         >
-          <Column alignItems="center" sx={{ minHeight: '100%' }}>
-            <Typography align="center" variant="h6" sx={{ fontWeight: 700, color: (theme) => theme.palette.primary.main }}>
-              Server Announcements:
-            </Typography>
+          <Typography
+            align="center"
+            variant="h6"
+            sx={{ userSelect: 'none', fontWeight: 700, color: (theme) => theme.palette.primary.main }}
+          >
+            Server Announcements:
+          </Typography>
+          <Column alignItems="center" sx={{ height: 'calc(100% - 32px)', overflowX: 'auto' }}>
             {announcements ? (
               announcements?.length > 0 ? (
                 announcements?.map((a, i) => {
@@ -110,11 +97,11 @@ export const WelcomePage = (): JSX.Element => {
                     <Row key={i} sx={{ gap: 1, marginTop: 1, width: '100%' }}>
                       <Typography
                         variant="caption"
-                        sx={{ color: (theme) => theme.palette.secondary.main, marginTop: '3px' }}
+                        sx={{ color: (theme) => theme.palette.secondary.main, marginTop: '3px', userSelect: 'none' }}
                       >
                         {new Date(a.createdAt).toDateString()}
                       </Typography>
-                      <Typography sx={{ flex: 1 }}>{a.message}</Typography>
+                      <Typography sx={{ flex: 1, userSelect: 'none' }}>{a.message}</Typography>
                     </Row>
                   );
                 })
@@ -134,12 +121,19 @@ export const WelcomePage = (): JSX.Element => {
             )}
           </Column>
         </Paper>
-        <Paper sx={{ padding: (theme) => theme.spacing(2), width: '320px' }}>
+        <Paper elevation={2} sx={{ padding: (theme) => theme.spacing(2), width: '320px', height: '188px' }}>
           <Column sx={{ '& Button': { margin: (theme) => theme.spacing(1) } }}>
-            <Button onClick={() => navigate('/login')}>
+            <Button
+              onClick={(): void => {
+                // navigate('/login')
+                login().then(() => {
+                  console.log('login in hard');
+                });
+              }}
+            >
               <Typography>Login</Typography>
             </Button>
-            <Button onClick={() => navigate('/register')}>
+            <Button onClick={(): void => navigate('/register')}>
               <Typography>Register</Typography>
             </Button>
             <Button>
@@ -150,4 +144,4 @@ export const WelcomePage = (): JSX.Element => {
       </Row>
     </Column>
   );
-};;;;
+};

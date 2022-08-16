@@ -30,4 +30,5 @@ export const colors = {
   black: '#414141',
   white: '#FFFFFF',
   whiteDark: '#F1F1F1',
+  // overlay: '#9696c8',
 };

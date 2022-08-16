@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const useName = (minLength: number, maxLength: number) => {
   const [name, setStateName] = useState('');
   const [isRequired, setIsRequired] = useState(false);
@@ -24,9 +25,9 @@ export const useName = (minLength: number, maxLength: number) => {
       setIsRequired(false);
       setNameErrorText('');
     }
-  }, [isLengthValid, isRegexValid, name]);
+  }, [isLengthValid, isRegexValid, name, minLength, maxLength]);
 
-  const setName = (value: string) => {
+  const setName = (value: string): void => {
     value = (value ?? '').trim();
 
     setIsLengthValid(value.length >= minLength && value.length <= maxLength);

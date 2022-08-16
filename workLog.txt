@@ -1,0 +1,39 @@
+reload announcements rework
+email confirmation infra and setup
+add persistance to login preference
+
+/// push II
+
+commit checks
+cleanup
+axios checks, use JSON where needed
+captcha on request
+captcha image endpoint glueing
+accept cookies components and logic
+glueing captcha with register
+captcha component
+DRY register page
+dialog on drag positioning jumps
+rejected backdrop click and esc btn due to usage of document event listener which can be troublesome when multiple dialogs could be shown
+drag dialogs
+positioning for multiple dialogs
+overlay ordering and focused dialogs
+quick cleanup check
+overlay infra, overlay wrapper, modal, dialog, bar, animations
+toaster errors, cont.
+welcome page polishing
+register page scrolling issue
+register page polishing
+register page show BE validations and register errors, email confirmation errors
+register page, form with validations(name, email, pass)
+added pwd visibility icon adornment on register
+
+/// push I
+
+antiforgery
+axios
+context setup
+router dom & setups
+structure, setups
+eslint, prettier
+boiler plate

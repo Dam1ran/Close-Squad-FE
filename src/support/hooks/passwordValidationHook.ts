@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 
-export const usePassword = () => {
-  const minLength = 8;
-  const maxLength = 64;
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const usePassword = (minLength: number, maxLength: number) => {
   const [password, setStatePassword] = useState('');
   const [isRequired, setIsRequired] = useState(false);
   const [isLengthValid, setIsLengthValid] = useState(true);
@@ -24,9 +23,9 @@ export const usePassword = () => {
       setIsRequired(false);
       setPasswordErrorText('');
     }
-  }, [isLengthValid, isRegexValid, password]);
+  }, [isLengthValid, isRegexValid, password, minLength, maxLength]);
 
-  const setPassword = (value: string) => {
+  const setPassword = (value: string): void => {
     value = (value ?? '').trim();
 
     setIsLengthValid(value.length >= minLength && value.length <= maxLength);

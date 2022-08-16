@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
-import { serverClient } from '../../../api/serverClient';
+import { useServerClient } from '../../../api/useServerClient';
+import { fadeIn } from '../../../styles';
 import { Column, Paper } from '../../elements';
 
 export const ConfirmEmailPage = () => {
@@ -10,7 +11,7 @@ export const ConfirmEmailPage = () => {
   const [isConfirming, setIsConfirming] = useState(true);
   const [isError, setIsError] = useState(false);
 
-  const { confirmEmail } = serverClient();
+  const { confirmEmail } = useServerClient();
 
   useEffect(() => {
     let isMounted = true;
@@ -43,16 +44,7 @@ export const ConfirmEmailPage = () => {
       justifyContent="center"
       sx={{
         height: '100%',
-        opacity: 0,
-        animation: 'fadeIn 0.6s forwards',
-        '@keyframes fadeIn': {
-          '0%': {
-            opacity: 0,
-          },
-          '100%': {
-            opacity: 1,
-          },
-        },
+        ...fadeIn(),
       }}
     >
       <Paper

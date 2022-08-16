@@ -19,22 +19,6 @@ export interface CreateServerAnnouncementViewModel {
     message: string;
 }
 
-export interface WeatherForecast {
-    date: Date;
-    temperatureC: number;
-    temperatureF: number;
-    summary: string | undefined;
-}
-
-export interface Kkt {
-    name: string;
-    cartoafi: Cartof[];
-}
-
-export interface Cartof {
-    sort: string;
-}
-
 export interface UserRegisterDto {
     nickname: string;
     email: string;
@@ -46,4 +30,11 @@ export interface UserRegisterDto {
 export interface ConfirmEmailDto {
     guid: string;
     token: string;
+}
+
+export interface FileResponse {
+    data: Blob;
+    status: number;
+    fileName?: string;
+    headers?: { [name: string]: any };
 }

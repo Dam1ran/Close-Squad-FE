@@ -6,20 +6,23 @@ import { AppContextState, ApplicationsState } from './appContext.state';
 
 const appContextInitialState: AppContextState = {
   application: {
-    cookiesAccepted: false,
+    cookiesAccepted: JSON.parse(localStorage.getItem('cookiesAccepted') || 'false'),
   } as ApplicationsState,
 };
 
+/* eslint-disable @typescript-eslint/no-unused-vars */
 let dispatcher = {
-  setCookiesAccepted: (cookiesAccepted: boolean): void => {},
+  setCookiesAccepted: (cookiesAccepted: boolean): void => {
+    return;
+  },
 };
 
 export const AppContext = createContext({
-  appContextState: appContextInitialState,
+  ...appContextInitialState,
   ...dispatcher,
 });
 
-export const AppContextProvider = ({ children }: PropsWithChildren<BrowserRouterProps>) => {
+export const AppContextProvider = ({ children }: PropsWithChildren<BrowserRouterProps>): JSX.Element => {
   const [appContextState, dispatch] = useReducer(appContextReducer, appContextInitialState);
 
   dispatcher = useMemo(
@@ -34,7 +37,7 @@ export const AppContextProvider = ({ children }: PropsWithChildren<BrowserRouter
   );
 
   const appContext = {
-    appContextState,
+    ...appContextState,
     ...dispatcher,
   };
 

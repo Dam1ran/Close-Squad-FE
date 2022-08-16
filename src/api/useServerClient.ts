@@ -1,11 +1,15 @@
+/* eslint-disable @typescript-eslint/explicit-function-return-type */
 import axios from 'axios';
+import toast from 'react-hot-toast';
 import { ConfirmEmailDto, ServerAnnouncementDto, UserRegisterDto } from '../models/api.models';
-import { Constants } from '../support/utils/constants';
-import { getCookieToken } from '../support/utils/cookies';
+import { CaptchaService } from '../support/services';
+import { Constants, getCookieToken } from '../support/utils';
+import { serverClientUtils } from './serverClientUtils';
 
-export const serverClient = () => {
+axios.defaults.withCredentials = true;
+
+export const useServerClient = () => {
   const instance = axios.create({ baseURL: process.env.REACT_APP_BASE_URL });
-  instance.defaults.withCredentials = true;
   instance.defaults.headers.common[Constants.XsrfTokenHeaderName] = getCookieToken(Constants.CookieTokenHeaderName);
 
   const getAntiforgeryTokenCookie = () => instance.post('antiforgery');
@@ -16,6 +20,16 @@ export const serverClient = () => {
       return response;
     },
     async (error) => {
+      if (error?.code === 'ERR_NETWORK') {
+        toast.error('No server connection. Try again later.', { icon: '😕', duration: 10000 });
+      }
+      if (error?.response?.status === 500) {
+        toast.error('Server error. Try again later.', { icon: '🤖', duration: 10000 });
+      }
+      if (error?.response?.status === 429) {
+        serverClientUtils().tooManyRequestToast();
+      }
+
       const prevRequest = error?.config;
       if (
         error?.response?.status === 400 &&
@@ -27,9 +41,32 @@ export const serverClient = () => {
         prevRequest.headers[Constants.XsrfTokenHeaderName] = getCookieToken(Constants.CookieTokenHeaderName);
         return instance(prevRequest);
       }
+
+      if (error?.response?.status === 400 && error?.response?.data?.code === 'CaptchaCheck') {
+        serverClientUtils().initiateAutoCaptcha();
+      }
+
       return Promise.reject(error);
     },
   );
+
+  instance.interceptors.request.use((request) => {
+    const captcha = CaptchaService.getCode();
+    if (captcha !== undefined) {
+      request.params = { ...request.params, captcha };
+      CaptchaService.clearCode();
+    }
+
+    return request;
+  });
+
+  const getCaptcha = () => {
+    return instance.get<Blob>('captcha', { responseType: 'blob' });
+  };
+
+  const validateCaptcha = (captcha: string) => {
+    return instance.patch('captcha', null, { params: { captcha } });
+  };
 
   const register = (userRegisterDto: UserRegisterDto) => {
     return instance.post('auth/register', { ...userRegisterDto });
@@ -40,19 +77,20 @@ export const serverClient = () => {
   };
 
   const login = async () => {
+    // REWORK
     return instance
       .get<string>('auth/login')
       .then((response) => {
         return response.data;
       })
       .catch((e) => {
-        // console.warn('asdasd');
         console.warn(e);
         return '';
       });
   };
 
   const getAnnouncements = async () => {
+    // REWORK
     return instance
       .get<ServerAnnouncementDto[]>('announcement')
       .then((response) => {
@@ -65,6 +103,8 @@ export const serverClient = () => {
 
   return {
     getAnnouncements,
+    getCaptcha,
+    validateCaptcha,
     register,
     confirmEmail,
     login,

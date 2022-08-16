@@ -1,23 +1,28 @@
 import { useEffect, useRef, useState } from 'react';
-import { serverClient } from '../../../api/serverClient';
+import toast from 'react-hot-toast';
+import { useServerClient } from '../../../api/useServerClient';
+import { fadeIn } from '../../../styles';
 import { useEmails } from '../../../support/hooks/emailsValidationHook';
 import { useName } from '../../../support/hooks/nameValidationHook';
 import { usePasswords } from '../../../support/hooks/passwordsValidationHook';
+import { isAnyEmpty } from '../../../support/utils';
 import {
   Box,
   Button,
+  CaptchaCheck,
   CircularProgress,
   Column,
-  FormHelperText,
   IconButton,
   InputAdornment,
   MarkEmailReadIcon,
   Paper,
-  TextField,
   Typography,
   VisibilityIcon,
   VisibilityOffIcon,
 } from '../../elements';
+import { overlay } from '../../features/overlay/overlay';
+import { DialogType } from '../../features/overlay/store/overlayStore';
+import { RegisterInputField, ResponseErrors } from './registerInputField';
 
 export const RegisterPage = (): JSX.Element => {
   const nickNameRef = useRef<HTMLInputElement>(null);
@@ -32,7 +37,7 @@ export const RegisterPage = (): JSX.Element => {
     setRepeatEmail,
     isRepeatEmailValid,
     emailRepeatErrorText,
-  } = useEmails();
+  } = useEmails(3, 255); // officially can be 3 - 319
   const {
     password,
     setPassword,
@@ -42,21 +47,12 @@ export const RegisterPage = (): JSX.Element => {
     setRepeatPassword,
     isRepeatPasswordValid,
     passwordRepeatErrorText,
-    showPasswords,
-    setShowPasswords,
+    showPassword,
+    setShowPassword,
     reset: resetPasswords,
-  } = usePasswords();
+  } = usePasswords(8, 64);
   const [invalid, setInvalid] = useState(true);
 
-  interface ResponseErrors {
-    Register: string[];
-    Nickname: string[];
-    Email: string[];
-    RepeatEmail: string[];
-    Password: string[];
-    RepeatPassword: string[];
-    Confirmation: string[];
-  }
   const [responseErrors, setResponseErrors] = useState<ResponseErrors | null>({
     Register: [],
     Nickname: [],
@@ -67,12 +63,10 @@ export const RegisterPage = (): JSX.Element => {
     Confirmation: [],
   });
 
-  const [successText, setSuccessText] = useState('');
-  const anyEmpty = (a1: string, a2: string, a3: string, a4: string, a5: string): boolean =>
-    a1.trim() === '' || a1.trim() === '' || a2.trim() === '' || a3.trim() === '' || a4.trim() === '' || a5.trim() === '';
+  const [isSuccess, setIsSuccess] = useState(false);
 
   useEffect(() => {
-    setInvalid(anyEmpty(nickname, email, repeatEmail, password, repeatPassword));
+    setInvalid(isAnyEmpty(nickname, email, repeatEmail, password, repeatPassword));
     if (
       nickname.length > 0 &&
       email.length > 0 &&
@@ -95,28 +89,53 @@ export const RegisterPage = (): JSX.Element => {
     isRepeatPasswordValid,
   ]);
 
-  const { register } = serverClient();
-
-  const onSubmit = async (event: React.FormEvent<HTMLDivElement>): Promise<void> => {
-    event.preventDefault();
-    resetPasswords(); // setInvalid(true);
-    setLoading(true);
-    setSuccessText('');
-    setResponseErrors(null);
-    if (anyEmpty(nickname, email, repeatEmail, password, repeatPassword)) {
+  const submit = (): void => {
+    if (isAnyEmpty(nickname, email, repeatEmail, password, repeatPassword)) {
       return;
     }
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const { register } = useServerClient();
+    setLoading(true);
+    setResponseErrors(null);
+    setIsSuccess(false);
     register({ nickname, email, repeatEmail, password, repeatPassword })
-      .then((response) => {
-        setSuccessText(response.data);
+      .then(() => {
+        toast.success('Confirmation email sent to specified address.', {
+          icon: '📨',
+          duration: 10000,
+          style: { minWidth: 'fit-content' },
+        });
+        setIsSuccess(true);
       })
       .catch((data) => {
         setResponseErrors(data?.response?.data?.errors);
       })
       .finally(() => {
-        nickNameRef.current?.focus();
+        resetPasswords();
         setLoading(false);
+        nickNameRef.current?.focus();
       });
+  };
+
+  const onSubmit = async (event: React.FormEvent<HTMLDivElement>): Promise<void> => {
+    event.preventDefault();
+    setInvalid(true);
+    overlay.setComponent(
+      <CaptchaCheck
+        onSuccess={(): void => {
+          overlay.removeComponent('register-captcha-check');
+          submit();
+        }}
+      />,
+      {
+        id: 'register-captcha-check',
+        modal: true,
+        canBeClosed: false,
+        title: 'Eyesight check',
+        icon: <VisibilityIcon />,
+        dialogType: DialogType.Other,
+      },
+    );
   };
 
   return (
@@ -124,16 +143,7 @@ export const RegisterPage = (): JSX.Element => {
       alignItems="center"
       sx={{
         height: '100%',
-        opacity: 0,
-        animation: 'fadeIn 0.6s forwards',
-        '@keyframes fadeIn': {
-          '0%': {
-            opacity: 0,
-          },
-          '100%': {
-            opacity: 1,
-          },
-        },
+        ...fadeIn(),
       }}
     >
       <Box component="form" m="auto" pt={2} onSubmit={(e): Promise<void> => onSubmit(e)}>
@@ -162,189 +172,79 @@ export const RegisterPage = (): JSX.Element => {
             Register new user:
           </Typography>
           <Column sx={{ paddingTop: 2, '& .MuiOutlinedInput-root': { '& fieldset': { transition: 'border 0.3s' } } }}>
-            <TextField
-              inputRef={nickNameRef}
-              size="small"
-              required
-              label="Nickname"
-              sx={{
-                backgroundColor: (theme) => theme.palette.background.default,
-                margin: 1,
-              }}
-              autoFocus
+            <RegisterInputField
+              ref={nickNameRef}
               value={nickname}
+              label="Nickname"
+              autofocus
               onChange={(e): void => {
                 setName(e.target.value);
-                setSuccessText('');
+                setIsSuccess(false);
               }}
               error={!isNameValid}
-              FormHelperTextProps={{ component: 'div', style: { marginTop: '0px' } } as never}
-              helperText={
-                (nameErrorText.length > 0 || (responseErrors?.Nickname && responseErrors?.Nickname?.length > 0)) && (
-                  <Box component="ul" sx={{ paddingInlineStart: 2, marginTop: '0px', marginBlockEnd: '0px' }}>
-                    {nameErrorText.length > 0 && (
-                      <Box component="li" sx={{ color: (theme) => theme.palette.warning.dark }}>
-                        {nameErrorText}
-                      </Box>
-                    )}
-                    {responseErrors?.Nickname &&
-                      responseErrors.Nickname?.map((value, index) => (
-                        <Box component="li" sx={{ color: (theme) => theme.palette.error.light }} key={index}>
-                          {value}
-                        </Box>
-                      ))}
-                  </Box>
-                )
-              }
+              errorText={nameErrorText}
+              responseErrors={responseErrors?.Nickname}
             />
-            <TextField
-              size="small"
-              required
-              label="Email"
-              sx={{
-                backgroundColor: (theme) => theme.palette.background.default,
-                margin: 1,
-              }}
+            <RegisterInputField
               value={email}
+              label="Email"
               onChange={(e): void => {
                 setEmail(e.target.value);
-                setSuccessText('');
+                setIsSuccess(false);
               }}
               error={!isEmailValid}
-              FormHelperTextProps={{ component: 'div', style: { marginTop: '0px' } } as never}
-              helperText={
-                (emailErrorText.length > 0 || (responseErrors?.Email && responseErrors?.Email?.length > 0)) && (
-                  <Box component="ul" sx={{ paddingInlineStart: 2, marginTop: '0px', marginBlockEnd: '0px' }}>
-                    {emailErrorText.length > 0 && (
-                      <Box component="li" sx={{ color: (theme) => theme.palette.warning.dark }}>
-                        {emailErrorText}
-                      </Box>
-                    )}
-                    {responseErrors?.Email &&
-                      responseErrors.Email?.map((value, index) => (
-                        <Box component="li" sx={{ color: (theme) => theme.palette.error.light }} key={index}>
-                          {value}
-                        </Box>
-                      ))}
-                  </Box>
-                )
-              }
+              errorText={emailErrorText}
+              responseErrors={responseErrors?.Email}
             />
-            <TextField
-              size="small"
-              required
-              label="Repeat email"
-              sx={{
-                backgroundColor: (theme) => theme.palette.background.default,
-                margin: 1,
-              }}
+            <RegisterInputField
               value={repeatEmail}
+              label="Repeat email"
               onChange={(e): void => {
                 setRepeatEmail(e.target.value);
-                setSuccessText('');
+                setIsSuccess(false);
               }}
               error={!isRepeatEmailValid}
-              FormHelperTextProps={{ component: 'div', style: { marginTop: '0px' } } as never}
-              helperText={
-                (emailRepeatErrorText.length > 0 ||
-                  (responseErrors?.RepeatEmail && responseErrors?.RepeatEmail?.length > 0)) && (
-                  <Box component="ul" sx={{ paddingInlineStart: 2, marginTop: '0px', marginBlockEnd: '0px' }}>
-                    {emailRepeatErrorText.length > 0 && (
-                      <Box component="li" sx={{ color: (theme) => theme.palette.warning.dark }}>
-                        {emailRepeatErrorText}
-                      </Box>
-                    )}
-                    {responseErrors?.RepeatEmail &&
-                      responseErrors.RepeatEmail?.map((value, index) => (
-                        <Box component="li" sx={{ color: (theme) => theme.palette.error.light }} key={index}>
-                          {value}
-                        </Box>
-                      ))}
-                  </Box>
-                )
-              }
+              errorText={emailRepeatErrorText}
+              responseErrors={responseErrors?.RepeatEmail}
             />
-            <TextField
-              size="small"
-              label="Password"
-              required
-              type={showPasswords ? 'text' : 'password'}
-              sx={{
-                backgroundColor: (theme) => theme.palette.background.default,
-                margin: 1,
-              }}
+            <RegisterInputField
               value={password}
+              label="Password"
+              type={showPassword ? 'text' : 'password'}
               onChange={(e): void => {
                 setPassword(e.target.value);
-                setSuccessText('');
+                setIsSuccess(false);
               }}
               error={!isPasswordValid}
-              FormHelperTextProps={{ component: 'div', style: { marginTop: '0px' } } as never}
-              helperText={
-                (passwordErrorText.length > 0 || (responseErrors?.Password && responseErrors?.Password?.length > 0)) && (
-                  <Box component="ul" sx={{ paddingInlineStart: 2, marginTop: '0px', marginBlockEnd: '0px' }}>
-                    {passwordErrorText.length > 0 && (
-                      <Box component="li" sx={{ color: (theme) => theme.palette.warning.dark }}>
-                        {passwordErrorText}
-                      </Box>
-                    )}
-                    {responseErrors?.Password &&
-                      responseErrors.Password?.map((value, index) => (
-                        <Box component="li" sx={{ color: (theme) => theme.palette.error.light }} key={index}>
-                          {value}
-                        </Box>
-                      ))}
-                  </Box>
-                )
-              }
-              InputProps={{
+              errorText={passwordErrorText}
+              responseErrors={responseErrors?.Password}
+              inputProps={{
                 endAdornment: (
                   <InputAdornment position="end">
                     <IconButton
-                      onMouseUp={(): void => setShowPasswords(false)}
-                      onMouseDown={(): void => setShowPasswords(true)}
+                      onMouseDown={(): void => setShowPassword(true)}
+                      onTouchStart={(): void => setShowPassword(true)}
+                      onMouseUp={(): void => setShowPassword(false)}
+                      onTouchEnd={(): void => setShowPassword(false)}
                       edge="end"
                     >
-                      {showPasswords ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                      {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                     </IconButton>
                   </InputAdornment>
                 ),
               }}
             />
-            <TextField
-              size="small"
-              required
-              type="password"
-              label="Repeat password"
-              sx={{
-                backgroundColor: (theme) => theme.palette.background.default,
-                margin: 1,
-              }}
+            <RegisterInputField
               value={repeatPassword}
+              label="Repeat password"
+              type="password"
               onChange={(e): void => {
                 setRepeatPassword(e.target.value);
-                setSuccessText('');
+                setIsSuccess(false);
               }}
               error={!isRepeatPasswordValid}
-              FormHelperTextProps={{ component: 'div', style: { marginTop: '0px' } } as never}
-              helperText={
-                (passwordRepeatErrorText.length > 0 ||
-                  (responseErrors?.RepeatPassword && responseErrors?.RepeatPassword?.length > 0)) && (
-                  <Box component="ul" sx={{ paddingInlineStart: 2, marginTop: '0px', marginBlockEnd: '0px' }}>
-                    {passwordRepeatErrorText.length > 0 && (
-                      <Box component="li" sx={{ color: (theme) => theme.palette.warning.dark }}>
-                        {passwordRepeatErrorText}
-                      </Box>
-                    )}
-                    {responseErrors?.RepeatPassword &&
-                      responseErrors.RepeatPassword?.map((value, index) => (
-                        <Box component="li" sx={{ color: (theme) => theme.palette.error.light }} key={index}>
-                          {value}
-                        </Box>
-                      ))}
-                  </Box>
-                )
-              }
+              errorText={passwordRepeatErrorText}
+              responseErrors={responseErrors?.RepeatPassword}
             />
             {((responseErrors?.Register && responseErrors?.Register.length > 0) ||
               (responseErrors?.Confirmation && responseErrors?.Confirmation.length > 0)) && (
@@ -386,28 +286,15 @@ export const RegisterPage = (): JSX.Element => {
             <Button type="submit" sx={{ margin: 1 }} disabled={invalid}>
               {loading ? (
                 <CircularProgress size={24.5} />
-              ) : successText.length > 0 ? (
+              ) : isSuccess ? (
                 <MarkEmailReadIcon sx={{ height: '24.5px', width: '24.5px' }} />
               ) : (
                 'Register'
               )}
             </Button>
-            {successText.length > 0 && (
-              <FormHelperText
-                sx={{
-                  color: (theme) => theme.palette.secondary.main,
-                  margin: 1,
-                  textAlign: 'center',
-                  border: (theme) => `1px solid ${theme.palette.background.default}`,
-                  borderRadius: 1,
-                }}
-              >
-                {successText}
-              </FormHelperText>
-            )}
           </Column>
         </Paper>
       </Box>
     </Column>
   );
-};
+};;

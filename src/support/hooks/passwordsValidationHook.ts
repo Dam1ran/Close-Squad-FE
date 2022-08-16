@@ -1,28 +1,31 @@
 import { useEffect, useState } from 'react';
 import { usePassword } from './passwordValidationHook';
 
-export const usePasswords = () => {
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const usePasswords = (minLength: number, maxLength: number) => {
+  const passwordHalfMinLength = Math.trunc(minLength / 2);
+
   const {
     password: password,
     setPassword: setPassword,
     isPasswordValid: isPasswordValid,
     passwordErrorText: passwordErrorText,
     reset: passwordReset,
-  } = usePassword();
+  } = usePassword(minLength, maxLength);
   const {
     password: repeatPassword,
     setPassword: setRepeatPassword,
     isPasswordValid: isRepeatPasswordValid,
     passwordErrorText: repeatPasswordErrorText,
     reset: passwordRepeatReset,
-  } = usePassword();
+  } = usePassword(minLength, maxLength);
   const [isMatch, setIsMatch] = useState(true);
   const [matchErrorText, setMatchErrorText] = useState('');
-  const [showPasswords, setShowPasswords] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (repeatPasswordErrorText === '') {
-      if (repeatPassword.length >= 5) {
+      if (repeatPassword.length >= passwordHalfMinLength) {
         const match = password === repeatPassword;
         setIsMatch(match);
         if (match) {
@@ -36,7 +39,7 @@ export const usePasswords = () => {
     } else {
       setMatchErrorText(repeatPasswordErrorText);
     }
-  }, [password, repeatPassword, repeatPasswordErrorText]);
+  }, [password, repeatPassword, repeatPasswordErrorText, passwordHalfMinLength]);
 
   const reset = (): void => {
     setIsMatch(true);
@@ -54,8 +57,8 @@ export const usePasswords = () => {
     setRepeatPassword,
     isRepeatPasswordValid: isRepeatPasswordValid && isMatch,
     passwordRepeatErrorText: matchErrorText,
-    showPasswords,
-    setShowPasswords,
+    showPassword,
+    setShowPassword,
     reset,
   };
 };

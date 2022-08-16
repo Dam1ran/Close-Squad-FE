@@ -1,5 +1,5 @@
 export interface AppContextAction {
-  type: AppContextActionEnum.SET_COOKIES_ACCEPTED;
+  type: AppContextActionEnum;
   cookiesAccepted: boolean;
 }
 

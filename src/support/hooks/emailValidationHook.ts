@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 
-export const useEmail = () => {
-  const minLength = 5;
-  const maxLength = 255;
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const useEmail = (minLength: number, maxLength:number) => {
   const [email, setStateEmail] = useState('');
   const [isRequired, setIsRequired] = useState(false);
   const [isLengthValid, setIsLengthValid] = useState(true);
@@ -24,9 +23,9 @@ export const useEmail = () => {
       setIsRequired(false);
       setEmailErrorText('');
     }
-  }, [isLengthValid, isRegexValid, email]);
+  }, [isLengthValid, isRegexValid, email, minLength, maxLength]);
 
-  const setEmail = (value: string) => {
+  const setEmail = (value: string): void => {
     value = (value ?? '').trim();
 
     setIsLengthValid(value.length >= minLength && value.length <= maxLength);

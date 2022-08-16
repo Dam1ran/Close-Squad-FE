@@ -2,7 +2,7 @@
 module.exports = {
   extends: ['plugin:@typescript-eslint/recommended', 'eslint-config-prettier'],
   parser: '@typescript-eslint/parser',
-  plugins: ['@typescript-eslint', 'import'],
+  plugins: ['@typescript-eslint', 'import', 'react-hooks'],
   settings: {
     'import/parsers': {
       '@typescript-eslint/parser': ['.ts', '.tsx', '.d.ts'],
@@ -16,6 +16,8 @@ module.exports = {
     'import/external-module-folders': ['node_modules', 'node_modules/@types'],
   },
   rules: {
+    'react-hooks/rules-of-hooks': 'warn',
+    'react-hooks/exhaustive-deps': 'warn',
     // @typescript-eslint rules
     // -----------------------------
 

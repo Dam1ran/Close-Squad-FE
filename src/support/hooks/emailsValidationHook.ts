@@ -1,20 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useEmail } from './emailValidationHook';
 
-export const useEmails = () => {
-  const { email: email, setEmail: setEmail, isEmailValid: isEmailValid, emailErrorText: emailErrorText } = useEmail();
+// eslint-disable-next-line @typescript-eslint/explicit-function-return-type
+export const useEmails = (minLength: number, maxLength: number) => {
+  const { email: email, setEmail: setEmail, isEmailValid: isEmailValid, emailErrorText: emailErrorText } = useEmail(minLength, maxLength);
   const {
     email: repeatEmail,
     setEmail: setRepeatEmail,
     isEmailValid: isRepeatEmailValid,
     emailErrorText: emailRepeatErrorText,
-  } = useEmail();
+  } = useEmail(minLength, maxLength);
   const [isMatch, setIsMatch] = useState(true);
   const [matchErrorText, setMatchErrorText] = useState('');
 
   useEffect(() => {
     if (emailRepeatErrorText === '') {
-      if (repeatEmail.length >= 5) {
+      if (repeatEmail.length >= minLength) {
         const match = email === repeatEmail;
         setIsMatch(match);
         if (match) {
@@ -28,7 +29,7 @@ export const useEmails = () => {
     } else {
       setMatchErrorText(emailRepeatErrorText);
     }
-  }, [email, repeatEmail, emailRepeatErrorText]);
+  }, [email, repeatEmail, emailRepeatErrorText, minLength, maxLength]);
 
   return {
     email,
