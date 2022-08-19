@@ -1,6 +1,13 @@
 reload announcements rework
-email confirmation infra and setup
 add persistance to login preference
+
+/// push III
+
+commit checks
+resend email confirmation link
+auth service and routes preparation
+useTitle hook
+email confirmation infra and setup
 
 /// push II
 

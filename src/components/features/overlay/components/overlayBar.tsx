@@ -15,6 +15,7 @@ export interface OverlayBarProps {
   canBeClosed: boolean;
   canBePaused: boolean;
   onClick: () => void;
+  onClose?: () => void;
 }
 
 export const OverlayBar: React.FC<OverlayBarProps> = (props) => {
@@ -34,11 +35,17 @@ export const OverlayBar: React.FC<OverlayBarProps> = (props) => {
     };
   }, [paused, props.durationMilliseconds]);
 
+  const onClose = (): void => {
+    overlay.removeComponent(props.id);
+    props.onClose?.();
+  };
+
   useEffect(() => {
     percentage >= 100.0 &&
       setTimeout(() => {
-        overlay.removeComponent(props.id);
+        onClose();
       }, 400);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [percentage, props.id]);
 
   const ref = useRef<HTMLDivElement>(null);
@@ -133,7 +140,7 @@ export const OverlayBar: React.FC<OverlayBarProps> = (props) => {
                 transform: 'rotate(-90deg)',
               },
             }}
-            onClick={(): void => overlay.removeComponent(props.id)}
+            onClick={onClose}
           />
         )}
       </CircularProgressWithChildren>

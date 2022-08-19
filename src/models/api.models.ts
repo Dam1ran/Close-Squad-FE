@@ -32,6 +32,11 @@ export interface ConfirmEmailDto {
     token: string;
 }
 
+export interface ResendConfirmationDto {
+    email: string;
+    repeatEmail: string;
+}
+
 export interface FileResponse {
     data: Blob;
     status: number;

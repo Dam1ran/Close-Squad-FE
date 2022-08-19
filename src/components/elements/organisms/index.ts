@@ -1,2 +1,2 @@
 export * from './header'
-export * from './captchaCheck';
+export * from './overlay';

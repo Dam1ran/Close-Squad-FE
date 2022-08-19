@@ -37,6 +37,7 @@ export interface OverlayComponent {
   durationMilliseconds: number;
   close: boolean;
   posYOrder: number;
+  onClose?: () => void;
 }
 
 export interface OverlayState {

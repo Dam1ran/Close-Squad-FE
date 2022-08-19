@@ -1,47 +1,88 @@
 import { useEffect, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { useServerClient } from '../../../api/useServerClient';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { ServerClient } from '../../../api/serverClient';
 import { fadeIn } from '../../../styles';
-import { Column, Paper } from '../../elements';
+import { useTitle } from '../../../support/hooks/useTitle';
+import { isNotEmpty } from '../../../support/utils';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Column,
+  ForwardToInboxIcon,
+  LoginIcon,
+  Paper,
+  resendConfirmationEmailDialogOverlay,
+  Row,
+  Typography,
+} from '../../elements';
 
-export const ConfirmEmailPage = () => {
-  const [searchParams] = useSearchParams();
-  const [guid, setGuid] = useState(searchParams.get('guid'));
-  const [token, setToken] = useState(searchParams.get('token'));
+export const ConfirmEmailPage = (): JSX.Element => {
+  useTitle('Confirm email');
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const guid = searchParams.get('guid');
+  const token = searchParams.get('token');
+
   const [isConfirming, setIsConfirming] = useState(true);
-  const [isError, setIsError] = useState(false);
+  const [responseText, setResponseText] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [isExpired, setIsExpired] = useState(false);
 
-  const { confirmEmail } = useServerClient();
-
+  const { confirmEmail } = ServerClient();
+  const navigate = useNavigate();
   useEffect(() => {
-    let isMounted = true;
     const sendData = async (): Promise<void> => {
-      if (guid && guid?.length > 0 && token && token?.length > 0 && isMounted) {
-        // confirmEmail({ guid, token })
-        //   .then((data) => {
-        //     console.log(data);
-        //     setIsConfirming(false);
-        //   })
-        //   .catch((data) => {
-        //     console.log(data);
-        //     setIsError(true);
-        //   })
-        //   .finally(() => {
-        //     setGuid('');
-        //     setToken('');
-        //   });
+      if (isNotEmpty(guid) && isNotEmpty(token)) {
+        searchParams.delete('guid');
+        searchParams.delete('token');
+        setSearchParams(searchParams);
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        confirmEmail({ guid: guid!, token: token! })
+          .then((data) => {
+            console.log(data);
+            setResponseText('Email confirmed you can log in now.');
+            setIsSuccess(true);
+            setTimeout(() => {
+              navigate('/login', { replace: true });
+            }, 3000);
+          })
+          .catch((data) => {
+            if (data?.response?.data?.code === 'InvalidToken') {
+              setResponseText('Confirmation link expired.');
+              setIsExpired(true);
+            }
+            if (data?.response?.data?.code === 'WrongData') {
+              setResponseText('Provided data did not yeld any result.');
+              setTimeout(() => {
+                navigate('/home', { replace: true });
+              }, 1000);
+            }
+            if (data?.response?.data?.code === 'AlreadyConfirmed') {
+              setResponseText('Email already confirmed.');
+              setTimeout(() => {
+                navigate('/login', { replace: true });
+              }, 2000);
+            }
+          })
+          .finally(() => {
+            setIsConfirming(false);
+          });
+      } else {
+        setIsConfirming(false);
+        setResponseText('Wrong confirmation link.');
+        setTimeout(() => {
+          navigate('/home', { replace: true });
+        }, 2000);
       }
     };
     sendData();
-    return (): void => {
-      isMounted = false;
-    };
-  }, [guid, token]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <Column
       alignItems="center"
-      justifyContent="center"
       sx={{
         height: '100%',
         ...fadeIn(),
@@ -53,10 +94,52 @@ export const ConfirmEmailPage = () => {
           minWidth: '320px',
           maxWidth: '320px',
           padding: 1,
+          margin: 'auto',
         }}
       >
-        <div style={{ backgroundColor: 'aqua' }}>{guid}</div>
-        <div style={{ backgroundColor: 'green' }}>{token}</div>
+        {isConfirming && (
+          <Typography p={1} textAlign="center" variant="body1">
+            Checking, please wait.
+          </Typography>
+        )}
+        {isConfirming && (
+          <Box display="flex" alignContent="center" alignItems="center" justifyContent="center" m="auto" p={2}>
+            <CircularProgress color="secondary" size={50} thickness={5} sx={{ margin: 'auto', opacity: 0.2 }} />
+          </Box>
+        )}
+        <Typography p={1} textAlign="center" variant="body1">
+          {responseText}
+        </Typography>
+        {isSuccess && (
+          <Row justifyContent="center">
+            <Button
+              startIcon={<LoginIcon />}
+              sx={{ minWidth: '110px' }}
+              onClick={(): void => {
+                navigate('/login', { replace: true });
+              }}
+            >
+              Login
+            </Button>
+          </Row>
+        )}
+        {isExpired && (
+          <Row justifyContent="center">
+            <Button
+              startIcon={<ForwardToInboxIcon />}
+              sx={{ minWidth: '110px' }}
+              onClick={(): void =>
+                resendConfirmationEmailDialogOverlay(() => {
+                  setTimeout(() => {
+                    navigate('/home', { replace: true });
+                  }, 4000);
+                })
+              }
+            >
+              Resend
+            </Button>
+          </Row>
+        )}
       </Paper>
     </Column>
   );

@@ -1,22 +1,22 @@
 /* eslint-disable react-hooks/rules-of-hooks */
 import { useEffect, useState } from 'react';
-import { CheckCircleOutlineIcon, CircularProgress, DirectionsIcon } from '../../atoms';
-import { DialogActionBar, TextField } from '../../molecules';
-import { Box, Column } from '../../templates';
-import { isNotEmpty, isNullOrEmpty } from '../../../../support/utils';
+import { CheckCircleOutlineIcon, CircularProgress, DirectionsIcon } from '../../../atoms';
+import { DialogActionBar, TextField } from '../../../molecules';
+import { Box, Column } from '../../../templates';
+import { isNotEmpty, isNullOrEmpty } from '../../../../../support/utils';
 import { alpha } from '@mui/system';
-import { useServerClient } from '../../../../api/useServerClient';
-import { CaptchaService } from '../../../../support/services';
-import { fadeIn } from '../../../../styles';
+import { ServerClient } from '../../../../../api/serverClient';
+import { CaptchaService } from '../../../../../support/services';
+import { fadeIn } from '../../../../../styles';
 
-export const CaptchaCheck: React.FC<{ onSuccess?: () => void }> = (props) => {
+export const CaptchaCheck: React.FC<{ onSuccess: () => void }> = (props) => {
   const [loading, setLoading] = useState(true);
   const [errorText, setErrorText] = useState('');
   const [success, setSuccess] = useState(false);
   const [code, setCode] = useState('');
   const [image, setImage] = useState<string | undefined>();
 
-  const { getCaptcha } = useServerClient();
+  const { getCaptcha } = ServerClient();
 
   const requestCaptcha = (): void => {
     setLoading(true);
@@ -38,7 +38,7 @@ export const CaptchaCheck: React.FC<{ onSuccess?: () => void }> = (props) => {
   }, []);
 
   const onCheck = (): void => {
-    const { validateCaptcha } = useServerClient();
+    const { validateCaptcha } = ServerClient();
     setLoading(true);
     validateCaptcha(code)
       .then(() => {
@@ -47,7 +47,7 @@ export const CaptchaCheck: React.FC<{ onSuccess?: () => void }> = (props) => {
         setErrorText('');
         setCode('');
         CaptchaService.setCode(code);
-        props.onSuccess?.();
+        props.onSuccess();
       })
       .catch((d) => {
         if (d?.response?.data?.code === 'WrongCaptcha') {

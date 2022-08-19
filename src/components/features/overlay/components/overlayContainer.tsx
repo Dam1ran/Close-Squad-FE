@@ -5,11 +5,13 @@ import { OverlayWrapper } from './overlayWrapper';
 import { alpha } from '@mui/system';
 import { fadeIn, fadeOut } from '../../../../styles';
 import React from 'react';
+import _ from 'lodash';
 
 export interface OverlayContainerProps {
   overlayComponent: OverlayComponent;
   isActive: boolean;
   setActiveDialog: (id: string) => void;
+  onClose?: () => void;
 }
 
 const container: React.FC<OverlayContainerProps> = (props) => {
@@ -40,6 +42,7 @@ const container: React.FC<OverlayContainerProps> = (props) => {
         onClick={(): void => {
           props.setActiveDialog(props.overlayComponent.id);
         }}
+        onClose={props.onClose}
       />
       <Box
         sx={{
@@ -73,4 +76,6 @@ const container: React.FC<OverlayContainerProps> = (props) => {
   );
 };
 
-export const OverlayContainer = React.memo(container);
+export const OverlayContainer = React.memo(container, (prevProps, nextProps) =>
+  _.isEqual(_.omit(prevProps, _.functions(prevProps)), _.omit(nextProps, _.functions(nextProps))),
+);

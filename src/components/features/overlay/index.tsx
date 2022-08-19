@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ScrollDisable } from '../../elements';
 import { overlay } from './overlay';
@@ -9,10 +9,6 @@ export const Overlay: React.FC = () => {
   const location = useLocation();
   const components = useOverlayStore();
   const [activeDialogId, setActiveDialogId] = useState('');
-
-  const setActiveDialog = useCallback((id: string) => {
-    setActiveDialogId(id);
-  }, []);
 
   useEffect(() => {
     overlay.clearComponents();
@@ -27,7 +23,10 @@ export const Overlay: React.FC = () => {
           key={c.id}
           overlayComponent={c}
           isActive={(activeDialogId === c.id || components.length === 1) && !anyModal}
-          setActiveDialog={setActiveDialog}
+          // don't need to useCallback for setActiveDialogId now
+          // as memoized container has special comparison to exclude functions
+          setActiveDialog={(id): void => setActiveDialogId(id)}
+          onClose={c.onClose}
         />
       ))}
       {anyModal && <ScrollDisable />}

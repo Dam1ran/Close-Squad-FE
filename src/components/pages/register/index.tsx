@@ -1,15 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
-import { useServerClient } from '../../../api/useServerClient';
+import { ServerClient } from '../../../api/serverClient';
 import { fadeIn } from '../../../styles';
 import { useEmails } from '../../../support/hooks/emailsValidationHook';
 import { useName } from '../../../support/hooks/nameValidationHook';
 import { usePasswords } from '../../../support/hooks/passwordsValidationHook';
+import { useTitle } from '../../../support/hooks/useTitle';
 import { isAnyEmpty } from '../../../support/utils';
 import {
   Box,
   Button,
-  CaptchaCheck,
   CircularProgress,
   Column,
   IconButton,
@@ -17,14 +17,15 @@ import {
   MarkEmailReadIcon,
   Paper,
   Typography,
+  captchaCheckModalOverlay,
   VisibilityIcon,
   VisibilityOffIcon,
 } from '../../elements';
-import { overlay } from '../../features/overlay/overlay';
-import { DialogType } from '../../features/overlay/store/overlayStore';
 import { RegisterInputField, ResponseErrors } from './registerInputField';
 
 export const RegisterPage = (): JSX.Element => {
+  useTitle('Register new user');
+
   const nickNameRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const { name: nickname, setName, isNameValid, nameErrorText } = useName(4, 20);
@@ -93,8 +94,7 @@ export const RegisterPage = (): JSX.Element => {
     if (isAnyEmpty(nickname, email, repeatEmail, password, repeatPassword)) {
       return;
     }
-    // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { register } = useServerClient();
+    const { register } = ServerClient();
     setLoading(true);
     setResponseErrors(null);
     setIsSuccess(false);
@@ -117,25 +117,12 @@ export const RegisterPage = (): JSX.Element => {
       });
   };
 
-  const onSubmit = async (event: React.FormEvent<HTMLDivElement>): Promise<void> => {
+  const onSubmit = (event: React.FormEvent<HTMLDivElement>): void => {
     event.preventDefault();
     setInvalid(true);
-    overlay.setComponent(
-      <CaptchaCheck
-        onSuccess={(): void => {
-          overlay.removeComponent('register-captcha-check');
-          submit();
-        }}
-      />,
-      {
-        id: 'register-captcha-check',
-        modal: true,
-        canBeClosed: false,
-        title: 'Eyesight check',
-        icon: <VisibilityIcon />,
-        dialogType: DialogType.Other,
-      },
-    );
+    captchaCheckModalOverlay(() => {
+      submit();
+    }, 'register-captcha-check');
   };
 
   return (
@@ -146,7 +133,7 @@ export const RegisterPage = (): JSX.Element => {
         ...fadeIn(),
       }}
     >
-      <Box component="form" m="auto" pt={2} onSubmit={(e): Promise<void> => onSubmit(e)}>
+      <Box component="form" m="auto" pt={2} onSubmit={(e): void => onSubmit(e)}>
         <Paper
           elevation={4}
           sx={{
@@ -297,4 +284,4 @@ export const RegisterPage = (): JSX.Element => {
       </Box>
     </Column>
   );
-};;
+};

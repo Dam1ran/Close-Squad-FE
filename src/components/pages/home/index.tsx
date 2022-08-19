@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useServerClient } from '../../../api/useServerClient';
+import { ServerClient } from '../../../api/serverClient';
 import { ServerAnnouncementDto } from '../../../models/api.models';
 
 import { Box, Button, CircularProgress, Column, Paper, Row, Typography } from '../../elements';
 // import { LocationProps } from '../../../models/types';
 
-export const WelcomePage = (): JSX.Element => {
-  const { login, getAnnouncements } = useServerClient();
+export const HomePage = (): JSX.Element => {
+  const { login, getAnnouncements } = ServerClient();
   const [announcements, setAnnouncements] = useState<ServerAnnouncementDto[] | null>();
 
   useEffect(() => {

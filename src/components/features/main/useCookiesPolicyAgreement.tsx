@@ -6,6 +6,8 @@ import { DialogType } from '../overlay/store/overlayStore';
 
 export const useCookiePolicyAgreement = (): void => {
   const { application, setCookiesAccepted } = useContext(AppContext);
+  const id = 'cookies-accepts-modal';
+
   useEffect(() => {
     if (!application.cookiesAccepted) {
       setTimeout(() => {
@@ -29,14 +31,14 @@ export const useCookiePolicyAgreement = (): void => {
                   minWidth: '110px',
                   onClick: (): void => {
                     setCookiesAccepted(true);
-                    overlay.removeComponent('cookies-accepts-modal');
+                    overlay.removeComponent(id);
                   },
                 },
               ]}
             />
           </Box>,
           {
-            id: 'cookies-accepts-modal',
+            id,
             title: 'This site uses cookies',
             modal: true,
             dialogType: DialogType.Warning,

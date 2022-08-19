@@ -1,14 +1,15 @@
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { ConfirmEmailDto, ServerAnnouncementDto, UserRegisterDto } from '../models/api.models';
+import { captchaCheckModalOverlay } from '../components/elements';
+import { ConfirmEmailDto, ResendConfirmationDto, ServerAnnouncementDto, UserRegisterDto } from '../models/api.models';
 import { CaptchaService } from '../support/services';
 import { Constants, getCookieToken } from '../support/utils';
 import { serverClientUtils } from './serverClientUtils';
 
 axios.defaults.withCredentials = true;
 
-export const useServerClient = () => {
+export const ServerClient = () => {
   const instance = axios.create({ baseURL: process.env.REACT_APP_BASE_URL });
   instance.defaults.headers.common[Constants.XsrfTokenHeaderName] = getCookieToken(Constants.CookieTokenHeaderName);
 
@@ -43,7 +44,7 @@ export const useServerClient = () => {
       }
 
       if (error?.response?.status === 400 && error?.response?.data?.code === 'CaptchaCheck') {
-        serverClientUtils().initiateAutoCaptcha();
+        captchaCheckModalOverlay();
       }
 
       return Promise.reject(error);
@@ -76,6 +77,10 @@ export const useServerClient = () => {
     return instance.post('auth/confirm-email', { ...confirmEmailDto });
   };
 
+  const resendConfirmation = (resendConfirmationDto: ResendConfirmationDto) => {
+    return instance.post('auth/resend-confirmation', { ...resendConfirmationDto });
+  };
+
   const login = async () => {
     // REWORK
     return instance
@@ -102,11 +107,12 @@ export const useServerClient = () => {
   };
 
   return {
-    getAnnouncements,
     getCaptcha,
     validateCaptcha,
     register,
     confirmEmail,
+    resendConfirmation,
     login,
+    getAnnouncements,
   };
 };

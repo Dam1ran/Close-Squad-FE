@@ -18,3 +18,6 @@ export { default as DoneOutlineIcon } from '@mui/icons-material/DoneOutline';
 export { default as DirectionsIcon } from '@mui/icons-material/Directions';
 export { default as AutorenewIcon } from '@mui/icons-material/Autorenew';
 export { default as CookieIcon } from '@mui/icons-material/Cookie';
+export { default as LoginIcon } from '@mui/icons-material/Login';
+export { default as ForwardToInboxIcon } from '@mui/icons-material/ForwardToInbox';
+export { default as HomeIcon } from '@mui/icons-material/Home';

@@ -2,7 +2,7 @@ import ReactDOM from 'react-dom/client';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { csTheme } from './styles';
 import { Main } from './components/features/main/main';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { disableReactDevTools } from '@fvilers/disable-react-devtools';
 import { AppContextProvider } from './support/contexts/appContextProvider';
 import React from 'react';
@@ -22,7 +22,9 @@ root.render(
     <ThemeProvider theme={csTheme}>
       <AppContextProvider>
         <BrowserRouter>
-          <Main />
+          <Routes>
+            <Route path="/*" element={<Main />} />
+          </Routes>
           <Overlay />
           <Toaster
             position="bottom-center"

@@ -13,6 +13,7 @@ export interface OverlayOptions {
   icon?: JSX.Element | string;
   iconDescription?: string;
   durationMilliseconds?: number;
+  onClose?: () => void;
 }
 
 const overlay = {
@@ -31,6 +32,7 @@ const overlay = {
       durationMilliseconds: options.dialogType === DialogType.Loading ? -1 : options.durationMilliseconds || 0,
       close: false,
       posYOrder: 0,
+      onClose: options.onClose,
     } as OverlayComponent;
 
     overlayDispatch({
