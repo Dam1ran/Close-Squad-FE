@@ -2,10 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { ServerClient } from '../../../api/serverClient';
 import { fadeIn } from '../../../styles';
-import { useEmails } from '../../../support/hooks/emailsValidationHook';
-import { useName } from '../../../support/hooks/nameValidationHook';
-import { usePasswords } from '../../../support/hooks/passwordsValidationHook';
-import { useTitle } from '../../../support/hooks/useTitle';
+import { useAbortSignal, useEmails, useNickname, usePasswords, useTitle } from '../../../support/hooks';
 import { isAnyEmpty } from '../../../support/utils';
 import {
   Box,
@@ -25,10 +22,11 @@ import { RegisterInputField, ResponseErrors } from './registerInputField';
 
 export const RegisterPage = (): JSX.Element => {
   useTitle('Register new user');
+  const signal = useAbortSignal();
 
-  const nickNameRef = useRef<HTMLInputElement>(null);
+  const nicknameRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
-  const { name: nickname, setName, isNameValid, nameErrorText } = useName(4, 20);
+  const { nickname, setNickname, isNicknameValid, nicknameErrorText } = useNickname(4, 20);
   const {
     email,
     setEmail,
@@ -38,7 +36,7 @@ export const RegisterPage = (): JSX.Element => {
     setRepeatEmail,
     isRepeatEmailValid,
     emailRepeatErrorText,
-  } = useEmails(3, 255); // officially can be 3 - 319
+  } = useEmails(5, 255); // officially can be 3 - 319
   const {
     password,
     setPassword,
@@ -75,11 +73,11 @@ export const RegisterPage = (): JSX.Element => {
       password.length > 0 &&
       repeatPassword.length > 0
     ) {
-      setInvalid(!isNameValid || !isEmailValid || !isRepeatEmailValid || !isPasswordValid || !isRepeatPasswordValid);
+      setInvalid(!nickname || !isEmailValid || !isRepeatEmailValid || !isPasswordValid || !isRepeatPasswordValid);
     }
   }, [
     nickname,
-    isNameValid,
+    isNicknameValid,
     email,
     isEmailValid,
     repeatEmail,
@@ -98,7 +96,7 @@ export const RegisterPage = (): JSX.Element => {
     setLoading(true);
     setResponseErrors(null);
     setIsSuccess(false);
-    register({ nickname, email, repeatEmail, password, repeatPassword })
+    register({ nickname, email, repeatEmail, password, repeatPassword }, signal)
       .then(() => {
         toast.success('Confirmation email sent to specified address.', {
           icon: '📨',
@@ -113,7 +111,7 @@ export const RegisterPage = (): JSX.Element => {
       .finally(() => {
         resetPasswords();
         setLoading(false);
-        nickNameRef.current?.focus();
+        nicknameRef.current?.focus();
       });
   };
 
@@ -160,16 +158,16 @@ export const RegisterPage = (): JSX.Element => {
           </Typography>
           <Column sx={{ paddingTop: 2, '& .MuiOutlinedInput-root': { '& fieldset': { transition: 'border 0.3s' } } }}>
             <RegisterInputField
-              ref={nickNameRef}
+              ref={nicknameRef}
               value={nickname}
               label="Nickname"
               autofocus
               onChange={(e): void => {
-                setName(e.target.value);
+                setNickname(e.target.value);
                 setIsSuccess(false);
               }}
-              error={!isNameValid}
-              errorText={nameErrorText}
+              error={!isNicknameValid}
+              errorText={nicknameErrorText}
               responseErrors={responseErrors?.Nickname}
             />
             <RegisterInputField

@@ -8,6 +8,7 @@ import { alpha } from '@mui/system';
 import { ServerClient } from '../../../../../api/serverClient';
 import { CaptchaService } from '../../../../../support/services';
 import { fadeIn } from '../../../../../styles';
+import { useAbortSignal } from '../../../../../support/hooks';
 
 export const CaptchaCheck: React.FC<{ onSuccess: () => void }> = (props) => {
   const [loading, setLoading] = useState(true);
@@ -15,12 +16,13 @@ export const CaptchaCheck: React.FC<{ onSuccess: () => void }> = (props) => {
   const [success, setSuccess] = useState(false);
   const [code, setCode] = useState('');
   const [image, setImage] = useState<string | undefined>();
+  const signal = useAbortSignal();
 
   const { getCaptcha } = ServerClient();
 
   const requestCaptcha = (): void => {
     setLoading(true);
-    getCaptcha()
+    getCaptcha(signal)
       .then((d) => {
         const reader = new FileReader();
         reader.readAsDataURL(d.data);
@@ -40,7 +42,7 @@ export const CaptchaCheck: React.FC<{ onSuccess: () => void }> = (props) => {
   const onCheck = (): void => {
     const { validateCaptcha } = ServerClient();
     setLoading(true);
-    validateCaptcha(code)
+    validateCaptcha(code, signal)
       .then(() => {
         setSuccess(true);
         setLoading(false);

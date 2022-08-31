@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ServerClient } from '../../../api/serverClient';
 import { fadeIn } from '../../../styles';
-import { useTitle } from '../../../support/hooks/useTitle';
+import { useAbortSignal, useTitle } from '../../../support/hooks';
 import { isNotEmpty } from '../../../support/utils';
 import {
   Box,
@@ -19,10 +19,10 @@ import {
 
 export const ConfirmEmailPage = (): JSX.Element => {
   useTitle('Confirm email');
+  const signal = useAbortSignal();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const guid = searchParams.get('guid');
-  const token = searchParams.get('token');
 
   const [isConfirming, setIsConfirming] = useState(true);
   const [responseText, setResponseText] = useState('');
@@ -31,24 +31,24 @@ export const ConfirmEmailPage = (): JSX.Element => {
 
   const { confirmEmail } = ServerClient();
   const navigate = useNavigate();
+
   useEffect(() => {
     const sendData = async (): Promise<void> => {
-      if (isNotEmpty(guid) && isNotEmpty(token)) {
+      if (isNotEmpty(guid)) {
         searchParams.delete('guid');
-        searchParams.delete('token');
         setSearchParams(searchParams);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        confirmEmail({ guid: guid!, token: token! })
+        confirmEmail({ guid: guid! }, signal)
           .then((data) => {
             console.log(data);
             setResponseText('Email confirmed you can log in now.');
             setIsSuccess(true);
             setTimeout(() => {
               navigate('/login', { replace: true });
-            }, 3000);
+            }, 4000);
           })
           .catch((data) => {
-            if (data?.response?.data?.code === 'InvalidToken') {
+            if (data?.response?.data?.code === 'TokenExpired') {
               setResponseText('Confirmation link expired.');
               setIsExpired(true);
             }
@@ -56,13 +56,13 @@ export const ConfirmEmailPage = (): JSX.Element => {
               setResponseText('Provided data did not yeld any result.');
               setTimeout(() => {
                 navigate('/home', { replace: true });
-              }, 1000);
+              }, 2000);
             }
             if (data?.response?.data?.code === 'AlreadyConfirmed') {
               setResponseText('Email already confirmed.');
               setTimeout(() => {
                 navigate('/login', { replace: true });
-              }, 2000);
+              }, 3000);
             }
           })
           .finally(() => {

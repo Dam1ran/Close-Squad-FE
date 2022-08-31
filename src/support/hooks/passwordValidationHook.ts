@@ -29,7 +29,7 @@ export const usePassword = (minLength: number, maxLength: number) => {
     value = (value ?? '').trim();
 
     setIsLengthValid(value.length >= minLength && value.length <= maxLength);
-    setIsRegexValid(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,64}$/.test(value));
+    setIsRegexValid(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]+$/.test(value));
 
     setStatePassword(value);
   };

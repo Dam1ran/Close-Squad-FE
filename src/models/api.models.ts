@@ -29,12 +29,16 @@ export interface UserRegisterDto {
 
 export interface ConfirmEmailDto {
     guid: string;
-    token: string;
 }
 
 export interface ResendConfirmationDto {
     email: string;
     repeatEmail: string;
+}
+
+export interface UserLoginDto {
+    email: string;
+    password: string;
 }
 
 export interface FileResponse {

@@ -1,6 +1,12 @@
 reload announcements rework
 add persistance to login preference
 
+/// push IV
+
+nickname and regex
+adjustments confirm email page
+add signal cancellation to endpoints
+
 /// push III
 
 commit checks

@@ -13,7 +13,7 @@ export const ServerClient = () => {
   const instance = axios.create({ baseURL: process.env.REACT_APP_BASE_URL });
   instance.defaults.headers.common[Constants.XsrfTokenHeaderName] = getCookieToken(Constants.CookieTokenHeaderName);
 
-  const getAntiforgeryTokenCookie = () => instance.post('antiforgery');
+  const getAntiforgeryTokenCookie = (signal?: AbortSignal) => instance.post('antiforgery', null, { signal });
 
   instance.interceptors.response.use(
     (response) => {
@@ -61,30 +61,30 @@ export const ServerClient = () => {
     return request;
   });
 
-  const getCaptcha = () => {
-    return instance.get<Blob>('captcha', { responseType: 'blob' });
+  const getCaptcha = (signal: AbortSignal) => {
+    return instance.get<Blob>('captcha', { responseType: 'blob', signal });
   };
 
-  const validateCaptcha = (captcha: string) => {
-    return instance.patch('captcha', null, { params: { captcha } });
+  const validateCaptcha = (captcha: string, signal: AbortSignal) => {
+    return instance.patch('captcha', null, { params: { captcha }, signal });
   };
 
-  const register = (userRegisterDto: UserRegisterDto) => {
-    return instance.post('auth/register', { ...userRegisterDto });
+  const register = (userRegisterDto: UserRegisterDto, signal: AbortSignal) => {
+    return instance.post('auth/register', { ...userRegisterDto }, { signal });
   };
 
-  const confirmEmail = (confirmEmailDto: ConfirmEmailDto) => {
-    return instance.post('auth/confirm-email', { ...confirmEmailDto });
+  const confirmEmail = (confirmEmailDto: ConfirmEmailDto, signal: AbortSignal) => {
+    return instance.post('auth/confirm-email', { ...confirmEmailDto }, { signal });
   };
 
-  const resendConfirmation = (resendConfirmationDto: ResendConfirmationDto) => {
-    return instance.post('auth/resend-confirmation', { ...resendConfirmationDto });
+  const resendConfirmation = (resendConfirmationDto: ResendConfirmationDto, signal: AbortSignal) => {
+    return instance.post('auth/resend-confirmation', { ...resendConfirmationDto }, { signal });
   };
 
-  const login = async () => {
+  const login = async (signal: AbortSignal) => {
     // REWORK
     return instance
-      .get<string>('auth/login')
+      .get<string>('auth/login', { signal })
       .then((response) => {
         return response.data;
       })
@@ -94,10 +94,10 @@ export const ServerClient = () => {
       });
   };
 
-  const getAnnouncements = async () => {
+  const getAnnouncements = async (signal: AbortSignal) => {
     // REWORK
     return instance
-      .get<ServerAnnouncementDto[]>('announcement')
+      .get<ServerAnnouncementDto[]>('announcement', { signal })
       .then((response) => {
         return response.data;
       })

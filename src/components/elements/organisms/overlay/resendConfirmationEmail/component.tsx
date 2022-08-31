@@ -1,6 +1,5 @@
 import { alpha } from '@mui/system';
 import { useEffect, useState } from 'react';
-import { useEmails } from '../../../../../support/hooks/emailsValidationHook';
 import { RegisterInputField, ResponseErrors } from '../../../../pages/register/registerInputField';
 import { MarkEmailReadIcon } from '../../../atoms';
 import { DialogActionBar, Typography } from '../../../molecules';
@@ -9,8 +8,12 @@ import { isAnyEmpty } from '../../../../../support/utils';
 import { captchaCheckModalOverlay } from '../captchaCheck';
 import { ServerClient } from '../../../../../api/serverClient';
 import toast from 'react-hot-toast';
+import { useAbortSignal, useEmails, useTitle } from '../../../../../support/hooks';
 
 export const ResendConfirmationEmail: React.FC<{ onSuccess: () => void }> = (props) => {
+  useTitle('Register');
+  const signal = useAbortSignal();
+
   const {
     email,
     setEmail,
@@ -47,7 +50,7 @@ export const ResendConfirmationEmail: React.FC<{ onSuccess: () => void }> = (pro
     setResponseErrors(null);
     setIsSuccess(false);
 
-    resendConfirmation({ email, repeatEmail })
+    resendConfirmation({ email, repeatEmail }, signal)
       .then(() => {
         toast.success('Confirmation email sent to specified address.', {
           icon: '📨',
