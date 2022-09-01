@@ -10,7 +10,7 @@ import { Box, Button, CircularProgress, Column, Paper, Row, Typography } from '.
 export const HomePage = (): JSX.Element => {
   useTitle('Home');
   const signal = useAbortSignal();
-  const { login, getAnnouncements } = ServerClient();
+  const { getAnnouncements } = ServerClient();
   const [announcements, setAnnouncements] = useState<ServerAnnouncementDto[] | null>();
 
   useEffect(() => {
@@ -126,14 +126,7 @@ export const HomePage = (): JSX.Element => {
         </Paper>
         <Paper elevation={2} sx={{ padding: (theme) => theme.spacing(2), width: '320px', height: '188px' }}>
           <Column sx={{ '& Button': { margin: (theme) => theme.spacing(1) } }}>
-            <Button
-              onClick={(): void => {
-                // navigate('/login')
-                login(signal).then(() => {
-                  console.log('login in hard');
-                });
-              }}
-            >
+            <Button onClick={(): void => navigate('/login')}>
               <Typography>Login</Typography>
             </Button>
             <Button onClick={(): void => navigate('/register')}>

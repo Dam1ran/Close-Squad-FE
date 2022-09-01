@@ -39,8 +39,7 @@ export const ConfirmEmailPage = (): JSX.Element => {
         setSearchParams(searchParams);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         confirmEmail({ guid: guid! }, signal)
-          .then((data) => {
-            console.log(data);
+          .then(() => {
             setResponseText('Email confirmed you can log in now.');
             setIsSuccess(true);
             setTimeout(() => {

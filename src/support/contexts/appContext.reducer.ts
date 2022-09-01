@@ -2,7 +2,8 @@ import { AppContextAction, AppContextActionEnum } from './appContext.actions';
 import { AppContextState } from './appContext.state';
 
 export const appContextReducer = (prevState: AppContextState, action: AppContextAction): AppContextState => {
-  switch (action.type) {
+  const actionType = action.type;
+  switch (actionType) {
     case AppContextActionEnum.SET_COOKIES_ACCEPTED: {
       localStorage.setItem('cookiesAccepted', JSON.stringify(action.cookiesAccepted));
       return {
@@ -13,7 +14,17 @@ export const appContextReducer = (prevState: AppContextState, action: AppContext
         },
       } as AppContextState;
     }
+    case AppContextActionEnum.SET_TRUST_THIS_DEVICE: {
+      localStorage.setItem('trustThisDevice', JSON.stringify(action.trustThisDevice));
+      return {
+        ...prevState,
+        application: {
+          ...prevState.application,
+          trustThisDevice: action.trustThisDevice,
+        },
+      } as AppContextState;
+    }
     default:
-      throw new Error(`App context state action: ${action.type} not handled in switch.`);
+      throw new Error(`App context state action: ${AppContextActionEnum[actionType]} not handled in switch.`);
   }
 };

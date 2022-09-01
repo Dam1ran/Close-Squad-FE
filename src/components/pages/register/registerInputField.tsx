@@ -3,7 +3,7 @@ import React from 'react';
 import { isNotEmpty } from '../../../support/utils';
 import { Box, TextField } from '../../elements';
 
-export interface ResponseErrors {
+export interface AuthResponseErrors {
   Register: string[];
   Nickname: string[];
   Email: string[];
@@ -11,6 +11,7 @@ export interface ResponseErrors {
   Password: string[];
   RepeatPassword: string[];
   Confirmation: string[];
+  Login: string[];
 }
 
 export interface RegisterInputFieldProps {

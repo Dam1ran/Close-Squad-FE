@@ -7,6 +7,7 @@ export const usePassword = (minLength: number, maxLength: number) => {
   const [isLengthValid, setIsLengthValid] = useState(true);
   const [isRegexValid, setIsRegexValid] = useState(true);
   const [passwordErrorText, setPasswordErrorText] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (!isLengthValid) {
@@ -42,5 +43,13 @@ export const usePassword = (minLength: number, maxLength: number) => {
     setPasswordErrorText('');
   };
 
-  return { password, setPassword, isPasswordValid: isLengthValid && !isRequired && isRegexValid, passwordErrorText, reset };
+  return {
+    password,
+    setPassword,
+    isPasswordValid: isLengthValid && !isRequired && isRegexValid,
+    passwordErrorText,
+    reset,
+    showPassword,
+    setShowPassword,
+  };
 };

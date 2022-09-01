@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AuthRole } from '../../../support/services';
 import { Layout, RequireRoles } from '../../elements/templates';
-import { ConfirmEmailPage, RegisterPage, HomePage } from '../../pages';
+import { ConfirmEmailPage, RegisterPage, HomePage, LoginPage } from '../../pages';
 import { useCookiePolicyAgreement } from './useCookiesPolicyAgreement';
 
 export const Main = (): JSX.Element => {
@@ -12,7 +12,7 @@ export const Main = (): JSX.Element => {
         <Route path="/" element={<Navigate to="/home" replace />} />
         <Route path="home" element={<HomePage />} />
         <Route path="register" element={<RegisterPage />} />
-        <Route path="login" element={<RegisterPage />} />
+        <Route path="login" element={<LoginPage />} />
         <Route path="confirm-email" element={<ConfirmEmailPage />} />
 
         <Route element={<RequireRoles roles={[AuthRole.ADM]} />}>

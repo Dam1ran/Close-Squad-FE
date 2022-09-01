@@ -3,7 +3,7 @@ import toast from 'react-hot-toast';
 import { ServerClient } from '../../../api/serverClient';
 import { fadeIn } from '../../../styles';
 import { useAbortSignal, useEmails, useNickname, usePasswords, useTitle } from '../../../support/hooks';
-import { isAnyEmpty } from '../../../support/utils';
+import { Constants, isAnyEmpty } from '../../../support/utils';
 import {
   Box,
   Button,
@@ -18,7 +18,7 @@ import {
   VisibilityIcon,
   VisibilityOffIcon,
 } from '../../elements';
-import { RegisterInputField, ResponseErrors } from './registerInputField';
+import { RegisterInputField, AuthResponseErrors } from './registerInputField';
 
 export const RegisterPage = (): JSX.Element => {
   useTitle('Register new user');
@@ -36,7 +36,7 @@ export const RegisterPage = (): JSX.Element => {
     setRepeatEmail,
     isRepeatEmailValid,
     emailRepeatErrorText,
-  } = useEmails(5, 255); // officially can be 3 - 319
+  } = useEmails(Constants.EmailMinLength, Constants.EmailMaxLength);
   const {
     password,
     setPassword,
@@ -49,10 +49,10 @@ export const RegisterPage = (): JSX.Element => {
     showPassword,
     setShowPassword,
     reset: resetPasswords,
-  } = usePasswords(8, 64);
+  } = usePasswords(Constants.PasswordMinLength, Constants.PasswordMaxLength);
   const [invalid, setInvalid] = useState(true);
 
-  const [responseErrors, setResponseErrors] = useState<ResponseErrors | null>({
+  const [responseErrors, setResponseErrors] = useState<Partial<AuthResponseErrors> | null>({
     Register: [],
     Nickname: [],
     Email: [],

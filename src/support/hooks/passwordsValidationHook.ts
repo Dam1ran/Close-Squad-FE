@@ -11,6 +11,8 @@ export const usePasswords = (minLength: number, maxLength: number) => {
     isPasswordValid: isPasswordValid,
     passwordErrorText: passwordErrorText,
     reset: passwordReset,
+    showPassword,
+    setShowPassword,
   } = usePassword(minLength, maxLength);
   const {
     password: repeatPassword,
@@ -21,7 +23,6 @@ export const usePasswords = (minLength: number, maxLength: number) => {
   } = usePassword(minLength, maxLength);
   const [isMatch, setIsMatch] = useState(true);
   const [matchErrorText, setMatchErrorText] = useState('');
-  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     if (repeatPasswordErrorText === '') {

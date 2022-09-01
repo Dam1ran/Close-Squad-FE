@@ -21,3 +21,7 @@ export { default as CookieIcon } from '@mui/icons-material/Cookie';
 export { default as LoginIcon } from '@mui/icons-material/Login';
 export { default as ForwardToInboxIcon } from '@mui/icons-material/ForwardToInbox';
 export { default as HomeIcon } from '@mui/icons-material/Home';
+export { default as HubIcon } from '@mui/icons-material/Hub';
+export { default as SyncLockIcon } from '@mui/icons-material/SyncLock';
+export { default as EnhancedEncryptionIcon } from '@mui/icons-material/EnhancedEncryption';
+export { default as LockOpenIcon } from '@mui/icons-material/LockOpen';

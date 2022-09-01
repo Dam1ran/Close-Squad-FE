@@ -4,4 +4,5 @@ export interface AppContextState {
 
 export interface ApplicationsState {
   cookiesAccepted: boolean;
+  trustThisDevice: boolean;
 }

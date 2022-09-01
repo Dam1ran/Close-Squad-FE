@@ -10,8 +10,8 @@ import { ServerClient } from '../../../../../api/serverClient';
 import toast from 'react-hot-toast';
 import { useAbortSignal, useEmails, useTitle } from '../../../../../support/hooks';
 
-export const ResendConfirmationEmail: React.FC<{ onSuccess: () => void }> = (props) => {
-  useTitle('Resend');
+export const SendChangePasswordEmail: React.FC<{ onSuccess: () => void }> = (props) => {
+  useTitle('Change password');
   const signal = useAbortSignal();
 
   const {
@@ -45,14 +45,14 @@ export const ResendConfirmationEmail: React.FC<{ onSuccess: () => void }> = (pro
     if (isAnyEmpty(email, repeatEmail)) {
       return;
     }
-    const { resendConfirmation } = ServerClient();
+    const { sendChangePasswordEmail } = ServerClient();
     setLoading(true);
     setResponseErrors(null);
     setIsSuccess(false);
 
-    resendConfirmation({ email, repeatEmail }, signal)
+    sendChangePasswordEmail({ email, repeatEmail }, signal)
       .then(() => {
-        toast.success('Confirmation email sent to specified address.', {
+        toast.success('Change password email sent to specified address.', {
           icon: '📨',
           duration: 10000,
           style: { minWidth: 'fit-content' },
@@ -74,7 +74,7 @@ export const ResendConfirmationEmail: React.FC<{ onSuccess: () => void }> = (pro
     submit();
     captchaCheckModalOverlay(() => {
       submit();
-    }, 'resend-confirmation-email-captcha-check');
+    }, 'send-change-password-email-captcha-check');
   };
 
   return (
@@ -143,7 +143,7 @@ export const ResendConfirmationEmail: React.FC<{ onSuccess: () => void }> = (pro
       <DialogActionBar
         btnData={[
           {
-            capture: isSuccess ? 'Email sent' : 'Resend',
+            capture: isSuccess ? 'Email sent' : 'Send',
             onClick: onSubmit,
             icon: <MarkEmailReadIcon />,
             disabled: invalid || loading,

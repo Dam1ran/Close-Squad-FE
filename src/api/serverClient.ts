@@ -2,7 +2,13 @@
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import { captchaCheckModalOverlay } from '../components/elements';
-import { ConfirmEmailDto, ResendConfirmationDto, ServerAnnouncementDto, UserRegisterDto } from '../models/api.models';
+import {
+  ConfirmEmailDto,
+  ResendConfirmationDto,
+  ServerAnnouncementDto,
+  UserLoginDto,
+  UserRegisterDto,
+} from '../models/api.models';
 import { CaptchaService } from '../support/services';
 import { Constants, getCookieToken } from '../support/utils';
 import { serverClientUtils } from './serverClientUtils';
@@ -61,38 +67,25 @@ export const ServerClient = () => {
     return request;
   });
 
-  const getCaptcha = (signal: AbortSignal) => {
-    return instance.get<Blob>('captcha', { responseType: 'blob', signal });
-  };
+  const getCaptcha = (signal: AbortSignal) => instance.get<Blob>('captcha', { responseType: 'blob', signal });
 
-  const validateCaptcha = (captcha: string, signal: AbortSignal) => {
-    return instance.patch('captcha', null, { params: { captcha }, signal });
-  };
+  const validateCaptcha = (captcha: string, signal: AbortSignal) =>
+    instance.patch('captcha', null, { params: { captcha }, signal });
 
-  const register = (userRegisterDto: UserRegisterDto, signal: AbortSignal) => {
-    return instance.post('auth/register', { ...userRegisterDto }, { signal });
-  };
+  const register = (userRegisterDto: UserRegisterDto, signal: AbortSignal) =>
+    instance.post('auth/register', { ...userRegisterDto }, { signal });
 
-  const confirmEmail = (confirmEmailDto: ConfirmEmailDto, signal: AbortSignal) => {
-    return instance.post('auth/confirm-email', { ...confirmEmailDto }, { signal });
-  };
+  const confirmEmail = (confirmEmailDto: ConfirmEmailDto, signal: AbortSignal) =>
+    instance.post('auth/confirm-email', { ...confirmEmailDto }, { signal });
 
-  const resendConfirmation = (resendConfirmationDto: ResendConfirmationDto, signal: AbortSignal) => {
-    return instance.post('auth/resend-confirmation', { ...resendConfirmationDto }, { signal });
-  };
+  const resendConfirmation = (resendConfirmationDto: ResendConfirmationDto, signal: AbortSignal) =>
+    instance.post('auth/resend-confirmation', { ...resendConfirmationDto }, { signal });
 
-  const login = async (signal: AbortSignal) => {
-    // REWORK
-    return instance
-      .get<string>('auth/login', { signal })
-      .then((response) => {
-        return response.data;
-      })
-      .catch((e) => {
-        console.warn(e);
-        return '';
-      });
-  };
+  const login = async (userLoginDto: UserLoginDto, signal: AbortSignal) =>
+    instance.post('auth/login', { ...userLoginDto }, { signal });
+
+  const sendChangePasswordEmail = (resendConfirmationDto: ResendConfirmationDto, signal: AbortSignal) =>
+    instance.post('auth/send-change-password', { ...resendConfirmationDto }, { signal });
 
   const getAnnouncements = async (signal: AbortSignal) => {
     // REWORK
@@ -113,6 +106,7 @@ export const ServerClient = () => {
     confirmEmail,
     resendConfirmation,
     login,
+    sendChangePasswordEmail,
     getAnnouncements,
   };
 };
