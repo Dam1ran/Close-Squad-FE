@@ -41,6 +41,10 @@ export interface UserLoginDto {
     password: string;
 }
 
+export interface ChangePasswordDto {
+    email: string;
+}
+
 export interface FileResponse {
     data: Blob;
     status: number;

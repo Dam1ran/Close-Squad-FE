@@ -1,5 +1,19 @@
+sendChangePasswordPage
 reload announcements rework
+not found page
+unauthorized page
+
+/// push VI
+
+added methods to login page
+bug with submit
+
+/// push V
+
+changePassword overlay dialog component
+small refactor
 add persistance to login preference
+login page
 
 /// push IV
 

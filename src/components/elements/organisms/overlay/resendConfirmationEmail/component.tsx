@@ -8,10 +8,9 @@ import { Constants, isAnyEmpty } from '../../../../../support/utils';
 import { captchaCheckModalOverlay } from '../captchaCheck';
 import { ServerClient } from '../../../../../api/serverClient';
 import toast from 'react-hot-toast';
-import { useAbortSignal, useEmails, useTitle } from '../../../../../support/hooks';
+import { useAbortSignal, useEmails } from '../../../../../support/hooks';
 
 export const ResendConfirmationEmail: React.FC<{ onSuccess: () => void }> = (props) => {
-  useTitle('Resend');
   const signal = useAbortSignal();
 
   const {
@@ -71,7 +70,6 @@ export const ResendConfirmationEmail: React.FC<{ onSuccess: () => void }> = (pro
 
   const onSubmit = (): void => {
     setInvalid(true);
-    submit();
     captchaCheckModalOverlay(() => {
       submit();
     }, 'resend-confirmation-email-captcha-check');

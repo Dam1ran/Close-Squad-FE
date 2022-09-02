@@ -2,6 +2,7 @@ import { useAbortSignal, useEmail, usePassword, useTitle } from '../../../suppor
 import {
   Box,
   Button,
+  captchaCheckModalOverlay,
   CircularProgress,
   Column,
   EnhancedEncryptionIcon,
@@ -12,8 +13,6 @@ import {
   LockOpenIcon,
   LoginIcon,
   Paper,
-  resendConfirmationEmailDialogOverlay,
-  sendChangePasswordEmailDialogOverlay,
   SyncLockIcon,
   Typography,
   VisibilityIcon,
@@ -82,6 +81,9 @@ export const LoginPage = (): JSX.Element => {
     setResponseErrors(null);
     setIsSuccess(false);
 
+    setShowResendBtn(false);
+    setShowForgotPasswordBtn(false);
+
     login({ email, password }, signal)
       .then((data) => {
         const loginText = `Last login on: ${getFormattedDateTme(addSeconds(data?.data?.lastLoginInterval))}`;
@@ -131,6 +133,84 @@ export const LoginPage = (): JSX.Element => {
       });
   };
 
+  const onResendConfirmation = (): void => {
+    if (isAnyEmpty(email)) {
+      return;
+    }
+    setShowResendBtn(false);
+    captchaCheckModalOverlay(
+      () => {
+        const { resendConfirmation } = ServerClient();
+        resendConfirmation({ email, repeatEmail: email }, signal)
+          .then(() => {
+            toast.success('Confirmation email sent to specified address.', {
+              icon: '📨',
+              duration: 10000,
+              style: { minWidth: 'fit-content' },
+            });
+            setTimeout(() => {
+              navigate('/home', { replace: true });
+            }, 3000);
+            setPassword('');
+            setIsSuccess(true);
+          })
+          .catch((data) => {
+            if (data?.response?.data?.errors) {
+              setResponseErrors(data?.response?.data?.errors);
+            } else {
+              setResponseErrors({
+                Login: ['An error occurred while sending the email.'],
+              });
+            }
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      },
+      undefined,
+      true,
+    );
+  };
+
+  const onForgotPassword = (): void => {
+    if (isAnyEmpty(email)) {
+      return;
+    }
+    setShowForgotPasswordBtn(false);
+    captchaCheckModalOverlay(
+      () => {
+        const { sendChangePasswordEmail } = ServerClient();
+        sendChangePasswordEmail({ email }, signal)
+          .then(() => {
+            toast.success('Change password email sent to specified address.', {
+              icon: '📨',
+              duration: 10000,
+              style: { minWidth: 'fit-content' },
+            });
+            setTimeout(() => {
+              navigate('/home');
+            }, 3000);
+            setPassword('');
+            setIsSuccess(true);
+          })
+          .catch((data) => {
+            if (data?.response?.data?.errors) {
+              setResponseErrors(data?.response?.data?.errors);
+            } else {
+              setResponseErrors({
+                Login: ['An error occurred while sending the email.'],
+              });
+            }
+          })
+          .finally(() => {
+            setLoading(false);
+          });
+      },
+      'resend-confirmation-email-captcha-check',
+      true,
+    );
+  };
+
   return (
     <Column
       alignItems="center"
@@ -171,6 +251,8 @@ export const LoginPage = (): JSX.Element => {
               onChange={(e): void => {
                 setEmail(e.target.value);
                 setIsSuccess(false);
+                setShowResendBtn(false);
+                setShowForgotPasswordBtn(false);
               }}
               error={!isEmailValid}
               errorText={emailErrorText}
@@ -183,6 +265,8 @@ export const LoginPage = (): JSX.Element => {
               onChange={(e): void => {
                 setPassword(e.target.value);
                 setIsSuccess(false);
+                setShowResendBtn(false);
+                setShowForgotPasswordBtn(false);
               }}
               error={!isPasswordValid}
               errorText={passwordErrorText}
@@ -259,34 +343,12 @@ export const LoginPage = (): JSX.Element => {
               )}
             </Button>
             {showResendBtn && (
-              <Button
-                startIcon={<ForwardToInboxIcon />}
-                sx={{ minWidth: '110px' }}
-                onClick={(): void => {
-                  setShowResendBtn(false);
-                  resendConfirmationEmailDialogOverlay(() => {
-                    setTimeout(() => {
-                      navigate('/home', { replace: true });
-                    }, 4000);
-                  });
-                }}
-              >
+              <Button startIcon={<ForwardToInboxIcon />} sx={{ minWidth: '110px' }} onClick={onResendConfirmation}>
                 Resend confirmation email
               </Button>
             )}
             {showForgotPasswordBtn && (
-              <Button
-                startIcon={<SyncLockIcon />}
-                sx={{ minWidth: '110px' }}
-                onClick={(): void => {
-                  setShowForgotPasswordBtn(false);
-                  sendChangePasswordEmailDialogOverlay(() => {
-                    setTimeout(() => {
-                      navigate('/home', { replace: true });
-                    }, 4000);
-                  });
-                }}
-              >
+              <Button startIcon={<SyncLockIcon />} sx={{ minWidth: '110px' }} onClick={onForgotPassword}>
                 Forgot password
               </Button>
             )}

@@ -5,7 +5,7 @@ import { VisibilityIcon } from '../../../atoms';
 import { CaptchaCheck } from './component';
 import { v4 } from 'uuid';
 
-export const captchaCheckModalOverlay = (onSuccess?: () => void, id?: string): void => {
+export const captchaCheckModalOverlay = (onSuccess?: () => void, id?: string, canBeClosed = false): void => {
   if (isNullOrEmpty(id)) {
     id = v4();
   }
@@ -22,6 +22,7 @@ export const captchaCheckModalOverlay = (onSuccess?: () => void, id?: string): v
       id,
       title: 'Eyesight check',
       modal: true,
+      canBeClosed,
       icon: <VisibilityIcon />,
       dialogType: DialogType.Other,
     },

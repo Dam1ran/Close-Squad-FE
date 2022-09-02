@@ -3,6 +3,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { captchaCheckModalOverlay } from '../components/elements';
 import {
+  ChangePasswordDto,
   ConfirmEmailDto,
   ResendConfirmationDto,
   ServerAnnouncementDto,
@@ -84,8 +85,8 @@ export const ServerClient = () => {
   const login = async (userLoginDto: UserLoginDto, signal: AbortSignal) =>
     instance.post('auth/login', { ...userLoginDto }, { signal });
 
-  const sendChangePasswordEmail = (resendConfirmationDto: ResendConfirmationDto, signal: AbortSignal) =>
-    instance.post('auth/send-change-password', { ...resendConfirmationDto }, { signal });
+  const sendChangePasswordEmail = (changePasswordDto: ChangePasswordDto, signal: AbortSignal) =>
+    instance.post('auth/send-change-password', { ...changePasswordDto }, { signal });
 
   const getAnnouncements = async (signal: AbortSignal) => {
     // REWORK
