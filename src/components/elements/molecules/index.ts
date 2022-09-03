@@ -8,3 +8,4 @@ export * from './modalBackground';
 export * from './tooltip';
 export * from './circularProgressWithChildren';
 export * from './dialogActionBar';
+export * from './loadingButton';

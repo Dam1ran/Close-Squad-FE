@@ -2,14 +2,13 @@ import { useAbortSignal, useEmail, usePassword, useTitle } from '../../../suppor
 import {
   Box,
   Button,
-  captchaCheckModalOverlay,
-  CircularProgress,
   Column,
   EnhancedEncryptionIcon,
   ForwardToInboxIcon,
   HubIcon,
   IconButton,
   InputAdornment,
+  LoadingButton,
   LockOpenIcon,
   LoginIcon,
   Paper,
@@ -19,7 +18,7 @@ import {
   VisibilityOffIcon,
 } from '../../elements';
 import { fadeIn } from '../../../styles';
-import { RegisterInputField, AuthResponseErrors } from '../register/registerInputField';
+import { RegisterInputField } from '../register/registerInputField';
 import { useContext, useEffect, useState } from 'react';
 import { addSeconds, Constants, getFormattedDateTme, isAnyEmpty } from '../../../support/utils';
 import { ServerClient } from '../../../api/serverClient';
@@ -27,19 +26,17 @@ import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../../../support/contexts/appContextProvider';
 import { alpha } from '@mui/system';
+import { AuthResponseErrors } from '../../../models/auth/authResponseErrors';
 
 export const LoginPage = (): JSX.Element => {
   useTitle('Login');
   const signal = useAbortSignal();
   const navigate = useNavigate();
+
   const { application, setTrustThisDevice } = useContext(AppContext);
 
-  const {
-    email: email,
-    setEmail: setEmail,
-    isEmailValid: isEmailValid,
-    emailErrorText: emailErrorText,
-  } = useEmail(Constants.EmailMinLength, Constants.EmailMaxLength);
+  const { email, setEmail, isEmailValid, emailErrorText } = useEmail(Constants.EmailMinLength, Constants.EmailMaxLength);
+
   const {
     password,
     setPassword,
@@ -60,7 +57,7 @@ export const LoginPage = (): JSX.Element => {
   const [isSuccess, setIsSuccess] = useState(false);
 
   const [showResendBtn, setShowResendBtn] = useState(false);
-  const [showForgotPasswordBtn, setShowForgotPasswordBtn] = useState(false);
+  const [showChangePasswordBtn, setShowChangePasswordBtn] = useState(false);
 
   useEffect(() => {
     setInvalid(isAnyEmpty(email, password));
@@ -82,7 +79,7 @@ export const LoginPage = (): JSX.Element => {
     setIsSuccess(false);
 
     setShowResendBtn(false);
-    setShowForgotPasswordBtn(false);
+    setShowChangePasswordBtn(false);
 
     login({ email, password }, signal)
       .then((data) => {
@@ -102,7 +99,7 @@ export const LoginPage = (): JSX.Element => {
           setResponseErrors({
             Login: ['Wrong credentials provided.'],
           });
-          setShowForgotPasswordBtn(true);
+          setShowChangePasswordBtn(true);
         }
         if (data?.response?.data?.code === 'LockedOut') {
           setResponseErrors({
@@ -131,84 +128,6 @@ export const LoginPage = (): JSX.Element => {
         passwordReset();
         setLoading(false);
       });
-  };
-
-  const onResendConfirmation = (): void => {
-    if (isAnyEmpty(email)) {
-      return;
-    }
-    setShowResendBtn(false);
-    captchaCheckModalOverlay(
-      () => {
-        const { resendConfirmation } = ServerClient();
-        resendConfirmation({ email, repeatEmail: email }, signal)
-          .then(() => {
-            toast.success('Confirmation email sent to specified address.', {
-              icon: '📨',
-              duration: 10000,
-              style: { minWidth: 'fit-content' },
-            });
-            setTimeout(() => {
-              navigate('/home', { replace: true });
-            }, 3000);
-            setPassword('');
-            setIsSuccess(true);
-          })
-          .catch((data) => {
-            if (data?.response?.data?.errors) {
-              setResponseErrors(data?.response?.data?.errors);
-            } else {
-              setResponseErrors({
-                Login: ['An error occurred while sending the email.'],
-              });
-            }
-          })
-          .finally(() => {
-            setLoading(false);
-          });
-      },
-      undefined,
-      true,
-    );
-  };
-
-  const onForgotPassword = (): void => {
-    if (isAnyEmpty(email)) {
-      return;
-    }
-    setShowForgotPasswordBtn(false);
-    captchaCheckModalOverlay(
-      () => {
-        const { sendChangePasswordEmail } = ServerClient();
-        sendChangePasswordEmail({ email }, signal)
-          .then(() => {
-            toast.success('Change password email sent to specified address.', {
-              icon: '📨',
-              duration: 10000,
-              style: { minWidth: 'fit-content' },
-            });
-            setTimeout(() => {
-              navigate('/home');
-            }, 3000);
-            setPassword('');
-            setIsSuccess(true);
-          })
-          .catch((data) => {
-            if (data?.response?.data?.errors) {
-              setResponseErrors(data?.response?.data?.errors);
-            } else {
-              setResponseErrors({
-                Login: ['An error occurred while sending the email.'],
-              });
-            }
-          })
-          .finally(() => {
-            setLoading(false);
-          });
-      },
-      'resend-confirmation-email-captcha-check',
-      true,
-    );
   };
 
   return (
@@ -246,13 +165,14 @@ export const LoginPage = (): JSX.Element => {
           </Typography>
           <Column sx={{ paddingTop: 2, '& .MuiOutlinedInput-root': { '& fieldset': { transition: 'border 0.3s' } } }}>
             <RegisterInputField
+              autofocus
               value={email}
               label="Email"
               onChange={(e): void => {
                 setEmail(e.target.value);
                 setIsSuccess(false);
                 setShowResendBtn(false);
-                setShowForgotPasswordBtn(false);
+                setShowChangePasswordBtn(false);
               }}
               error={!isEmailValid}
               errorText={emailErrorText}
@@ -266,7 +186,7 @@ export const LoginPage = (): JSX.Element => {
                 setPassword(e.target.value);
                 setIsSuccess(false);
                 setShowResendBtn(false);
-                setShowForgotPasswordBtn(false);
+                setShowChangePasswordBtn(false);
               }}
               error={!isPasswordValid}
               errorText={passwordErrorText}
@@ -287,36 +207,13 @@ export const LoginPage = (): JSX.Element => {
                 ),
               }}
             />
-            {responseErrors?.Login && responseErrors?.Login.length > 0 && (
-              <Box
-                sx={{
-                  margin: 1,
-                  border: (theme) => `1px solid ${theme.palette.background.default}`,
-                  borderRadius: 1,
-                }}
-              >
-                {responseErrors?.Login?.map((value, index) => (
-                  <Typography
-                    align="center"
-                    key={index}
-                    sx={{
-                      color: (theme) => theme.palette.error.main,
-                      fontSize: (theme) => theme.typography.caption.fontSize,
-                      borderBottom: (theme) => `1px solid ${theme.palette.background.default}`,
-                    }}
-                  >
-                    {value}
-                  </Typography>
-                ))}
-              </Box>
-            )}
             <Button
               color={application.trustThisDevice ? 'secondary' : 'primary'}
               sx={{
-                height: 24,
-                opacity: 0.8,
-                marginLeft: 1,
-                marginRight: 1,
+                height: 28,
+                opacity: 0.6,
+                margin: 1,
+                borderRadius: '14px',
                 border: (theme) =>
                   application.trustThisDevice
                     ? `1px solid ${theme.palette.grey[400]}`
@@ -333,23 +230,52 @@ export const LoginPage = (): JSX.Element => {
             >
               <Box sx={{ minWidth: '207px' }}>{application.trustThisDevice ? 'Remember: ON' : 'Remember: OFF'}</Box>
             </Button>
-            <Button type="submit" sx={{ margin: 1 }} disabled={invalid}>
-              {loading ? (
-                <CircularProgress size={24.5} />
-              ) : isSuccess ? (
-                <LoginIcon sx={{ height: '24.5px', width: '24.5px' }} />
-              ) : (
-                'Login'
-              )}
-            </Button>
+            {responseErrors?.Login && responseErrors?.Login.length > 0 && (
+              <Box
+                sx={{
+                  margin: 1,
+                  borderRadius: 1,
+                }}
+              >
+                {responseErrors?.Login?.map((value, index) => (
+                  <Typography
+                    align="center"
+                    key={index}
+                    sx={{
+                      color: (theme) => theme.palette.error.light,
+                      fontSize: (theme) => theme.typography.caption.fontSize,
+                    }}
+                  >
+                    {value}
+                  </Typography>
+                ))}
+              </Box>
+            )}
+            <LoadingButton
+              type="submit"
+              sx={{ margin: 1 }}
+              startIcon={<LoginIcon />}
+              loading={loading}
+              disabled={invalid || isSuccess}
+            >
+              <Box sx={{ marginTop: '2px' }}>Login</Box>
+            </LoadingButton>
             {showResendBtn && (
-              <Button startIcon={<ForwardToInboxIcon />} sx={{ minWidth: '110px' }} onClick={onResendConfirmation}>
-                Resend confirmation email
+              <Button
+                startIcon={<ForwardToInboxIcon />}
+                sx={{ minWidth: '110px' }}
+                onClick={(): void => navigate('/resend-confirmation', { state: { email } })}
+              >
+                <u>Resend confirmation page</u>
               </Button>
             )}
-            {showForgotPasswordBtn && (
-              <Button startIcon={<SyncLockIcon />} sx={{ minWidth: '110px' }} onClick={onForgotPassword}>
-                Forgot password
+            {showChangePasswordBtn && (
+              <Button
+                startIcon={<SyncLockIcon />}
+                sx={{ minWidth: '110px' }}
+                onClick={(): void => navigate('/send-email-change-password', { state: { email } })}
+              >
+                <u>Change password page</u>
               </Button>
             )}
           </Column>

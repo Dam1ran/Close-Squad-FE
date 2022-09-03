@@ -1,7 +1,17 @@
-sendChangePasswordPage
 reload announcements rework
 not found page
 unauthorized page
+
+/// push VII
+
+adjustments on login page
+resend email password page
+change password page
+login page addons
+resend confirmation page
+email confirmation page
+cosmetics on forms
+emails reset
 
 /// push VI
 

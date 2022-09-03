@@ -41,8 +41,15 @@ export interface UserLoginDto {
     password: string;
 }
 
-export interface ChangePasswordDto {
+export interface ChangePasswordEmailDto {
     email: string;
+    repeatEmail: string;
+}
+
+export interface ChangePasswordDto {
+    guid: string;
+    password: string;
+    repeatPassword: string;
 }
 
 export interface FileResponse {

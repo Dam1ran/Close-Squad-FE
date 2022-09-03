@@ -12,7 +12,6 @@ import {
   ForwardToInboxIcon,
   LoginIcon,
   Paper,
-  resendConfirmationEmailDialogOverlay,
   Row,
   Typography,
 } from '../../elements';
@@ -127,15 +126,11 @@ export const ConfirmEmailPage = (): JSX.Element => {
             <Button
               startIcon={<ForwardToInboxIcon />}
               sx={{ minWidth: '110px' }}
-              onClick={(): void =>
-                resendConfirmationEmailDialogOverlay(() => {
-                  setTimeout(() => {
-                    navigate('/home', { replace: true });
-                  }, 4000);
-                })
-              }
+              onClick={(): void => {
+                navigate('/resend-confirmation', { replace: true });
+              }}
             >
-              Resend
+              <u>Resend confirmation page</u>
             </Button>
           </Row>
         )}

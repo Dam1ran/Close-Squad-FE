@@ -1,43 +1,36 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ServerClient } from '../../../api/serverClient';
 import { AuthResponseErrors } from '../../../models/auth/authResponseErrors';
 import { fadeIn } from '../../../styles';
-import { useAbortSignal, useEmails, useNickname, usePasswords, useTitle } from '../../../support/hooks';
-import { Constants, isAnyEmpty } from '../../../support/utils';
+import { useAbortSignal, usePasswords, useTitle } from '../../../support/hooks';
+import { Constants, isAnyEmpty, isNotEmpty } from '../../../support/utils';
 import {
   Box,
   Button,
+  captchaCheckModalOverlay,
   CircularProgress,
   Column,
+  ForwardToInboxIcon,
   IconButton,
   InputAdornment,
-  MarkEmailReadIcon,
   Paper,
+  SyncLockIcon,
   Typography,
-  captchaCheckModalOverlay,
   VisibilityIcon,
   VisibilityOffIcon,
 } from '../../elements';
-import { RegisterInputField } from './registerInputField';
+import { RegisterInputField } from '../register/registerInputField';
 
-export const RegisterPage = (): JSX.Element => {
-  useTitle('Register new user');
+export const ChangePasswordPage = (): JSX.Element => {
+  useTitle('Change password');
   const signal = useAbortSignal();
 
-  const nicknameRef = useRef<HTMLInputElement>(null);
-  const [loading, setLoading] = useState(false);
-  const { nickname, setNickname, isNicknameValid, nicknameErrorText } = useNickname(4, 20);
-  const {
-    email,
-    setEmail,
-    isEmailValid,
-    emailErrorText,
-    repeatEmail,
-    setRepeatEmail,
-    isRepeatEmailValid,
-    emailRepeatErrorText,
-  } = useEmails(Constants.EmailMinLength, Constants.EmailMaxLength);
+  const [searchParams, setSearchParams] = useSearchParams();
+  const paramGuid = searchParams.get('guid');
+  const [guid, setGuid] = useState('');
+
   const {
     password,
     setPassword,
@@ -51,68 +44,92 @@ export const RegisterPage = (): JSX.Element => {
     setShowPassword,
     reset: resetPasswords,
   } = usePasswords(Constants.PasswordMinLength, Constants.PasswordMaxLength);
+
   const [invalid, setInvalid] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [showResendBtn, setShowResendBtn] = useState(false);
 
   const [responseErrors, setResponseErrors] = useState<Partial<AuthResponseErrors> | null>({
-    Register: [],
-    Nickname: [],
-    Email: [],
-    RepeatEmail: [],
     Password: [],
     RepeatPassword: [],
-    Confirmation: [],
+    ChangePassword: [],
   });
 
-  const [isSuccess, setIsSuccess] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    setInvalid(isAnyEmpty(nickname, email, repeatEmail, password, repeatPassword));
-    if (
-      nickname.length > 0 &&
-      email.length > 0 &&
-      repeatEmail.length > 0 &&
-      password.length > 0 &&
-      repeatPassword.length > 0
-    ) {
-      setInvalid(!nickname || !isEmailValid || !isRepeatEmailValid || !isPasswordValid || !isRepeatPasswordValid);
+    if (isNotEmpty(paramGuid)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      setGuid(paramGuid!);
+      searchParams.delete('guid');
+      setSearchParams(searchParams);
+    } else {
+      navigate('/home', { replace: true });
     }
-  }, [
-    nickname,
-    isNicknameValid,
-    email,
-    isEmailValid,
-    repeatEmail,
-    isRepeatEmailValid,
-    password,
-    isPasswordValid,
-    repeatPassword,
-    isRepeatPasswordValid,
-  ]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    setInvalid(isAnyEmpty(guid, password, repeatPassword));
+    if (password.length > 0 && repeatPassword.length > 0) {
+      setInvalid(!isPasswordValid || !isRepeatPasswordValid);
+    }
+  }, [guid, password, isPasswordValid, repeatPassword, isRepeatPasswordValid]);
 
   const submit = (): void => {
-    if (isAnyEmpty(nickname, email, repeatEmail, password, repeatPassword)) {
+    if (isAnyEmpty(guid, password, repeatPassword)) {
       return;
     }
-    const { register } = ServerClient();
+    const { changePassword } = ServerClient();
+
     setLoading(true);
     setResponseErrors(null);
     setIsSuccess(false);
-    register({ nickname, email, repeatEmail, password, repeatPassword }, signal)
+
+    changePassword({ guid, password, repeatPassword }, signal)
       .then(() => {
-        toast.success('Confirmation email sent to specified address.', {
-          icon: '📨',
-          duration: 10000,
+        toast.success('Password successfully changed.', {
+          icon: <SyncLockIcon />,
+          duration: 5000,
           style: { minWidth: 'fit-content' },
         });
+        setGuid('');
         setIsSuccess(true);
+        setTimeout(() => {
+          navigate('/login', { replace: true });
+        }, 3000);
       })
       .catch((data) => {
         setResponseErrors(data?.response?.data?.errors);
+        if (data?.response?.data?.code === 'TokenExpired') {
+          setResponseErrors({
+            ChangePassword: ['Change password link expired. Please resend new confirmation link.'],
+          });
+          setShowResendBtn(true);
+          setGuid('');
+          setTimeout(() => {
+            navigate('/resend-confirmation', { replace: true });
+          }, 8000);
+        }
+        if (data?.response?.data?.code === 'WrongData') {
+          setResponseErrors({
+            ChangePassword: ['An error occurred while sending the email.'],
+          });
+          setGuid('');
+          setTimeout(() => {
+            navigate('/home', { replace: true });
+          }, 2000);
+        }
+        if (data?.response?.data?.code === 'SamePassword') {
+          setResponseErrors({
+            ChangePassword: ['Password must be different than previous one.'],
+          });
+        }
       })
       .finally(() => {
         resetPasswords();
         setLoading(false);
-        nicknameRef.current?.focus();
       });
   };
 
@@ -121,7 +138,7 @@ export const RegisterPage = (): JSX.Element => {
     setInvalid(true);
     captchaCheckModalOverlay(() => {
       submit();
-    }, 'register-captcha-check');
+    }, 'change-password-captcha-check');
   };
 
   return (
@@ -155,51 +172,18 @@ export const RegisterPage = (): JSX.Element => {
               userSelect: 'none',
             }}
           >
-            Register new user:
+            Change password:
           </Typography>
           <Column sx={{ paddingTop: 2, '& .MuiOutlinedInput-root': { '& fieldset': { transition: 'border 0.3s' } } }}>
             <RegisterInputField
-              ref={nicknameRef}
-              value={nickname}
-              label="Nickname"
-              autofocus
-              onChange={(e): void => {
-                setNickname(e.target.value);
-                setIsSuccess(false);
-              }}
-              error={!isNicknameValid}
-              errorText={nicknameErrorText}
-              responseErrors={responseErrors?.Nickname}
-            />
-            <RegisterInputField
-              value={email}
-              label="Email"
-              onChange={(e): void => {
-                setEmail(e.target.value);
-                setIsSuccess(false);
-              }}
-              error={!isEmailValid}
-              errorText={emailErrorText}
-              responseErrors={responseErrors?.Email}
-            />
-            <RegisterInputField
-              value={repeatEmail}
-              label="Repeat email"
-              onChange={(e): void => {
-                setRepeatEmail(e.target.value);
-                setIsSuccess(false);
-              }}
-              error={!isRepeatEmailValid}
-              errorText={emailRepeatErrorText}
-              responseErrors={responseErrors?.RepeatEmail}
-            />
-            <RegisterInputField
               value={password}
               label="Password"
+              autofocus
               type={showPassword ? 'text' : 'password'}
               onChange={(e): void => {
                 setPassword(e.target.value);
                 setIsSuccess(false);
+                setShowResendBtn(false);
               }}
               error={!isPasswordValid}
               errorText={passwordErrorText}
@@ -227,32 +211,20 @@ export const RegisterPage = (): JSX.Element => {
               onChange={(e): void => {
                 setRepeatPassword(e.target.value);
                 setIsSuccess(false);
+                setShowResendBtn(false);
               }}
               error={!isRepeatPasswordValid}
               errorText={passwordRepeatErrorText}
               responseErrors={responseErrors?.RepeatPassword}
             />
-            {((responseErrors?.Register && responseErrors?.Register.length > 0) ||
-              (responseErrors?.Confirmation && responseErrors?.Confirmation.length > 0)) && (
+            {responseErrors?.ChangePassword && responseErrors?.ChangePassword.length > 0 && (
               <Box
                 sx={{
                   margin: 1,
                   borderRadius: 1,
                 }}
               >
-                {responseErrors?.Register?.map((value, index) => (
-                  <Typography
-                    align="center"
-                    key={index}
-                    sx={{
-                      color: (theme) => theme.palette.secondary.main,
-                      fontSize: (theme) => theme.typography.caption.fontSize,
-                    }}
-                  >
-                    {value}
-                  </Typography>
-                ))}
-                {responseErrors?.Confirmation?.map((value, index) => (
+                {responseErrors?.ChangePassword?.map((value, index) => (
                   <Typography
                     align="center"
                     key={index}
@@ -270,11 +242,20 @@ export const RegisterPage = (): JSX.Element => {
               {loading ? (
                 <CircularProgress size={24.5} />
               ) : isSuccess ? (
-                <MarkEmailReadIcon sx={{ height: '24.5px', width: '24.5px' }} />
+                <SyncLockIcon sx={{ height: '24.5px', width: '24.5px' }} />
               ) : (
-                'Register'
+                'Change password'
               )}
             </Button>
+            {showResendBtn && (
+              <Button
+                startIcon={<ForwardToInboxIcon />}
+                sx={{ minWidth: '110px' }}
+                onClick={(): void => navigate('/resend-confirmation')}
+              >
+                <u>Resend confirmation page</u>
+              </Button>
+            )}
           </Column>
         </Paper>
       </Box>

@@ -34,10 +34,19 @@ export const useEmail = (minLength: number, maxLength:number) => {
     setStateEmail(value);
   };
 
+  const reset = (): void => {
+    setStateEmail('');
+    setIsRequired(false);
+    setIsLengthValid(true);
+    setIsRegexValid(true);
+    setEmailErrorText('');
+  };
+
   return {
     email,
     setEmail,
     isEmailValid: isLengthValid && isRegexValid && !isRequired,
     emailErrorText,
+    reset,
   };
 };

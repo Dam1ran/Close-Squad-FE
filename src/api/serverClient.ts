@@ -4,6 +4,7 @@ import toast from 'react-hot-toast';
 import { captchaCheckModalOverlay } from '../components/elements';
 import {
   ChangePasswordDto,
+  ChangePasswordEmailDto,
   ConfirmEmailDto,
   ResendConfirmationDto,
   ServerAnnouncementDto,
@@ -85,8 +86,11 @@ export const ServerClient = () => {
   const login = async (userLoginDto: UserLoginDto, signal: AbortSignal) =>
     instance.post('auth/login', { ...userLoginDto }, { signal });
 
-  const sendChangePasswordEmail = (changePasswordDto: ChangePasswordDto, signal: AbortSignal) =>
-    instance.post('auth/send-change-password', { ...changePasswordDto }, { signal });
+  const sendChangePasswordEmail = (changePasswordEmailDto: ChangePasswordEmailDto, signal: AbortSignal) =>
+    instance.post('auth/send-change-password', { ...changePasswordEmailDto }, { signal });
+
+  const changePassword = (changePasswordDto: ChangePasswordDto, signal: AbortSignal) =>
+    instance.post('auth/change-password', { ...changePasswordDto }, { signal });
 
   const getAnnouncements = async (signal: AbortSignal) => {
     // REWORK
@@ -108,6 +112,7 @@ export const ServerClient = () => {
     resendConfirmation,
     login,
     sendChangePasswordEmail,
+    changePassword,
     getAnnouncements,
   };
 };
