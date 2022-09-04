@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ServerClient } from '../../../api/serverClient';
-import { AuthResponseErrors } from '../../../models/auth/authResponseErrors';
+import { AuthResponseErrors } from '../../../models/auth';
 import { fadeIn } from '../../../styles';
 import { useAbortSignal, usePasswords, useTitle } from '../../../support/hooks';
 import { Constants, isAnyEmpty, isNotEmpty } from '../../../support/utils';

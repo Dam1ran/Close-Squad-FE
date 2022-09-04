@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { ServerClient } from '../../../api/serverClient';
-import { AuthResponseErrors } from '../../../models/auth/authResponseErrors';
+import { AuthResponseErrors } from '../../../models/auth';
 import { fadeIn } from '../../../styles';
 import { useAbortSignal, useEmails, useNickname, usePasswords, useTitle } from '../../../support/hooks';
 import { Constants, isAnyEmpty } from '../../../support/utils';

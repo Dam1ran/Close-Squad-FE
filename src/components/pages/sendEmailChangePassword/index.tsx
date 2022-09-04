@@ -7,7 +7,7 @@ import { Constants, isAnyEmpty } from '../../../support/utils';
 import { ServerClient } from '../../../api/serverClient';
 import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { AuthResponseErrors } from '../../../models/auth/authResponseErrors';
+import { AuthResponseErrors } from '../../../models/auth';
 import { LocationProps } from '../../../models/types';
 
 export const SendEmailChangePasswordPage = (): JSX.Element => {

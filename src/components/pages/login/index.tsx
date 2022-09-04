@@ -1,4 +1,4 @@
-import { useAbortSignal, useEmail, usePassword, useTitle } from '../../../support/hooks';
+import { useAbortSignal, useAuth, useEmail, usePassword, useTitle } from '../../../support/hooks';
 import {
   Box,
   Button,
@@ -23,17 +23,20 @@ import { useContext, useEffect, useState } from 'react';
 import { addSeconds, Constants, getFormattedDateTme, isAnyEmpty } from '../../../support/utils';
 import { ServerClient } from '../../../api/serverClient';
 import toast from 'react-hot-toast';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { AppContext } from '../../../support/contexts/appContextProvider';
 import { alpha } from '@mui/system';
-import { AuthResponseErrors } from '../../../models/auth/authResponseErrors';
+import { AuthResponseErrors } from '../../../models/auth';
+import { LocationProps } from '../../../models/types';
 
 export const LoginPage = (): JSX.Element => {
   useTitle('Login');
   const signal = useAbortSignal();
   const navigate = useNavigate();
+  const location = useLocation() as unknown as LocationProps;
+  const from = location.state?.from?.pathname || '/';
 
-  const { application, setTrustThisDevice } = useContext(AppContext);
+  const { application, setTrustThisDevice, setToken } = useContext(AppContext);
 
   const { email, setEmail, isEmailValid, emailErrorText } = useEmail(Constants.EmailMinLength, Constants.EmailMaxLength);
 
@@ -83,15 +86,23 @@ export const LoginPage = (): JSX.Element => {
 
     login({ email, password }, signal)
       .then((data) => {
+        setPassword('');
+        setIsSuccess(true);
         const loginText = `Last login on: ${getFormattedDateTme(addSeconds(data?.data?.lastLoginInterval))}`;
         toast.success(loginText, {
           icon: <HubIcon color="primary" />,
           duration: 10000,
           style: { minWidth: 'fit-content' },
         });
-        setPassword('');
-        setIsSuccess(true);
-        // TODO: decide further where & how to go
+        if (data.data.token) {
+          setToken(data.data.token);
+          navigate(from, { replace: true });
+        } else {
+          console.warn('Wrong token.');
+          setTimeout(() => {
+            navigate('/home');
+          }, 2000);
+        }
       })
       .catch((data) => {
         setResponseErrors(data?.response?.data?.errors);
@@ -129,6 +140,8 @@ export const LoginPage = (): JSX.Element => {
         setLoading(false);
       });
   };
+
+  const trustThisDevice = application.trustThisDevice;
 
   return (
     <Column
@@ -208,27 +221,25 @@ export const LoginPage = (): JSX.Element => {
               }}
             />
             <Button
-              color={application.trustThisDevice ? 'secondary' : 'primary'}
+              color={trustThisDevice ? 'secondary' : 'primary'}
               sx={{
                 height: 28,
-                opacity: 0.6,
+                opacity: 0.75,
                 margin: 1,
                 borderRadius: '14px',
                 border: (theme) =>
-                  application.trustThisDevice
-                    ? `1px solid ${theme.palette.grey[400]}`
-                    : `1px solid ${theme.palette.grey[300]}`,
-                boxShadow: (theme) => (application.trustThisDevice ? `inset 0px 0px 6px ${theme.palette.grey[400]}` : ''),
+                  trustThisDevice ? `1px solid ${theme.palette.grey[400]}` : `1px solid ${theme.palette.grey[300]}`,
+                boxShadow: (theme) => (trustThisDevice ? `inset 0px 0px 6px ${theme.palette.grey[400]}` : ''),
                 backgroundColor: (theme) =>
-                  application.trustThisDevice ? theme.palette.grey[100] : alpha(theme.palette.warning.light, 0.05),
+                  trustThisDevice ? theme.palette.grey[100] : alpha(theme.palette.warning.light, 0.05),
               }}
-              startIcon={application.trustThisDevice ? <EnhancedEncryptionIcon /> : <LockOpenIcon />}
-              endIcon={application.trustThisDevice ? <EnhancedEncryptionIcon /> : <LockOpenIcon />}
+              startIcon={trustThisDevice ? <EnhancedEncryptionIcon /> : <LockOpenIcon />}
+              endIcon={trustThisDevice ? <EnhancedEncryptionIcon /> : <LockOpenIcon />}
               onClick={(): void => {
-                setTrustThisDevice(!application.trustThisDevice);
+                setTrustThisDevice(!trustThisDevice);
               }}
             >
-              <Box sx={{ minWidth: '207px' }}>{application.trustThisDevice ? 'Remember: ON' : 'Remember: OFF'}</Box>
+              <Box sx={{ minWidth: '207px' }}>{trustThisDevice ? 'Remember: ON' : 'Remember: OFF'}</Box>
             </Button>
             {responseErrors?.Login && responseErrors?.Login.length > 0 && (
               <Box

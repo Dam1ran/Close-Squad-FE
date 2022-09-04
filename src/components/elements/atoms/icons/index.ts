@@ -25,3 +25,4 @@ export { default as HubIcon } from '@mui/icons-material/Hub';
 export { default as SyncLockIcon } from '@mui/icons-material/SyncLock';
 export { default as EnhancedEncryptionIcon } from '@mui/icons-material/EnhancedEncryption';
 export { default as LockOpenIcon } from '@mui/icons-material/LockOpen';
+export { default as KeyOffIcon } from '@mui/icons-material/KeyOff';

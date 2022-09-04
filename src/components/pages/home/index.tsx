@@ -3,9 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { ServerClient } from '../../../api/serverClient';
 import { ServerAnnouncementDto } from '../../../models/api.models';
 import { useAbortSignal, useTitle } from '../../../support/hooks';
-
 import { Box, Button, CircularProgress, Column, Paper, Row, Typography } from '../../elements';
-// import { LocationProps } from '../../../models/types';
 
 export const HomePage = (): JSX.Element => {
   useTitle('Home');
@@ -22,8 +20,6 @@ export const HomePage = (): JSX.Element => {
   }, []);
 
   const navigate = useNavigate();
-  // const location = useLocation() as unknown as LocationProps;
-  // const from = location.state?.from?.pathname || '/';
 
   return (
     <Column

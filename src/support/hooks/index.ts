@@ -5,3 +5,4 @@ export * from './passwordsValidationHook';
 export * from './passwordValidationHook';
 export * from './useAbortSignal';
 export * from './useTitle';
+export * from './useAuth';

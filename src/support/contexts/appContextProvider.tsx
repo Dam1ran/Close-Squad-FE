@@ -2,23 +2,26 @@ import { createContext, PropsWithChildren, useMemo, useReducer } from 'react';
 import { BrowserRouterProps } from 'react-router-dom';
 import { AppContextActionEnum } from './appContext.actions';
 import { appContextReducer } from './appContext.reducer';
-import { AppContextState, ApplicationsState } from './appContext.state';
+import { AppContextState, ApplicationState, AuthState } from './appContext.state';
 
 const appContextInitialState: AppContextState = {
   application: {
     cookiesAccepted: JSON.parse(localStorage.getItem('cookiesAccepted') || 'false'),
     trustThisDevice: JSON.parse(localStorage.getItem('trustThisDevice') || 'false'),
-  } as ApplicationsState,
+  } as ApplicationState,
+  auth: {
+    token: undefined,
+    nickname: undefined,
+    role: undefined,
+  } as AuthState,
 };
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function*/
 let dispatcher = {
-  setCookiesAccepted: (cookiesAccepted: boolean): void => {
-    return;
-  },
-  setTrustThisDevice: (trustThisDevice: boolean): void => {
-    return;
-  },
+  setCookiesAccepted: (cookiesAccepted: boolean): void => {},
+  setTrustThisDevice: (trustThisDevice: boolean): void => {},
+  setToken: (token: string): void => {},
+  clearAuth: (): void => {},
 };
 
 export const AppContext = createContext({
@@ -40,6 +43,15 @@ export const AppContextProvider = ({ children }: PropsWithChildren<BrowserRouter
         dispatch({
           type: AppContextActionEnum.SET_TRUST_THIS_DEVICE,
           trustThisDevice,
+        }),
+      setToken: (token) =>
+        dispatch({
+          type: AppContextActionEnum.SET_TOKEN,
+          token,
+        }),
+      clearAuth: () =>
+        dispatch({
+          type: AppContextActionEnum.CLEAR_AUTH,
         }),
     }),
     [],
