@@ -5,3 +5,5 @@ export * from './login';
 export * from './changePassword';
 export * from './resendConfirmation';
 export * from './sendEmailChangePassword';
+export * from './serverAdministration';
+export * from './lobby';

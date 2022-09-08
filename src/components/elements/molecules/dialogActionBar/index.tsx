@@ -31,6 +31,7 @@ export const DialogActionBar: React.FC<DialogActionBarProps> = ({ btnData = [] }
         <LoadingButton
           key={index}
           size="small"
+          position="start"
           variant="outlined"
           color="secondary"
           sx={{
@@ -42,7 +43,7 @@ export const DialogActionBar: React.FC<DialogActionBarProps> = ({ btnData = [] }
             '&:hover': { borderColor: (theme) => theme.palette.grey[400], borderWidth: '1px' },
             minWidth: d.minWidth,
           }}
-          startIcon={d.icon}
+          icon={d.icon}
           onClick={d.onClick}
           loading={d.loading}
           disabled={d.disabled}

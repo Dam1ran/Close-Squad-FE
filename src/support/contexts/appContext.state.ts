@@ -11,7 +11,6 @@ export interface ApplicationState {
 }
 
 export interface AuthState {
-  token?: string;
   nickname?: string;
   role?: AuthRole;
 }

@@ -6,3 +6,4 @@ export * from './container';
 export * from './box';
 export * from './requireRoles';
 export * from './requireNotLoggedIn';
+export * from './requireLoggedIn';

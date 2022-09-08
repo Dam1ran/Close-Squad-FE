@@ -1,2 +1,2 @@
 export * from './captchaService';
-export * from './authHelper';
+export * from './authService';

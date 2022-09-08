@@ -3,7 +3,21 @@ import { useNavigate } from 'react-router-dom';
 import { ServerClient } from '../../../api/serverClient';
 import { ServerAnnouncementDto } from '../../../models/api.models';
 import { useAbortSignal, useTitle } from '../../../support/hooks';
-import { Box, Button, CircularProgress, Column, Paper, Row, Typography } from '../../elements';
+import { useAuthServiceHelper } from '../../../support/services';
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Column,
+  LoadingButton,
+  LoginIcon,
+  LogoutIcon,
+  Paper,
+  RateReviewIcon,
+  Row,
+  ShareLocationIcon,
+  Typography,
+} from '../../elements';
 
 export const HomePage = (): JSX.Element => {
   useTitle('Home');
@@ -20,6 +34,12 @@ export const HomePage = (): JSX.Element => {
   }, []);
 
   const navigate = useNavigate();
+  const { isLoggedIn, clearAndLogout, nickname } = useAuthServiceHelper();
+  const [loggingOut, setLoggingOut] = useState(false);
+  const logout = async (): Promise<void> => {
+    setLoggingOut(true);
+    await clearAndLogout().finally(() => setLoggingOut(false));
+  };
 
   return (
     <Column
@@ -122,14 +142,35 @@ export const HomePage = (): JSX.Element => {
         </Paper>
         <Paper elevation={2} sx={{ padding: (theme) => theme.spacing(2), width: '320px', height: '188px' }}>
           <Column sx={{ '& Button': { margin: (theme) => theme.spacing(1) } }}>
-            <Button onClick={(): void => navigate('/login')}>
-              <Typography>Login</Typography>
+            <Button
+              sx={{ border: (theme) => `1px solid ${theme.palette.grey[200]}` }}
+              endIcon={<LoginIcon />}
+              onClick={(): void => navigate('/lobby')}
+            >
+              <Typography marginRight="auto">Enter</Typography>
             </Button>
-            <Button onClick={(): void => navigate('/register')}>
-              <Typography>Register</Typography>
-            </Button>
-            <Button>
-              <Typography>Guides</Typography>
+            {isLoggedIn && (
+              <LoadingButton
+                sx={{ border: (theme) => `1px solid ${theme.palette.grey[200]}` }}
+                position="end"
+                loading={loggingOut}
+                icon={<LogoutIcon />}
+                onClick={logout}
+              >
+                <Typography marginRight="auto">{nickname}</Typography>
+              </LoadingButton>
+            )}
+            {!isLoggedIn && (
+              <Button
+                sx={{ border: (theme) => `1px solid ${theme.palette.grey[200]}` }}
+                endIcon={<RateReviewIcon />}
+                onClick={(): void => navigate('/register')}
+              >
+                <Typography marginRight="auto">Register</Typography>
+              </Button>
+            )}
+            <Button endIcon={<ShareLocationIcon />} sx={{ border: (theme) => `1px solid ${theme.palette.grey[200]}` }}>
+              <Typography marginRight="auto">Guides</Typography>
             </Button>
           </Column>
         </Paper>

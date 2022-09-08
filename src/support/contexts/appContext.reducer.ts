@@ -1,4 +1,3 @@
-import { AuthHelper } from '../services';
 import { AppContextAction, AppContextActionEnum } from './appContext.actions';
 import { AppContextState } from './appContext.state';
 
@@ -25,13 +24,12 @@ export const appContextReducer = (prevState: AppContextState, action: AppContext
         },
       } as AppContextState;
     }
-    case AppContextActionEnum.SET_TOKEN: {
+    case AppContextActionEnum.SET_AUTH: {
       return {
         ...prevState,
         auth: {
-          token: action.token,
-          nickname: AuthHelper.getNickname(action.token),
-          role: AuthHelper.getRole(action.token),
+          ...prevState.auth,
+          ...action.auth,
         },
       } as AppContextState;
     }
@@ -39,7 +37,6 @@ export const appContextReducer = (prevState: AppContextState, action: AppContext
       return {
         ...prevState,
         auth: {
-          token: undefined,
           nickname: undefined,
           role: undefined,
         },

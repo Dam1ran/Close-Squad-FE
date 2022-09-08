@@ -1,7 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ServerClient } from '../../../api/serverClient';
 import { AuthResponseErrors } from '../../../models/auth';
+import { LocationProps } from '../../../models/types';
 import { fadeIn } from '../../../styles';
 import { useAbortSignal, useEmails, useNickname, usePasswords, useTitle } from '../../../support/hooks';
 import { Constants, isAnyEmpty } from '../../../support/utils';
@@ -18,6 +20,7 @@ import {
   captchaCheckModalOverlay,
   VisibilityIcon,
   VisibilityOffIcon,
+  HomeIcon,
 } from '../../elements';
 import { RegisterInputField } from './registerInputField';
 
@@ -123,6 +126,16 @@ export const RegisterPage = (): JSX.Element => {
       submit();
     }, 'register-captcha-check');
   };
+
+  const { state } = useLocation() as unknown as LocationProps;
+  useEffect(() => {
+    if (state?.email) {
+      setEmail(state.email);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const navigate = useNavigate();
 
   return (
     <Column
@@ -274,6 +287,9 @@ export const RegisterPage = (): JSX.Element => {
               ) : (
                 'Register'
               )}
+            </Button>
+            <Button startIcon={<HomeIcon />} sx={{ minWidth: '110px' }} onClick={(): void => navigate('/home')}>
+              <u>Home page</u>
             </Button>
           </Column>
         </Paper>

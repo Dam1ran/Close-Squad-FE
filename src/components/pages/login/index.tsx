@@ -1,10 +1,11 @@
-import { useAbortSignal, useAuth, useEmail, usePassword, useTitle } from '../../../support/hooks';
+import { useAbortSignal, useEmail, usePassword, useTitle } from '../../../support/hooks';
 import {
   Box,
   Button,
   Column,
   EnhancedEncryptionIcon,
   ForwardToInboxIcon,
+  HomeIcon,
   HubIcon,
   IconButton,
   InputAdornment,
@@ -12,6 +13,7 @@ import {
   LockOpenIcon,
   LoginIcon,
   Paper,
+  RateReviewIcon,
   SyncLockIcon,
   Typography,
   VisibilityIcon,
@@ -20,7 +22,7 @@ import {
 import { fadeIn } from '../../../styles';
 import { RegisterInputField } from '../register/registerInputField';
 import { useContext, useEffect, useState } from 'react';
-import { addSeconds, Constants, getFormattedDateTme, isAnyEmpty } from '../../../support/utils';
+import { addSeconds, Constants, getFormattedDateTime, isAnyEmpty } from '../../../support/utils';
 import { ServerClient } from '../../../api/serverClient';
 import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
@@ -28,6 +30,7 @@ import { AppContext } from '../../../support/contexts/appContextProvider';
 import { alpha } from '@mui/system';
 import { AuthResponseErrors } from '../../../models/auth';
 import { LocationProps } from '../../../models/types';
+import { useAuthServiceHelper } from '../../../support/services';
 
 export const LoginPage = (): JSX.Element => {
   useTitle('Login');
@@ -36,7 +39,7 @@ export const LoginPage = (): JSX.Element => {
   const location = useLocation() as unknown as LocationProps;
   const from = location.state?.from?.pathname || '/';
 
-  const { application, setTrustThisDevice, setToken } = useContext(AppContext);
+  const { application, setTrustThisDevice } = useContext(AppContext);
 
   const { email, setEmail, isEmailValid, emailErrorText } = useEmail(Constants.EmailMinLength, Constants.EmailMaxLength);
 
@@ -44,7 +47,6 @@ export const LoginPage = (): JSX.Element => {
     password,
     setPassword,
     isPasswordValid,
-    passwordErrorText,
     reset: passwordReset,
     showPassword,
     setShowPassword,
@@ -61,6 +63,7 @@ export const LoginPage = (): JSX.Element => {
 
   const [showResendBtn, setShowResendBtn] = useState(false);
   const [showChangePasswordBtn, setShowChangePasswordBtn] = useState(false);
+  const { checkAndSet } = useAuthServiceHelper();
 
   useEffect(() => {
     setInvalid(isAnyEmpty(email, password));
@@ -88,14 +91,13 @@ export const LoginPage = (): JSX.Element => {
       .then((data) => {
         setPassword('');
         setIsSuccess(true);
-        const loginText = `Last login on: ${getFormattedDateTme(addSeconds(data?.data?.lastLoginInterval))}`;
+        const loginText = `Previous login: ${getFormattedDateTime(addSeconds(data?.data?.lastLoginInterval))}`;
         toast.success(loginText, {
           icon: <HubIcon color="primary" />,
           duration: 10000,
           style: { minWidth: 'fit-content' },
         });
-        if (data.data.token) {
-          setToken(data.data.token);
+        if (checkAndSet(data.data.token)) {
           navigate(from, { replace: true });
         } else {
           console.warn('Wrong token.');
@@ -201,8 +203,8 @@ export const LoginPage = (): JSX.Element => {
                 setShowResendBtn(false);
                 setShowChangePasswordBtn(false);
               }}
-              error={!isPasswordValid}
-              errorText={passwordErrorText}
+              error={false}
+              errorText={''}
               responseErrors={responseErrors?.Password}
               inputProps={{
                 endAdornment: (
@@ -265,7 +267,8 @@ export const LoginPage = (): JSX.Element => {
             <LoadingButton
               type="submit"
               sx={{ margin: 1 }}
-              startIcon={<LoginIcon />}
+              position="start"
+              icon={<LoginIcon />}
               loading={loading}
               disabled={invalid || isSuccess}
             >
@@ -282,6 +285,15 @@ export const LoginPage = (): JSX.Element => {
             )}
             {showChangePasswordBtn && (
               <Button
+                startIcon={<RateReviewIcon />}
+                sx={{ minWidth: '110px' }}
+                onClick={(): void => navigate('/register', { state: { email } })}
+              >
+                <u>Register page</u>
+              </Button>
+            )}
+            {showChangePasswordBtn && (
+              <Button
                 startIcon={<SyncLockIcon />}
                 sx={{ minWidth: '110px' }}
                 onClick={(): void => navigate('/send-email-change-password', { state: { email } })}
@@ -289,6 +301,9 @@ export const LoginPage = (): JSX.Element => {
                 <u>Change password page</u>
               </Button>
             )}
+            <Button startIcon={<HomeIcon />} sx={{ minWidth: '110px' }} onClick={(): void => navigate('/home')}>
+              <u>Home page</u>
+            </Button>
           </Column>
         </Paper>
       </Box>

@@ -177,7 +177,8 @@ export const ResendConfirmationPage = (): JSX.Element => {
             )}
             <LoadingButton
               type="submit"
-              startIcon={<ForwardToInboxIcon />}
+              position="start"
+              icon={<ForwardToInboxIcon />}
               sx={{ margin: 1 }}
               loading={loading}
               disabled={invalid || isSuccess}

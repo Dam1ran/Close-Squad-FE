@@ -10,7 +10,6 @@ const appContextInitialState: AppContextState = {
     trustThisDevice: JSON.parse(localStorage.getItem('trustThisDevice') || 'false'),
   } as ApplicationState,
   auth: {
-    token: undefined,
     nickname: undefined,
     role: undefined,
   } as AuthState,
@@ -20,7 +19,7 @@ const appContextInitialState: AppContextState = {
 let dispatcher = {
   setCookiesAccepted: (cookiesAccepted: boolean): void => {},
   setTrustThisDevice: (trustThisDevice: boolean): void => {},
-  setToken: (token: string): void => {},
+  setAuth: (auth: AuthState): void => {},
   clearAuth: (): void => {},
 };
 
@@ -44,10 +43,10 @@ export const AppContextProvider = ({ children }: PropsWithChildren<BrowserRouter
           type: AppContextActionEnum.SET_TRUST_THIS_DEVICE,
           trustThisDevice,
         }),
-      setToken: (token) =>
+      setAuth: (auth) =>
         dispatch({
-          type: AppContextActionEnum.SET_TOKEN,
-          token,
+          type: AppContextActionEnum.SET_AUTH,
+          auth,
         }),
       clearAuth: () =>
         dispatch({

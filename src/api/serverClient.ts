@@ -11,8 +11,8 @@ import {
   UserLoginDto,
   UserRegisterDto,
 } from '../models/api.models';
-import { CaptchaService } from '../support/services';
-import { Constants, getCookieToken } from '../support/utils';
+import { AuthService, CaptchaService } from '../support/services';
+import { ClearAuthHandler, Constants, getCookieToken, NavigateHandler } from '../support/utils';
 import { serverClientUtils } from './serverClientUtils';
 
 axios.defaults.withCredentials = true;
@@ -22,6 +22,8 @@ export const ServerClient = () => {
   instance.defaults.headers.common[Constants.XsrfTokenHeaderName] = getCookieToken(Constants.CookieTokenHeaderName);
 
   const getAntiforgeryTokenCookie = (signal?: AbortSignal) => instance.post('antiforgery', null, { signal });
+
+  const refreshToken = (signal?: AbortSignal) => instance.post<string>('auth/refresh-token', null, { signal });
 
   instance.interceptors.response.use(
     (response) => {
@@ -36,18 +38,21 @@ export const ServerClient = () => {
         toast.error('Server error. Try again later.', { icon: '🤖', duration: 10000 });
       }
       if (error?.response?.status === 429) {
-        serverClientUtils().tooManyRequestToast();
+        serverClientUtils().tooManyRequestToast(error?.response?.data?.code === 'UserThrottle');
       }
 
       const prevRequest = error?.config;
       if (
         error?.response?.status === 400 &&
         error?.response?.headers[Constants.CookieTokenHeaderName] === '' &&
-        !prevRequest?.sent
+        !prevRequest?._retry400
       ) {
-        prevRequest.sent = true;
+        prevRequest._retry400 = true;
+
+        await new Promise((r) => setTimeout(r, 500));
         await getAntiforgeryTokenCookie();
-        prevRequest.headers[Constants.XsrfTokenHeaderName] = getCookieToken(Constants.CookieTokenHeaderName);
+        await new Promise((r) => setTimeout(r, 500));
+
         return instance(prevRequest);
       }
 
@@ -55,19 +60,56 @@ export const ServerClient = () => {
         captchaCheckModalOverlay();
       }
 
+      if (error?.response?.status === 401 && prevRequest.url !== 'auth/refresh-token' && !prevRequest?._retry401) {
+        prevRequest._retry401 = true;
+        console.log('Refreshing token.');
+        document.body.style.cursor = 'wait';
+
+        await refreshToken()
+          .then(async (r) => {
+            AuthService().setToken(r.data);
+
+            await getAntiforgeryTokenCookie().catch(() => {
+              console.error('XSRF request failed.');
+            });
+          })
+          .catch((err) => {
+            if (err?.response?.status === 401) {
+              ClearAuthHandler.clear();
+              NavigateHandler.navigate('/login', { state: { from: { pathname: location.pathname } }, replace: true });
+              document.body.style.cursor = 'default';
+            }
+            return Promise.reject(error);
+          });
+
+        document.body.style.cursor = 'default';
+        return instance(prevRequest);
+      }
+
       return Promise.reject(error);
     },
   );
 
-  instance.interceptors.request.use((request) => {
-    const captcha = CaptchaService.getCode();
-    if (captcha !== undefined) {
-      request.params = { ...request.params, captcha };
-      CaptchaService.clearCode();
-    }
+  instance.interceptors.request.use(
+    (config) => {
+      console.log(`Request to: ${config.url}`);
 
-    return request;
-  });
+      const captcha = CaptchaService.getCode();
+      if (captcha !== undefined) {
+        config.params = { ...config.params, captcha };
+        CaptchaService.clearCode();
+      }
+
+      const token = AuthService().getToken();
+      if (token && config.headers) {
+        config.headers[Constants.XsrfTokenHeaderName] = getCookieToken(Constants.CookieTokenHeaderName);
+        config.headers[Constants.AuthorizationHeaderName] = `Bearer ${token}`;
+      }
+
+      return config;
+    },
+    (error) => Promise.reject(error),
+  );
 
   const getCaptcha = (signal: AbortSignal) => instance.get<Blob>('captcha', { responseType: 'blob', signal });
 
@@ -92,10 +134,15 @@ export const ServerClient = () => {
   const changePassword = (changePasswordDto: ChangePasswordDto, signal: AbortSignal) =>
     instance.post('auth/change-password', { ...changePasswordDto }, { signal });
 
+  const logout = (signal: AbortSignal) => instance.post('auth/logout', null, { signal });
+
+  const test = (signal: AbortSignal) => instance.post<string>('auth/test', null, { signal });
+  const test2 = (signal: AbortSignal) => instance.post<string>('auth/test2', null, { signal });
+
   const getAnnouncements = async (signal: AbortSignal) => {
     // REWORK
     return instance
-      .get<ServerAnnouncementDto[]>('announcement', { signal })
+      .get<ServerAnnouncementDto[]>('announcement/announcements', { signal })
       .then((response) => {
         return response.data;
       })
@@ -113,6 +160,11 @@ export const ServerClient = () => {
     login,
     sendChangePasswordEmail,
     changePassword,
+    refreshToken,
+    getAntiforgeryTokenCookie,
+    logout,
     getAnnouncements,
+    test,
+    test2,
   };
 };
