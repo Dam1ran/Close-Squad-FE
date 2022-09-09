@@ -63,17 +63,15 @@ export const useAuthServiceHelper = () => {
   const signal = useAbortSignal();
   const { logout } = ServerClient();
 
-  const checkAndSet = (token?: string): boolean => {
-    if (isNullOrEmpty(token) || !AuthService().setToken(token!)) {
-      return false;
-    }
-
-    const nickname = (jwt_decode(token!) as any)?.nickname;
-    const role = (jwt_decode(token!) as any)?.role;
+  const setAuthData = (): boolean => {
+    const nickname = (jwt_decode(AuthService().getToken()!) as any)?.nickname;
+    const role = (jwt_decode(AuthService().getToken()!) as any)?.role;
     setAuth({ nickname, role });
 
     return true;
   };
+
+  const setToken = (token: string) => AuthService().setToken(token);
 
   const hasAnyOf = (roles: AuthRole[]): boolean => roles.some((r) => r === auth?.role);
 
@@ -96,7 +94,8 @@ export const useAuthServiceHelper = () => {
   const isExpiredBy = (dateTime = new Date()) => AuthService().isExpiredBy(dateTime);
 
   return {
-    checkAndSet,
+    setToken,
+    setAuthData,
     hasAnyOf,
     isLoggedIn: !isAnyEmpty(...Object.values(auth)),
     nickname: auth?.nickname,

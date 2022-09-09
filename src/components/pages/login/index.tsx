@@ -63,7 +63,7 @@ export const LoginPage = (): JSX.Element => {
 
   const [showResendBtn, setShowResendBtn] = useState(false);
   const [showChangePasswordBtn, setShowChangePasswordBtn] = useState(false);
-  const { checkAndSet } = useAuthServiceHelper();
+  const { setToken, setAuthData } = useAuthServiceHelper();
 
   useEffect(() => {
     setInvalid(isAnyEmpty(email, password));
@@ -79,7 +79,7 @@ export const LoginPage = (): JSX.Element => {
       return;
     }
 
-    const { login } = ServerClient();
+    const { login, getAntiforgeryTokenCookie } = ServerClient();
     setLoading(true);
     setResponseErrors(null);
     setIsSuccess(false);
@@ -88,7 +88,7 @@ export const LoginPage = (): JSX.Element => {
     setShowChangePasswordBtn(false);
 
     login({ email, password }, signal)
-      .then((data) => {
+      .then(async (data) => {
         setPassword('');
         setIsSuccess(true);
         const loginText = `Previous login: ${getFormattedDateTime(addSeconds(data?.data?.lastLoginInterval))}`;
@@ -97,7 +97,9 @@ export const LoginPage = (): JSX.Element => {
           duration: 10000,
           style: { minWidth: 'fit-content' },
         });
-        if (checkAndSet(data.data.token)) {
+        if (setToken(data.data.token)) {
+          await getAntiforgeryTokenCookie(signal);
+          setAuthData();
           navigate(from, { replace: true });
         } else {
           console.warn('Wrong token.');

@@ -7,7 +7,7 @@ import { KeyOffIcon } from '../../atoms';
 
 export const RequireNotLoggedIn = (): JSX.Element => {
   const { isLoggedIn, isExpiredBy } = useAuthServiceHelper();
-  const expired = isExpiredBy(addSeconds(10));
+  const expired = isExpiredBy(addSeconds(15));
   useEffect(() => {
     if (isLoggedIn && !expired) {
       toast('This route is accessible when logged out only.', {

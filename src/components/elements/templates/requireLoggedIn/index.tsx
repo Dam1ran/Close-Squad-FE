@@ -12,7 +12,7 @@ import { Column } from '../column';
 export const RequireLoggedIn = (): JSX.Element => {
   const signal = useAbortSignal();
   const { application } = useContext(AppContext);
-  const { isLoggedIn, checkAndSet, isExpiredBy } = useAuthServiceHelper();
+  const { isLoggedIn, setToken, setAuthData, isExpiredBy } = useAuthServiceHelper();
   const isExpired = isExpiredBy();
   const [isLoading, setIsLoading] = useState(true);
   const [requesting, setRequesting] = useState(false);
@@ -27,7 +27,10 @@ export const RequireLoggedIn = (): JSX.Element => {
       setIsLoading(true);
       await refreshToken(signal)
         .then(async (r) => {
-          if (!checkAndSet(r.data)) {
+          if (setToken(r.data)) {
+            await getAntiforgeryTokenCookie(signal);
+            setAuthData();
+          } else {
             console.warn('Wrong token.');
             setTimeout(() => {
               navigate('/home');

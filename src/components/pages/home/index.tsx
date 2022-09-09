@@ -16,6 +16,7 @@ import {
   RateReviewIcon,
   Row,
   ShareLocationIcon,
+  Tooltip,
   Typography,
 } from '../../elements';
 
@@ -150,15 +151,17 @@ export const HomePage = (): JSX.Element => {
               <Typography marginRight="auto">Enter</Typography>
             </Button>
             {isLoggedIn && (
-              <LoadingButton
-                sx={{ border: (theme) => `1px solid ${theme.palette.grey[200]}` }}
-                position="end"
-                loading={loggingOut}
-                icon={<LogoutIcon />}
-                onClick={logout}
-              >
-                <Typography marginRight="auto">{nickname}</Typography>
-              </LoadingButton>
+              <Tooltip title="Logout" placement="right" arrow>
+                <LoadingButton
+                  sx={{ border: (theme) => `1px solid ${theme.palette.grey[200]}` }}
+                  position="end"
+                  loading={loggingOut}
+                  icon={<LogoutIcon />}
+                  onClick={logout}
+                >
+                  <Typography marginRight="auto">{nickname}</Typography>
+                </LoadingButton>
+              </Tooltip>
             )}
             {!isLoggedIn && (
               <Button
