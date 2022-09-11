@@ -11,7 +11,7 @@ import {
   UserLoginDto,
   UserRegisterDto,
 } from '../models/api.models';
-import { AuthService, CaptchaService } from '../support/services';
+import { AuthService, CaptchaService, SessionService } from '../support/services';
 import { ClearAuthHandler, Constants, getCookieToken, NavigateHandler } from '../support/utils';
 import { serverClientUtils } from './serverClientUtils';
 
@@ -23,7 +23,8 @@ export const ServerClient = () => {
 
   const getAntiforgeryTokenCookie = (signal?: AbortSignal) => instance.post('antiforgery', null, { signal });
 
-  const refreshToken = (signal?: AbortSignal) => instance.post<string>('auth/refresh-token', null, { signal });
+  const refreshToken = (signal?: AbortSignal) =>
+    instance.post<string>('auth/refresh-token', { sessionId: SessionService().get() }, { signal });
 
   instance.interceptors.response.use(
     (response) => {

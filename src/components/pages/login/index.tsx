@@ -30,7 +30,7 @@ import { AppContext } from '../../../support/contexts/appContextProvider';
 import { alpha } from '@mui/system';
 import { AuthResponseErrors } from '../../../models/auth';
 import { LocationProps } from '../../../models/types';
-import { useAuthServiceHelper } from '../../../support/services';
+import { SessionService, useAuthServiceHelper } from '../../../support/services';
 
 export const LoginPage = (): JSX.Element => {
   useTitle('Login');
@@ -100,6 +100,7 @@ export const LoginPage = (): JSX.Element => {
         if (setToken(data.data.token)) {
           await getAntiforgeryTokenCookie(signal);
           setAuthData();
+          SessionService().set(data.data.sessionId);
           navigate(from, { replace: true });
         } else {
           console.warn('Wrong token.');

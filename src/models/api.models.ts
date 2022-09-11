@@ -52,6 +52,10 @@ export interface ChangePasswordDto {
     repeatPassword: string;
 }
 
+export interface SessionIdDto {
+    sessionId: string;
+}
+
 export interface FileResponse {
     data: Blob;
     status: number;

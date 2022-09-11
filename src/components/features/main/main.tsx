@@ -1,6 +1,6 @@
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { AuthRole } from '../../../models/auth';
-import { useAuthServiceHelper } from '../../../support/services';
+import { useAuthServiceHelper, useSession } from '../../../support/services';
 import { ClearAuthHandler, NavigateHandler } from '../../../support/utils';
 import { Layout, RequireLoggedIn, RequireNotLoggedIn, RequireRoles } from '../../elements/templates';
 import {
@@ -21,6 +21,7 @@ export const Main = (): JSX.Element => {
   NavigateHandler.navigate = useNavigate();
   const { clear } = useAuthServiceHelper();
   ClearAuthHandler.clear = clear;
+  useSession();
 
   return (
     <Routes>

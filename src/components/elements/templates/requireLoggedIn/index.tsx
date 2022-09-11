@@ -40,6 +40,8 @@ export const RequireLoggedIn = (): JSX.Element => {
         .catch((err) => {
           if (err?.response?.status === 401) {
             navigate('/login', { state: { from: { pathname: location.pathname } }, replace: true });
+          } else {
+            navigate('/home');
           }
         })
         .finally(() => {
@@ -47,7 +49,9 @@ export const RequireLoggedIn = (): JSX.Element => {
         });
     };
 
-    (!isLoggedIn || isExpired) && application.trustThisDevice && checkToken();
+    if ((!isLoggedIn || isExpired) && application.trustThisDevice) {
+      setTimeout(() => checkToken());
+    }
     setIsLoading(!isLoggedIn);
 
     let request = false;
@@ -57,7 +61,6 @@ export const RequireLoggedIn = (): JSX.Element => {
         setRequesting(true);
         document.body.style.cursor = 'wait';
         await checkToken();
-        await getAntiforgeryTokenCookie(signal);
         setRequesting(false);
         document.body.style.cursor = 'default';
         request = false;
@@ -79,7 +82,7 @@ export const RequireLoggedIn = (): JSX.Element => {
     <ModalBackground sx={{ userSelect: 'none' }}>
       <Column>
         <CircularProgress color="secondary" size={40} thickness={5} sx={{ margin: 'auto', opacity: 0.7 }} />
-        <Typography mt={4} ml={3} variant="h4" sx={{ fontWeight: 700, opacity: 0.4 }}>
+        <Typography mt={4} ml={4} variant="h4" sx={{ fontWeight: 700, opacity: 0.4 }}>
           LOADING...
         </Typography>
       </Column>
