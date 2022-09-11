@@ -29,19 +29,24 @@ export const SessionService = () => {
 };
 
 export const useSession = () => {
+  const clean = () => {
+    if (isNotEmpty(SessionService().get())) {
+      window.name = SessionService().get()!;
+    } else {
+      window.name = '';
+    }
+  };
+
   useEffect(() => {
     SessionService().set(window.name || v4());
+    window.name = '';
 
     window.addEventListener('unload', () => {
-      if (isNotEmpty(SessionService().get())) {
-        window.name = SessionService().get()!;
-      }
+      clean();
     });
 
     return () => {
-      if (isNotEmpty(SessionService().get())) {
-        window.name = SessionService().get()!;
-      }
+      clean();
     };
   }, []);
 

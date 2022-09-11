@@ -15,6 +15,7 @@ import { AuthService, CaptchaService, SessionService } from '../support/services
 import { ClearAuthHandler, Constants, getCookieToken, NavigateHandler } from '../support/utils';
 import { serverClientUtils } from './serverClientUtils';
 
+axios.defaults.timeout = 20000;
 axios.defaults.withCredentials = true;
 
 export const ServerClient = () => {
@@ -140,17 +141,8 @@ export const ServerClient = () => {
   const test = (signal: AbortSignal) => instance.post<string>('auth/test', null, { signal });
   const test2 = (signal: AbortSignal) => instance.post<string>('auth/test2', null, { signal });
 
-  const getAnnouncements = async (signal: AbortSignal) => {
-    // REWORK
-    return instance
-      .get<ServerAnnouncementDto[]>('announcement/announcements', { signal })
-      .then((response) => {
-        return response.data;
-      })
-      .catch(() => {
-        return null;
-      });
-  };
+  const getAnnouncements = async (signal: AbortSignal) =>
+    instance.get<ServerAnnouncementDto[]>('announcement/announcements', { signal });
 
   return {
     getCaptcha,
