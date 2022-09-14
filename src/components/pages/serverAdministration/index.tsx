@@ -1,22 +1,21 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ServerClient } from '../../../api/serverClient';
+import { useServerClient } from '../../../api/useServerClient';
 import { LocationProps } from '../../../models/types';
-import { useAbortSignal, useTitle } from '../../../support/hooks';
+import { useTitle } from '../../../support/hooks';
 import { Button, Typography } from '../../elements';
 
 export const ServerAdministrationPage = (): JSX.Element => {
   useTitle('Server administration');
-  const signal = useAbortSignal();
   const navigate = useNavigate();
   const { state } = useLocation() as unknown as LocationProps;
-  const { test } = ServerClient();
+  const { createAnnouncement } = useServerClient();
 
   return (
     <>
       <Button
         onClick={async (): Promise<void> => {
-          const test1 = await test(signal);
-          console.log(test1);
+          const response = await createAnnouncement({ message: 'ei pizdec' });
+          console.log(response);
         }}
       >
         <Typography>Test</Typography>

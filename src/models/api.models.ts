@@ -11,6 +11,7 @@
 
 
 export interface ServerAnnouncementDto {
+    id: number;
     createdAt: Date;
     message: string;
 }

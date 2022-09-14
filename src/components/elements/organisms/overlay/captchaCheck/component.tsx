@@ -5,10 +5,9 @@ import { DialogActionBar, TextField } from '../../../molecules';
 import { Box, Column } from '../../../templates';
 import { isNotEmpty, isNullOrEmpty } from '../../../../../support/utils';
 import { alpha } from '@mui/system';
-import { ServerClient } from '../../../../../api/serverClient';
 import { CaptchaService } from '../../../../../support/services';
 import { fadeIn } from '../../../../../styles';
-import { useAbortSignal } from '../../../../../support/hooks';
+import { useServerClient } from '../../../../../api/useServerClient';
 
 export const CaptchaCheck: React.FC<{ onSuccess: () => void }> = (props) => {
   const [loading, setLoading] = useState(true);
@@ -16,13 +15,12 @@ export const CaptchaCheck: React.FC<{ onSuccess: () => void }> = (props) => {
   const [success, setSuccess] = useState(false);
   const [code, setCode] = useState('');
   const [image, setImage] = useState<string | undefined>();
-  const signal = useAbortSignal();
 
-  const { getCaptcha } = ServerClient();
+  const { getCaptcha, validateCaptcha } = useServerClient();
 
   const requestCaptcha = (): void => {
     setLoading(true);
-    getCaptcha(signal)
+    getCaptcha()
       .then((d) => {
         const reader = new FileReader();
         reader.readAsDataURL(d.data);
@@ -40,9 +38,8 @@ export const CaptchaCheck: React.FC<{ onSuccess: () => void }> = (props) => {
   }, []);
 
   const onCheck = (): void => {
-    const { validateCaptcha } = ServerClient();
     setLoading(true);
-    validateCaptcha(code, signal)
+    validateCaptcha(code)
       .then(() => {
         setSuccess(true);
         setLoading(false);
@@ -158,7 +155,7 @@ export const CaptchaCheck: React.FC<{ onSuccess: () => void }> = (props) => {
             icon: <DirectionsIcon />,
             disabled: isNullOrEmpty(code) || loading,
             loading,
-            minWidth: '110px',
+            width: '100%',
           },
         ]}
       />

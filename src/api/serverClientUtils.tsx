@@ -1,5 +1,5 @@
 import toast from 'react-hot-toast';
-import { FlashOffIcon, SecurityIcon } from '../components/elements';
+import { FlashOffIcon, SecurityIcon, RemoveCircleOutlineIcon } from '../components/elements';
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const serverClientUtils = () => {
@@ -16,7 +16,16 @@ export const serverClientUtils = () => {
       });
     }
   };
+
+  const unauthorizedToast = (): void => {
+    toast.error('Unauthorized access to this source.', {
+      icon: <RemoveCircleOutlineIcon color="secondary" />,
+      duration: 5000,
+    });
+  };
+
   return {
     tooManyRequestToast,
+    unauthorizedToast,
   };
 };

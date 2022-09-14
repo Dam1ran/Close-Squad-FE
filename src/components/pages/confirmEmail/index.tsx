@@ -1,24 +1,22 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ServerClient } from '../../../api/serverClient';
+import { useServerClient } from '../../../api/useServerClient';
 import { fadeIn } from '../../../styles';
-import { useAbortSignal, useTitle } from '../../../support/hooks';
+import { useTitle } from '../../../support/hooks';
 import { isNotEmpty } from '../../../support/utils';
 import {
   Box,
-  Button,
   CircularProgress,
   Column,
   ForwardToInboxIcon,
+  LoadingButton,
   LoginIcon,
   Paper,
-  Row,
   Typography,
 } from '../../elements';
 
 export const ConfirmEmailPage = (): JSX.Element => {
   useTitle('Confirm email');
-  const signal = useAbortSignal();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const guid = searchParams.get('guid');
@@ -28,7 +26,7 @@ export const ConfirmEmailPage = (): JSX.Element => {
   const [isSuccess, setIsSuccess] = useState(false);
   const [isExpired, setIsExpired] = useState(false);
 
-  const { confirmEmail } = ServerClient();
+  const { confirmEmail } = useServerClient();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -37,7 +35,7 @@ export const ConfirmEmailPage = (): JSX.Element => {
         searchParams.delete('guid');
         setSearchParams(searchParams);
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        confirmEmail({ guid: guid! }, signal)
+        confirmEmail({ guid: guid! })
           .then(() => {
             setResponseText('Email confirmed you can log in now.');
             setIsSuccess(true);
@@ -108,32 +106,29 @@ export const ConfirmEmailPage = (): JSX.Element => {
         <Typography p={1} textAlign="center" variant="body1">
           {responseText}
         </Typography>
-        {isSuccess && (
-          <Row justifyContent="center">
-            <Button
-              startIcon={<LoginIcon />}
-              sx={{ minWidth: '110px' }}
+        <Column alignItems="center">
+          {isSuccess && (
+            <LoadingButton
+              icon={<LoginIcon />}
+              sx={{ width: '280px', margin: 1 }}
               onClick={(): void => {
                 navigate('/login', { replace: true });
               }}
-            >
-              Login
-            </Button>
-          </Row>
-        )}
-        {isExpired && (
-          <Row justifyContent="center">
-            <Button
-              startIcon={<ForwardToInboxIcon />}
-              sx={{ minWidth: '110px' }}
+              caption={<u>Login</u>}
+              centered
+            />
+          )}
+          {isExpired && (
+            <LoadingButton
+              icon={<ForwardToInboxIcon />}
+              sx={{ width: '280px', margin: 1 }}
               onClick={(): void => {
                 navigate('/resend-confirmation', { replace: true });
               }}
-            >
-              <u>Resend confirmation page</u>
-            </Button>
-          </Row>
-        )}
+              caption={<u>Resend confirmation page</u>}
+            />
+          )}
+        </Column>
       </Paper>
     </Column>
   );

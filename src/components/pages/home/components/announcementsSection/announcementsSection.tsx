@@ -1,8 +1,29 @@
-import { CircularProgress, Column, Paper, Row, Typography } from '../../../../elements';
+import { useState } from 'react';
+import { useServerClient } from '../../../../../api/useServerClient';
+import { useAuthServiceHelper } from '../../../../../support/services';
+import { getFormattedDateTime } from '../../../../../support/utils';
+import { CircularProgress, Column, Paper, Row, Typography, CloseIcon, LoadingButton } from '../../../../elements';
 import { useAnnouncements } from './useAnnouncements';
 
 export const AnnouncementsSection = (): JSX.Element => {
-  const announcements = useAnnouncements();
+  const { announcements, reload } = useAnnouncements();
+  const { isManagementRole } = useAuthServiceHelper();
+  const { deleteAnnouncement } = useServerClient();
+
+  const [isDeleteLoading, setIsDeleteLoading] = useState(false);
+  const [deleteId, setDeleteId] = useState(-1);
+  const onDeleteAnnouncement = async (id: number): Promise<void> => {
+    setDeleteId(id);
+    setIsDeleteLoading(true);
+    await deleteAnnouncement(id)
+      .then(() => {
+        setDeleteId(-1);
+        reload();
+      })
+      .finally(() => {
+        setIsDeleteLoading(false);
+      });
+  };
 
   return (
     <Paper
@@ -27,16 +48,26 @@ export const AnnouncementsSection = (): JSX.Element => {
       <Column alignItems="center" sx={{ height: 'calc(100% - 32px)', overflowX: 'auto' }}>
         {announcements ? (
           announcements?.length > 0 ? (
-            announcements?.map((a, i) => {
+            announcements?.map((a) => {
               return (
-                <Row key={i} sx={{ gap: 1, marginTop: 1, width: '100%' }}>
+                <Row key={a.id} sx={{ gap: 1, marginTop: 1, width: '100%' }}>
                   <Typography
                     variant="caption"
                     sx={{ color: (theme) => theme.palette.secondary.main, marginTop: '3px', userSelect: 'none' }}
                   >
-                    {new Date(a.createdAt).toDateString()}
+                    {getFormattedDateTime(new Date(a.createdAt), true)}
                   </Typography>
                   <Typography sx={{ flex: 1, userSelect: 'none' }}>{a.message}</Typography>
+                  {isManagementRole() && (
+                    <LoadingButton
+                      sx={{ width: '26px', padding: 0, margin: 0, minWidth: 0 }}
+                      icon={<CloseIcon sx={{ marginLeft: '2px' }} />}
+                      loading={isDeleteLoading && a.id === deleteId}
+                      onClick={(): Promise<void> => onDeleteAnnouncement(a.id)}
+                      position="start"
+                      centered
+                    />
+                  )}
                 </Row>
               );
             })

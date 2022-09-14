@@ -1,4 +1,4 @@
-import { useAbortSignal, useEmail, usePassword, useTitle } from '../../../support/hooks';
+import { useEmail, usePassword, useTitle } from '../../../support/hooks';
 import {
   Box,
   Button,
@@ -23,7 +23,7 @@ import { fadeIn } from '../../../styles';
 import { RegisterInputField } from '../register/registerInputField';
 import { useContext, useEffect, useState } from 'react';
 import { addSeconds, Constants, getFormattedDateTime, isAnyEmpty } from '../../../support/utils';
-import { ServerClient } from '../../../api/serverClient';
+import { useServerClient } from '../../../api/useServerClient';
 import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AppContext } from '../../../support/contexts/appContextProvider';
@@ -34,7 +34,6 @@ import { SessionService, useAuthServiceHelper } from '../../../support/services'
 
 export const LoginPage = (): JSX.Element => {
   useTitle('Login');
-  const signal = useAbortSignal();
   const navigate = useNavigate();
   const location = useLocation() as unknown as LocationProps;
   const from = location.state?.from?.pathname || '/';
@@ -64,6 +63,7 @@ export const LoginPage = (): JSX.Element => {
   const [showResendBtn, setShowResendBtn] = useState(false);
   const [showChangePasswordBtn, setShowChangePasswordBtn] = useState(false);
   const { setToken, setAuthData } = useAuthServiceHelper();
+  const { login, getAntiforgeryTokenCookie } = useServerClient();
 
   useEffect(() => {
     setInvalid(isAnyEmpty(email, password));
@@ -79,7 +79,6 @@ export const LoginPage = (): JSX.Element => {
       return;
     }
 
-    const { login, getAntiforgeryTokenCookie } = ServerClient();
     setLoading(true);
     setResponseErrors(null);
     setIsSuccess(false);
@@ -87,7 +86,7 @@ export const LoginPage = (): JSX.Element => {
     setShowResendBtn(false);
     setShowChangePasswordBtn(false);
 
-    login({ email, password }, signal)
+    login({ email, password })
       .then(async (data) => {
         setPassword('');
         setIsSuccess(true);
@@ -98,7 +97,7 @@ export const LoginPage = (): JSX.Element => {
           style: { minWidth: 'fit-content' },
         });
         if (setToken(data.data.token)) {
-          await getAntiforgeryTokenCookie(signal);
+          await getAntiforgeryTokenCookie();
           setAuthData();
           SessionService().set(data.data.sessionId);
           navigate(from, { replace: true });
@@ -269,44 +268,47 @@ export const LoginPage = (): JSX.Element => {
             )}
             <LoadingButton
               type="submit"
-              sx={{ margin: 1 }}
-              position="start"
+              sx={{ width: 'unset', margin: 1 }}
               icon={<LoginIcon />}
               loading={loading}
               disabled={invalid || isSuccess}
-            >
-              <Box sx={{ marginTop: '2px' }}>Login</Box>
-            </LoadingButton>
+              caption="Login"
+              centered
+            />
             {showResendBtn && (
-              <Button
-                startIcon={<ForwardToInboxIcon />}
-                sx={{ minWidth: '110px' }}
+              <LoadingButton
+                sx={{ width: 'unset', margin: 1 }}
+                icon={<ForwardToInboxIcon />}
+                caption={<u>Resend confirmation page</u>}
                 onClick={(): void => navigate('/resend-confirmation', { state: { email } })}
-              >
-                <u>Resend confirmation page</u>
-              </Button>
+                centered
+              />
             )}
             {showChangePasswordBtn && (
-              <Button
-                startIcon={<RateReviewIcon />}
-                sx={{ minWidth: '110px' }}
+              <LoadingButton
+                sx={{ width: 'unset', margin: 1 }}
+                icon={<RateReviewIcon />}
+                caption={<u>Register page</u>}
                 onClick={(): void => navigate('/register', { state: { email } })}
-              >
-                <u>Register page</u>
-              </Button>
+                centered
+              />
             )}
             {showChangePasswordBtn && (
-              <Button
-                startIcon={<SyncLockIcon />}
-                sx={{ minWidth: '110px' }}
+              <LoadingButton
+                sx={{ width: 'unset', margin: 1 }}
+                icon={<SyncLockIcon />}
+                caption={<u>Change password page</u>}
                 onClick={(): void => navigate('/send-email-change-password', { state: { email } })}
-              >
-                <u>Change password page</u>
-              </Button>
+                centered
+              />
             )}
-            <Button startIcon={<HomeIcon />} sx={{ minWidth: '110px' }} onClick={(): void => navigate('/home')}>
-              <u>Home page</u>
-            </Button>
+            <LoadingButton
+              sx={{ width: 'unset', margin: 1 }}
+              icon={<HomeIcon />}
+              caption={<u>Home page</u>}
+              onClick={(): void => navigate('/home')}
+              centered
+            />
           </Column>
         </Paper>
       </Box>

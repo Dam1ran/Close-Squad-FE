@@ -3,10 +3,8 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import jwt_decode from 'jwt-decode';
 import { useContext } from 'react';
-import { ServerClient } from '../../api/serverClient';
 import { AuthRole } from '../../models/auth';
 import { AppContext } from '../contexts/appContextProvider';
-import { useAbortSignal } from '../hooks';
 import { isAnyEmpty, isNullOrEmpty } from '../utils';
 
 interface AuthMemory {
@@ -60,8 +58,6 @@ export const AuthService = () => {
 
 export const useAuthServiceHelper = () => {
   const { auth, setAuth, setTrustThisDevice } = useContext(AppContext);
-  const signal = useAbortSignal();
-  const { logout } = ServerClient();
 
   const setAuthData = (): boolean => {
     const nickname = (jwt_decode(AuthService().getToken()!) as any)?.nickname;
@@ -78,20 +74,12 @@ export const useAuthServiceHelper = () => {
   const clear = (): void => {
     AuthService().clear();
     setAuth({ nickname: undefined, role: undefined });
-  };
-
-  const clearAndLogout = async (): Promise<void> => {
-    await logout(signal)
-      .then(() => {
-        clear();
-        setTrustThisDevice(false);
-      })
-      .catch(() => {
-        console.warn('Cannot logout.');
-      });
+    setTrustThisDevice(false);
   };
 
   const isExpiredBy = (dateTime = new Date()) => AuthService().isExpiredBy(dateTime);
+
+  const isManagementRole = () => hasAnyOf([AuthRole.ADM, AuthRole.GMA]);
 
   return {
     setToken,
@@ -100,7 +88,7 @@ export const useAuthServiceHelper = () => {
     isLoggedIn: !isAnyEmpty(...Object.values(auth)),
     nickname: auth?.nickname,
     clear,
-    clearAndLogout,
     isExpiredBy,
+    isManagementRole,
   };
 };

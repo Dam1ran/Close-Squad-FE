@@ -28,7 +28,7 @@ export const useCookiePolicyAgreement = (): void => {
                 {
                   capture: 'Accept',
                   icon: <CookieIcon />,
-                  minWidth: '110px',
+                  width: '110px',
                   onClick: (): void => {
                     setCookiesAccepted(true);
                     overlay.removeComponent(id);

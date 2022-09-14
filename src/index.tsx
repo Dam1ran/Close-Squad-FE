@@ -29,7 +29,7 @@ root.render(
           <Toaster
             position="bottom-center"
             containerStyle={{
-              bottom: 60,
+              bottom: 40,
             }}
             reverseOrder={true}
           />

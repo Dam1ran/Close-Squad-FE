@@ -1,5 +1,5 @@
 import { alpha } from '@mui/system';
-import { Box, Row } from '../../templates';
+import { Row } from '../../templates';
 import { LoadingButton } from '../loadingButton';
 
 export interface DialogActionBtnData {
@@ -8,7 +8,7 @@ export interface DialogActionBtnData {
   onClick: () => void;
   loading?: boolean;
   disabled?: boolean;
-  minWidth?: string;
+  width?: string;
 }
 
 export interface DialogActionBarProps {
@@ -31,7 +31,6 @@ export const DialogActionBar: React.FC<DialogActionBarProps> = ({ btnData = [] }
         <LoadingButton
           key={index}
           size="small"
-          position="start"
           variant="outlined"
           color="secondary"
           sx={{
@@ -41,15 +40,15 @@ export const DialogActionBar: React.FC<DialogActionBarProps> = ({ btnData = [] }
             borderColor: (theme) => theme.palette.grey[300],
             boxShadow: (theme) => `inset 0px 0px 10px ${alpha(theme.palette.grey[400], 0.2)}`,
             '&:hover': { borderColor: (theme) => theme.palette.grey[400], borderWidth: '1px' },
-            minWidth: d.minWidth,
+            width: d.width,
           }}
           icon={d.icon}
           onClick={d.onClick}
           loading={d.loading}
           disabled={d.disabled}
-        >
-          <Box sx={{ marginTop: '2px' }}>{d.capture}</Box>
-        </LoadingButton>
+          caption={d.capture}
+          centered
+        />
       ))}
     </Row>
   );

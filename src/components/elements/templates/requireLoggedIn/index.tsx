@@ -1,8 +1,7 @@
 import { useContext, useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { ServerClient } from '../../../../api/serverClient';
+import { useServerClient } from '../../../../api/useServerClient';
 import { AppContext } from '../../../../support/contexts/appContextProvider';
-import { useAbortSignal } from '../../../../support/hooks';
 import { useAuthServiceHelper } from '../../../../support/services';
 import { addSeconds } from '../../../../support/utils';
 import { CircularProgress } from '../../atoms';
@@ -10,7 +9,6 @@ import { ModalBackground, Typography } from '../../molecules';
 import { Column } from '../column';
 
 export const RequireLoggedIn = (): JSX.Element => {
-  const signal = useAbortSignal();
   const { application } = useContext(AppContext);
   const { isLoggedIn, setToken, setAuthData, isExpiredBy } = useAuthServiceHelper();
   const isExpired = isExpiredBy();
@@ -18,17 +16,17 @@ export const RequireLoggedIn = (): JSX.Element => {
   const [requesting, setRequesting] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { refreshToken, getAntiforgeryTokenCookie } = useServerClient();
 
   useEffect(() => {
     let isMounted = true;
-    const { refreshToken, getAntiforgeryTokenCookie } = ServerClient();
 
     const checkToken = async (): Promise<void> => {
       setIsLoading(true);
-      await refreshToken(signal)
+      await refreshToken()
         .then(async (r) => {
           if (setToken(r.data)) {
-            await getAntiforgeryTokenCookie(signal);
+            await getAntiforgeryTokenCookie();
             setAuthData();
           } else {
             console.warn('Wrong token.');

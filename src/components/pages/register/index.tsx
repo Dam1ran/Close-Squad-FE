@@ -1,16 +1,14 @@
 import { useEffect, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { ServerClient } from '../../../api/serverClient';
+import { useServerClient } from '../../../api/useServerClient';
 import { AuthResponseErrors } from '../../../models/auth';
 import { LocationProps } from '../../../models/types';
 import { fadeIn } from '../../../styles';
-import { useAbortSignal, useEmails, useNickname, usePasswords, useTitle } from '../../../support/hooks';
+import { useEmails, useNickname, usePasswords, useTitle } from '../../../support/hooks';
 import { Constants, isAnyEmpty } from '../../../support/utils';
 import {
   Box,
-  Button,
-  CircularProgress,
   Column,
   IconButton,
   InputAdornment,
@@ -21,12 +19,12 @@ import {
   VisibilityIcon,
   VisibilityOffIcon,
   HomeIcon,
+  LoadingButton,
 } from '../../elements';
 import { RegisterInputField } from './registerInputField';
 
 export const RegisterPage = (): JSX.Element => {
   useTitle('Register new user');
-  const signal = useAbortSignal();
 
   const nicknameRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
@@ -66,8 +64,6 @@ export const RegisterPage = (): JSX.Element => {
     Confirmation: [],
   });
 
-  const [isSuccess, setIsSuccess] = useState(false);
-
   useEffect(() => {
     setInvalid(isAnyEmpty(nickname, email, repeatEmail, password, repeatPassword));
     if (
@@ -92,22 +88,21 @@ export const RegisterPage = (): JSX.Element => {
     isRepeatPasswordValid,
   ]);
 
+  const { register } = useServerClient();
+
   const submit = (): void => {
     if (isAnyEmpty(nickname, email, repeatEmail, password, repeatPassword)) {
       return;
     }
-    const { register } = ServerClient();
     setLoading(true);
     setResponseErrors(null);
-    setIsSuccess(false);
-    register({ nickname, email, repeatEmail, password, repeatPassword }, signal)
+    register({ nickname, email, repeatEmail, password, repeatPassword })
       .then(() => {
         toast.success('Confirmation email sent to specified address.', {
           icon: '📨',
           duration: 10000,
           style: { minWidth: 'fit-content' },
         });
-        setIsSuccess(true);
       })
       .catch((data) => {
         setResponseErrors(data?.response?.data?.errors);
@@ -176,10 +171,7 @@ export const RegisterPage = (): JSX.Element => {
               value={nickname}
               label="Nickname"
               autofocus
-              onChange={(e): void => {
-                setNickname(e.target.value);
-                setIsSuccess(false);
-              }}
+              onChange={(e): void => setNickname(e.target.value)}
               error={!isNicknameValid}
               errorText={nicknameErrorText}
               responseErrors={responseErrors?.Nickname}
@@ -187,10 +179,7 @@ export const RegisterPage = (): JSX.Element => {
             <RegisterInputField
               value={email}
               label="Email"
-              onChange={(e): void => {
-                setEmail(e.target.value);
-                setIsSuccess(false);
-              }}
+              onChange={(e): void => setEmail(e.target.value)}
               error={!isEmailValid}
               errorText={emailErrorText}
               responseErrors={responseErrors?.Email}
@@ -198,10 +187,7 @@ export const RegisterPage = (): JSX.Element => {
             <RegisterInputField
               value={repeatEmail}
               label="Repeat email"
-              onChange={(e): void => {
-                setRepeatEmail(e.target.value);
-                setIsSuccess(false);
-              }}
+              onChange={(e): void => setRepeatEmail(e.target.value)}
               error={!isRepeatEmailValid}
               errorText={emailRepeatErrorText}
               responseErrors={responseErrors?.RepeatEmail}
@@ -210,10 +196,7 @@ export const RegisterPage = (): JSX.Element => {
               value={password}
               label="Password"
               type={showPassword ? 'text' : 'password'}
-              onChange={(e): void => {
-                setPassword(e.target.value);
-                setIsSuccess(false);
-              }}
+              onChange={(e): void => setPassword(e.target.value)}
               error={!isPasswordValid}
               errorText={passwordErrorText}
               responseErrors={responseErrors?.Password}
@@ -237,10 +220,7 @@ export const RegisterPage = (): JSX.Element => {
               value={repeatPassword}
               label="Repeat password"
               type="password"
-              onChange={(e): void => {
-                setRepeatPassword(e.target.value);
-                setIsSuccess(false);
-              }}
+              onChange={(e): void => setRepeatPassword(e.target.value)}
               error={!isRepeatPasswordValid}
               errorText={passwordRepeatErrorText}
               responseErrors={responseErrors?.RepeatPassword}
@@ -279,18 +259,22 @@ export const RegisterPage = (): JSX.Element => {
                 ))}
               </Box>
             )}
-            <Button type="submit" sx={{ margin: 1 }} disabled={invalid}>
-              {loading ? (
-                <CircularProgress size={24.5} />
-              ) : isSuccess ? (
-                <MarkEmailReadIcon sx={{ height: '24.5px', width: '24.5px' }} />
-              ) : (
-                'Register'
-              )}
-            </Button>
-            <Button startIcon={<HomeIcon />} sx={{ minWidth: '110px' }} onClick={(): void => navigate('/home')}>
-              <u>Home page</u>
-            </Button>
+            <LoadingButton
+              type="submit"
+              sx={{ width: 'unset', margin: 1 }}
+              icon={<MarkEmailReadIcon />}
+              loading={loading}
+              disabled={invalid}
+              caption="Register"
+              centered
+            />
+            <LoadingButton
+              sx={{ width: 'unset', margin: 1 }}
+              icon={<HomeIcon />}
+              caption={<u>Home page</u>}
+              onClick={(): void => navigate('/home')}
+              centered
+            />
           </Column>
         </Paper>
       </Box>

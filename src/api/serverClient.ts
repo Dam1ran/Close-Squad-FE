@@ -6,6 +6,7 @@ import {
   ChangePasswordDto,
   ChangePasswordEmailDto,
   ConfirmEmailDto,
+  CreateServerAnnouncementViewModel,
   ResendConfirmationDto,
   ServerAnnouncementDto,
   UserLoginDto,
@@ -18,14 +19,14 @@ import { serverClientUtils } from './serverClientUtils';
 axios.defaults.timeout = 20000;
 axios.defaults.withCredentials = true;
 
-export const ServerClient = () => {
+export const ServerClient = (incomeAbortSignal?: AbortSignal) => {
+  const signal = incomeAbortSignal;
   const instance = axios.create({ baseURL: process.env.REACT_APP_BASE_URL });
   instance.defaults.headers.common[Constants.XsrfTokenHeaderName] = getCookieToken(Constants.CookieTokenHeaderName);
 
-  const getAntiforgeryTokenCookie = (signal?: AbortSignal) => instance.post('antiforgery', null, { signal });
+  const getAntiforgeryTokenCookie = () => instance.post('antiforgery', null, { signal });
 
-  const refreshToken = (signal?: AbortSignal) =>
-    instance.post<string>('auth/refresh-token', { sessionId: SessionService().get() }, { signal });
+  const refreshToken = () => instance.post<string>('auth/refresh-token', { sessionId: SessionService().get() }, { signal });
 
   instance.interceptors.response.use(
     (response) => {
@@ -41,6 +42,10 @@ export const ServerClient = () => {
       }
       if (error?.response?.status === 429) {
         serverClientUtils().tooManyRequestToast(error?.response?.data?.code === 'UserThrottle');
+      }
+      if (error?.response?.status === 403) {
+        serverClientUtils().unauthorizedToast();
+        return Promise.reject(error);
       }
 
       const prevRequest = error?.config;
@@ -81,6 +86,7 @@ export const ServerClient = () => {
               NavigateHandler.navigate('/login', { state: { from: { pathname: location.pathname } }, replace: true });
               document.body.style.cursor = 'default';
             }
+
             return Promise.reject(error);
           });
 
@@ -113,36 +119,40 @@ export const ServerClient = () => {
     (error) => Promise.reject(error),
   );
 
-  const getCaptcha = (signal: AbortSignal) => instance.get<Blob>('captcha', { responseType: 'blob', signal });
+  const getCaptcha = () => instance.get<Blob>('captcha', { responseType: 'blob', signal });
 
-  const validateCaptcha = (captcha: string, signal: AbortSignal) =>
-    instance.patch('captcha', null, { params: { captcha }, signal });
+  const validateCaptcha = (captcha: string) => instance.patch('captcha', null, { params: { captcha }, signal });
 
-  const register = (userRegisterDto: UserRegisterDto, signal: AbortSignal) =>
-    instance.post('auth/register', { ...userRegisterDto }, { signal });
+  const register = (userRegisterDto: UserRegisterDto) => instance.post('auth/register', { ...userRegisterDto }, { signal });
 
-  const confirmEmail = (confirmEmailDto: ConfirmEmailDto, signal: AbortSignal) =>
+  const confirmEmail = (confirmEmailDto: ConfirmEmailDto) =>
     instance.post('auth/confirm-email', { ...confirmEmailDto }, { signal });
 
-  const resendConfirmation = (resendConfirmationDto: ResendConfirmationDto, signal: AbortSignal) =>
+  const resendConfirmation = (resendConfirmationDto: ResendConfirmationDto) =>
     instance.post('auth/resend-confirmation', { ...resendConfirmationDto }, { signal });
 
-  const login = async (userLoginDto: UserLoginDto, signal: AbortSignal) =>
-    instance.post('auth/login', { ...userLoginDto }, { signal });
+  const login = async (userLoginDto: UserLoginDto) => instance.post('auth/login', { ...userLoginDto }, { signal });
 
-  const sendChangePasswordEmail = (changePasswordEmailDto: ChangePasswordEmailDto, signal: AbortSignal) =>
+  const sendChangePasswordEmail = (changePasswordEmailDto: ChangePasswordEmailDto) =>
     instance.post('auth/send-change-password', { ...changePasswordEmailDto }, { signal });
 
-  const changePassword = (changePasswordDto: ChangePasswordDto, signal: AbortSignal) =>
+  const changePassword = (changePasswordDto: ChangePasswordDto) =>
     instance.post('auth/change-password', { ...changePasswordDto }, { signal });
 
-  const logout = (signal: AbortSignal) => instance.post('auth/logout', null, { signal });
+  const logout = () => instance.post('auth/logout', null, { signal });
 
-  const test = (signal: AbortSignal) => instance.post<string>('auth/test', null, { signal });
-  const test2 = (signal: AbortSignal) => instance.post<string>('auth/test2', null, { signal });
+  const getAnnouncements = async () => instance.get<ServerAnnouncementDto[]>('announcement/announcements', { signal });
 
-  const getAnnouncements = async (signal: AbortSignal) =>
-    instance.get<ServerAnnouncementDto[]>('announcement/announcements', { signal });
+  const createAnnouncement = async (model: CreateServerAnnouncementViewModel) =>
+    instance.post('announcement/create', { ...model }, { signal });
+
+  const deleteAnnouncement = async (id: number) => instance.delete(`announcement/delete/${id}`, { signal });
+
+  const test1 = () => instance.get('tryout/test1', { signal });
+  const test2 = () => instance.get('tryout/test2', { signal });
+  const test3 = () => instance.get('tryout/test3', { signal });
+  const test4 = () => instance.get('tryout/test4', { signal });
+  const test5 = () => instance.get('tryout/test5', { signal });
 
   return {
     getCaptcha,
@@ -157,7 +167,12 @@ export const ServerClient = () => {
     getAntiforgeryTokenCookie,
     logout,
     getAnnouncements,
-    test,
+    createAnnouncement,
+    deleteAnnouncement,
+    test1,
     test2,
+    test3,
+    test4,
+    test5,
   };
 };

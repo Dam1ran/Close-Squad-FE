@@ -1,18 +1,17 @@
-import { useAbortSignal, useEmails, useTitle } from '../../../support/hooks';
+import { useEmails, useTitle } from '../../../support/hooks';
 import { Box, captchaCheckModalOverlay, Column, ForwardToInboxIcon, LoadingButton, Paper, Typography } from '../../elements';
 import { fadeIn } from '../../../styles';
 import { RegisterInputField } from '../register/registerInputField';
 import { useEffect, useRef, useState } from 'react';
 import { Constants, isAnyEmpty } from '../../../support/utils';
-import { ServerClient } from '../../../api/serverClient';
 import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { AuthResponseErrors } from '../../../models/auth';
 import { LocationProps } from '../../../models/types';
+import { useServerClient } from '../../../api/useServerClient';
 
 export const SendEmailChangePasswordPage = (): JSX.Element => {
   useTitle('Send email - change password');
-  const signal = useAbortSignal();
   const navigate = useNavigate();
   const { state } = useLocation() as unknown as LocationProps;
   const {
@@ -52,16 +51,17 @@ export const SendEmailChangePasswordPage = (): JSX.Element => {
     }
   }, [email, isEmailValid, repeatEmail, isRepeatEmailValid]);
 
+  const { sendChangePasswordEmail } = useServerClient();
+
   const submit = (): void => {
     if (isAnyEmpty(email, repeatEmail)) {
       return;
     }
-    const { sendChangePasswordEmail } = ServerClient();
     setLoading(true);
     setResponseErrors(null);
     setIsSuccess(false);
 
-    sendChangePasswordEmail({ email, repeatEmail }, signal)
+    sendChangePasswordEmail({ email, repeatEmail })
       .then(() => {
         toast.success('Confirmation email sent to specified address.', {
           icon: '📨',
@@ -186,12 +186,12 @@ export const SendEmailChangePasswordPage = (): JSX.Element => {
               type="submit"
               position="start"
               icon={<ForwardToInboxIcon />}
-              sx={{ margin: 1 }}
               loading={loading}
               disabled={invalid || isSuccess}
-            >
-              <Box sx={{ marginTop: '2px' }}>Send</Box>
-            </LoadingButton>
+              sx={{ margin: 1, width: 'unset' }}
+              caption="Send"
+              centered
+            />
           </Column>
         </Paper>
       </Box>

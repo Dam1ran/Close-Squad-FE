@@ -1,20 +1,19 @@
 import { useEffect, useState } from 'react';
 import toast from 'react-hot-toast';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ServerClient } from '../../../api/serverClient';
+import { useServerClient } from '../../../api/useServerClient';
 import { AuthResponseErrors } from '../../../models/auth';
 import { fadeIn } from '../../../styles';
-import { useAbortSignal, usePasswords, useTitle } from '../../../support/hooks';
+import { usePasswords, useTitle } from '../../../support/hooks';
 import { Constants, isAnyEmpty, isNotEmpty } from '../../../support/utils';
 import {
   Box,
-  Button,
   captchaCheckModalOverlay,
-  CircularProgress,
   Column,
   ForwardToInboxIcon,
   IconButton,
   InputAdornment,
+  LoadingButton,
   Paper,
   SyncLockIcon,
   Typography,
@@ -25,7 +24,6 @@ import { RegisterInputField } from '../register/registerInputField';
 
 export const ChangePasswordPage = (): JSX.Element => {
   useTitle('Change password');
-  const signal = useAbortSignal();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const paramGuid = searchParams.get('guid');
@@ -77,17 +75,18 @@ export const ChangePasswordPage = (): JSX.Element => {
     }
   }, [guid, password, isPasswordValid, repeatPassword, isRepeatPasswordValid]);
 
+  const { changePassword } = useServerClient();
+
   const submit = (): void => {
     if (isAnyEmpty(guid, password, repeatPassword)) {
       return;
     }
-    const { changePassword } = ServerClient();
 
     setLoading(true);
     setResponseErrors(null);
     setIsSuccess(false);
 
-    changePassword({ guid, password, repeatPassword }, signal)
+    changePassword({ guid, password, repeatPassword })
       .then(() => {
         toast.success('Password successfully changed.', {
           icon: <SyncLockIcon />,
@@ -238,23 +237,22 @@ export const ChangePasswordPage = (): JSX.Element => {
                 ))}
               </Box>
             )}
-            <Button type="submit" sx={{ margin: 1 }} disabled={invalid}>
-              {loading ? (
-                <CircularProgress size={24.5} />
-              ) : isSuccess ? (
-                <SyncLockIcon sx={{ height: '24.5px', width: '24.5px' }} />
-              ) : (
-                'Change password'
-              )}
-            </Button>
+            <LoadingButton
+              type="submit"
+              loading={loading}
+              disabled={invalid}
+              icon={<SyncLockIcon />}
+              sx={{ width: 'unset', margin: 1 }}
+              caption={isSuccess ? 'Done' : 'Change password'}
+              centered
+            />
             {showResendBtn && (
-              <Button
-                startIcon={<ForwardToInboxIcon />}
-                sx={{ minWidth: '110px' }}
+              <LoadingButton
+                icon={<ForwardToInboxIcon />}
+                sx={{ width: 'unset', margin: 1 }}
+                caption={<u>Resend confirmation page</u>}
                 onClick={(): void => navigate('/resend-confirmation')}
-              >
-                <u>Resend confirmation page</u>
-              </Button>
+              />
             )}
           </Column>
         </Paper>

@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
+import { useServerClient } from '../../../api/useServerClient';
 import { AuthRole } from '../../../models/auth';
 import { useAuthServiceHelper, useSession } from '../../../support/services';
 import { ClearAuthHandler, NavigateHandler } from '../../../support/utils';
@@ -22,7 +23,7 @@ export const Main = (): JSX.Element => {
   const { clear } = useAuthServiceHelper();
   ClearAuthHandler.clear = clear;
   useSession();
-
+  useServerClient();
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
@@ -40,12 +41,18 @@ export const Main = (): JSX.Element => {
         </Route>
 
         <Route element={<RequireLoggedIn />}>
-          <Route element={<RequireRoles roles={[AuthRole.USR]} />}>
+          <Route element={<RequireRoles roles={[AuthRole.USR, AuthRole.ADM, AuthRole.GMA]} />}>
             <Route path="" element={<Navigate to="lobby" replace />} />
             <Route path="lobby" element={<LobbyPage />} />
           </Route>
 
-          <Route path="administration" element={<RequireRoles roles={[AuthRole.ADM]} />}>
+          <Route path="administration" element={<RequireRoles roles={[AuthRole.ADM, AuthRole.GMA]} />}>
+            <Route path="" element={<Navigate to="server" replace />} />
+            <Route path="server" element={<ServerAdministrationPage />} />
+            <Route path="players" element={'<PlayersAdministrationPage />'} />
+          </Route>
+
+          <Route path="game-master" element={<RequireRoles roles={[AuthRole.GMA]} />}>
             <Route path="" element={<Navigate to="server" replace />} />
             <Route path="server" element={<ServerAdministrationPage />} />
             <Route path="players" element={'<PlayersAdministrationPage />'} />

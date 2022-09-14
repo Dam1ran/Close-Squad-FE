@@ -30,3 +30,4 @@ export { default as KeyOffIcon } from '@mui/icons-material/KeyOff';
 export { default as FlashOffIcon } from '@mui/icons-material/FlashOff';
 export { default as RateReviewIcon } from '@mui/icons-material/RateReview';
 export { default as ShareLocationIcon } from '@mui/icons-material/ShareLocation';
+export { default as RemoveCircleOutlineIcon } from '@mui/icons-material/RemoveCircleOutline';

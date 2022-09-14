@@ -10,7 +10,7 @@ export const GoHome: React.FC<{ onClick: () => void }> = (props) => {
           {
             capture: 'OK',
             icon: <HomeIcon />,
-            minWidth: '110px',
+            width: '110px',
             onClick: props.onClick,
           },
         ]}
