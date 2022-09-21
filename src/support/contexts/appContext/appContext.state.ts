@@ -1,4 +1,4 @@
-import { AuthRole } from '../../models/auth';
+import { AuthRole } from '../../../models/auth';
 
 export interface AppContextState {
   application: ApplicationState;

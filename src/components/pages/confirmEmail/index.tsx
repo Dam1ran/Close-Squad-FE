@@ -109,7 +109,7 @@ export const ConfirmEmailPage = (): JSX.Element => {
         <Column alignItems="center">
           {isSuccess && (
             <LoadingButton
-              icon={<LoginIcon />}
+              icon={<LoginIcon sx={{ transform: 'rotateY(180deg)' }} />}
               sx={{ width: '280px', margin: 1 }}
               onClick={(): void => {
                 navigate('/login', { replace: true });

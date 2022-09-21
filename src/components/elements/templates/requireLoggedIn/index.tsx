@@ -1,7 +1,8 @@
 import { useContext, useEffect, useState } from 'react';
-import { Navigate, Outlet, useLocation, useNavigate } from 'react-router-dom';
-import { useServerClient } from '../../../../api/useServerClient';
-import { AppContext } from '../../../../support/contexts/appContextProvider';
+import { Navigate, Outlet } from 'react-router-dom';
+import { useRefreshToken } from '../../../../api/useRefreshToken';
+import { AppContext } from '../../../../support/contexts/appContext/appContextProvider';
+import { SignalRContextProvider } from '../../../../support/contexts/signalRContext/signalRContextProvider';
 import { useAuthServiceHelper } from '../../../../support/services';
 import { addSeconds } from '../../../../support/utils';
 import { CircularProgress } from '../../atoms';
@@ -10,41 +11,21 @@ import { Column } from '../column';
 
 export const RequireLoggedIn = (): JSX.Element => {
   const { application } = useContext(AppContext);
-  const { isLoggedIn, setToken, setAuthData, isExpiredBy } = useAuthServiceHelper();
+  const { isLoggedIn, isExpiredBy } = useAuthServiceHelper();
   const isExpired = isExpiredBy();
+  const { refresh } = useRefreshToken(true);
+
   const [isLoading, setIsLoading] = useState(true);
   const [requesting, setRequesting] = useState(false);
-  const navigate = useNavigate();
-  const location = useLocation();
-  const { refreshToken, getAntiforgeryTokenCookie } = useServerClient();
 
   useEffect(() => {
     let isMounted = true;
 
     const checkToken = async (): Promise<void> => {
       setIsLoading(true);
-      await refreshToken()
-        .then(async (r) => {
-          if (setToken(r.data)) {
-            await getAntiforgeryTokenCookie();
-            setAuthData();
-          } else {
-            console.warn('Wrong token.');
-            setTimeout(() => {
-              navigate('/home');
-            }, 2000);
-          }
-        })
-        .catch((err) => {
-          if (err?.response?.status === 401) {
-            navigate('/login', { state: { from: { pathname: location.pathname } }, replace: true });
-          } else {
-            navigate('/home');
-          }
-        })
-        .finally(() => {
-          isMounted && setIsLoading(false);
-        });
+      await refresh().finally(() => {
+        isMounted && setIsLoading(false);
+      });
     };
 
     if ((!isLoggedIn || isExpired) && application.trustThisDevice) {
@@ -86,6 +67,8 @@ export const RequireLoggedIn = (): JSX.Element => {
       </Column>
     </ModalBackground>
   ) : (
-    <Outlet />
+    <SignalRContextProvider>
+      <Outlet />
+    </SignalRContextProvider>
   );
 };

@@ -1,10 +1,12 @@
 import ReactDOM from 'react-dom/client';
+// eslint-disable-next-line import/extensions
+import './index.scss';
 import { CssBaseline, ThemeProvider } from '@mui/material';
 import { csTheme } from './styles';
 import { Main } from './components/features/main/main';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { disableReactDevTools } from '@fvilers/disable-react-devtools';
-import { AppContextProvider } from './support/contexts/appContextProvider';
+import { AppContextProvider } from './support/contexts/appContext/appContextProvider';
 import React from 'react';
 import { Toaster } from 'react-hot-toast';
 import { Overlay } from './components/features/overlay';

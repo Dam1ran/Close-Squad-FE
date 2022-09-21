@@ -4,7 +4,7 @@
 import jwt_decode from 'jwt-decode';
 import { useContext } from 'react';
 import { AuthRole } from '../../models/auth';
-import { AppContext } from '../contexts/appContextProvider';
+import { AppContext } from '../contexts/appContext/appContextProvider';
 import { isAnyEmpty, isNullOrEmpty } from '../utils';
 
 interface AuthMemory {

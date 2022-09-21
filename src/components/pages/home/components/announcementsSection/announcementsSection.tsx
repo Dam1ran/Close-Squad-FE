@@ -29,7 +29,7 @@ export const AnnouncementsSection = (): JSX.Element => {
     <Paper
       sx={{
         minWidth: '320px',
-        height: '188px',
+        height: '194px',
         flex: 1,
         padding: 1,
         outline: (theme) => `1px solid ${theme.palette.secondary.main}`,

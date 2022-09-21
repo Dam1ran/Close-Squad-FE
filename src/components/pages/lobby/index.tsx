@@ -1,64 +1,34 @@
-import { useLocation, useNavigate } from 'react-router-dom';
-import { useServerClient } from '../../../api/useServerClient';
-import { LocationProps } from '../../../models/types';
+import { useState } from 'react';
+import { useSignalR } from '../../../api/signalR/useSignalR';
+import { Player } from '../../../models/signalR';
+import { fadeIn } from '../../../styles';
 import { useTitle } from '../../../support/hooks';
-import { Button, Typography } from '../../elements';
+import { Column, Row } from '../../elements';
+import { ChatContainer } from './components/social/components/chatContainer';
+import { LobbyNavigationPanel } from './components/social/components/navigationPanel';
+import { PlayerGroupsContainer } from './components/social/components/playerGroupsContainer';
 
 export const LobbyPage = (): JSX.Element => {
   useTitle('Lobby');
-  const navigate = useNavigate();
-  const { state } = useLocation() as unknown as LocationProps;
-  const { test1, test2, test3, test4, test5 } = useServerClient();
+  useSignalR();
+  const [statePlayer, setStatePlayer] = useState<Player | undefined>();
+
+  const onSelectPlayer = (player: Player): void => {
+    setStatePlayer(player);
+  };
+
+  const onDeselectPlayer = (): void => {
+    setStatePlayer(undefined);
+  };
 
   return (
-    <>
-      <Button
-        onClick={async (): Promise<void> => {
-          const response = await test1();
-          console.log(response);
-        }}
-      >
-        <Typography>Test1</Typography>
-      </Button>
-      <Button
-        onClick={async (): Promise<void> => {
-          const response = await test2();
-          console.log(response);
-        }}
-      >
-        <Typography>Test2</Typography>
-      </Button>
-      <Button
-        onClick={async (): Promise<void> => {
-          const response = await test3();
-          console.log(response);
-        }}
-      >
-        <Typography>Test3</Typography>
-      </Button>
-      <Button
-        onClick={async (): Promise<void> => {
-          const response = await test4();
-          console.log(response);
-        }}
-      >
-        <Typography>Test4</Typography>
-      </Button>
-      <Button
-        onClick={async (): Promise<void> => {
-          const response = await test5();
-          console.log(response);
-        }}
-      >
-        <Typography>Test5</Typography>
-      </Button>
-      <Button
-        onClick={(): void => {
-          navigate('/administration');
-        }}
-      >
-        <Typography>Administration</Typography>
-      </Button>
-    </>
+    <Column sx={{ height: '100%', ...fadeIn() }}>
+      ads adasd asda dasda sdasd asd
+      <Row flexWrap="wrap" justifyContent="center" gap={0.5} p={0.5}>
+        <PlayerGroupsContainer onSelectPlayer={onSelectPlayer} />
+        <ChatContainer player={statePlayer} onSelectPlayer={onSelectPlayer} onDeselectPlayer={onDeselectPlayer} />
+        <LobbyNavigationPanel />
+      </Row>
+    </Column>
   );
 };

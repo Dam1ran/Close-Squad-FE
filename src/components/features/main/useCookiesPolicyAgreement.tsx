@@ -1,5 +1,5 @@
 import { useContext, useEffect } from 'react';
-import { AppContext } from '../../../support/contexts/appContextProvider';
+import { AppContext } from '../../../support/contexts/appContext/appContextProvider';
 import { Box, CookieIcon, DialogActionBar, Typography } from '../../elements';
 import { overlay } from '../overlay/overlay';
 import { DialogType } from '../overlay/store/overlayStore';

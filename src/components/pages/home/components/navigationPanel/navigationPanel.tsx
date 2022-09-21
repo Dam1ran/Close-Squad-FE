@@ -8,10 +8,10 @@ export const NavigationPanel = (): JSX.Element => {
   const { isLoggedIn } = useAuthServiceHelper();
 
   return (
-    <Paper elevation={2} sx={{ padding: (theme) => theme.spacing(2), width: '320px', height: '188px' }}>
+    <Paper elevation={2} sx={{ padding: (theme) => theme.spacing(2), width: '320px', height: '194px' }}>
       <Column sx={{ '& Button': { margin: (theme) => theme.spacing(1) } }}>
         <LoadingButton
-          icon={<LoginIcon />}
+          icon={<LoginIcon sx={{ transform: 'rotateY(180deg)' }} />}
           caption="Enter"
           sx={{ width: 'unset' }}
           onClick={(): void => navigate('/lobby')}

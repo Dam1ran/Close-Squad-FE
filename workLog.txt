@@ -2,6 +2,16 @@ not found page
 unauthorized page
 prepare test page
 
+/// push XIII
+
+checks on refresh optimizations
+retry connection functionality info popover
+reconnection signalR, when logged in
+chat input works
+signalR infra an chat groups
+player groups panel
+reconnect signalR
+
 /// push XII
 
 announcements reworks

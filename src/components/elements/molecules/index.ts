@@ -9,3 +9,7 @@ export * from './tooltip';
 export * from './circularProgressWithChildren';
 export * from './dialogActionBar';
 export * from './loadingButton';
+export * from './tabs';
+export * from './tabPanel';
+export * from './input';
+export * from './popover';

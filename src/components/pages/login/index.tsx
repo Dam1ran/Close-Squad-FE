@@ -26,7 +26,7 @@ import { addSeconds, Constants, getFormattedDateTime, isAnyEmpty } from '../../.
 import { useServerClient } from '../../../api/useServerClient';
 import toast from 'react-hot-toast';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { AppContext } from '../../../support/contexts/appContextProvider';
+import { AppContext } from '../../../support/contexts/appContext/appContextProvider';
 import { alpha } from '@mui/system';
 import { AuthResponseErrors } from '../../../models/auth';
 import { LocationProps } from '../../../models/types';
@@ -40,7 +40,7 @@ export const LoginPage = (): JSX.Element => {
 
   const { application, setTrustThisDevice } = useContext(AppContext);
 
-  const { email, setEmail, isEmailValid, emailErrorText } = useEmail(Constants.EmailMinLength, Constants.EmailMaxLength);
+  const { email, setEmail, isEmailValid } = useEmail(Constants.EmailMinLength, Constants.EmailMaxLength);
 
   const {
     password,
@@ -191,8 +191,8 @@ export const LoginPage = (): JSX.Element => {
                 setShowResendBtn(false);
                 setShowChangePasswordBtn(false);
               }}
-              error={!isEmailValid}
-              errorText={emailErrorText}
+              error={false}
+              errorText={''}
               responseErrors={responseErrors?.Email}
             />
             <RegisterInputField
@@ -269,7 +269,7 @@ export const LoginPage = (): JSX.Element => {
             <LoadingButton
               type="submit"
               sx={{ width: 'unset', margin: 1 }}
-              icon={<LoginIcon />}
+              icon={<LoginIcon sx={{ transform: 'rotateY(180deg)' }} />}
               loading={loading}
               disabled={invalid || isSuccess}
               caption="Login"
