@@ -24,6 +24,13 @@ export const appContextReducer = (prevState: AppContextState, action: AppContext
         },
       } as AppContextState;
     }
+    case AppContextActionEnum.SET_LOBBY_SETTINGS: {
+      localStorage.setItem('lobbySettings', JSON.stringify(action.lobbySettings));
+      return {
+        ...prevState,
+        lobbySettings: { ...action.lobbySettings },
+      } as AppContextState;
+    }
     case AppContextActionEnum.SET_AUTH: {
       return {
         ...prevState,

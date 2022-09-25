@@ -2,7 +2,7 @@ import { createContext, PropsWithChildren, useMemo, useReducer } from 'react';
 import { BrowserRouterProps } from 'react-router-dom';
 import { AppContextActionEnum } from './appContext.actions';
 import { appContextReducer } from './appContext.reducer';
-import { AppContextState, ApplicationState, AuthState } from './appContext.state';
+import { AppContextState, ApplicationState, AuthState, LobbySettings } from './appContext.state';
 
 const appContextInitialState: AppContextState = {
   application: {
@@ -13,12 +13,16 @@ const appContextInitialState: AppContextState = {
     nickname: undefined,
     role: undefined,
   } as AuthState,
+  lobbySettings: {
+    soundEnabled: !!JSON.parse(localStorage.getItem('lobbySettings') || '{}')?.soundEnabled,
+  } as LobbySettings,
 };
 
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function*/
 let dispatcher = {
   setCookiesAccepted: (cookiesAccepted: boolean): void => {},
   setTrustThisDevice: (trustThisDevice: boolean): void => {},
+  setLobbySettings: (lobbySettings: LobbySettings): void => {},
   setAuth: (auth: AuthState): void => {},
   clearAuth: (): void => {},
 };
@@ -42,6 +46,11 @@ export const AppContextProvider = ({ children }: PropsWithChildren<BrowserRouter
         dispatch({
           type: AppContextActionEnum.SET_TRUST_THIS_DEVICE,
           trustThisDevice,
+        }),
+      setLobbySettings: (lobbySettings) =>
+        dispatch({
+          type: AppContextActionEnum.SET_LOBBY_SETTINGS,
+          lobbySettings,
         }),
       setAuth: (auth) =>
         dispatch({

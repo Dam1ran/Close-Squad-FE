@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/rules-of-hooks */
+import { useAudioService } from '../../../assets/audio/audioService';
 import { ChatMessageType } from '../../../models/signalR';
 import { SignalRContextAction, SignalRContextActionEnum } from './signalRContext.actions';
 import { ChatMessages, SignalRContextState } from './signalRContext.state';
@@ -73,7 +75,6 @@ export const signalRContextReducer = (prevState: SignalRContextState, action: Si
           prevState?.chatMessages['general']?.messages?.shift();
         }
       }
-
       return {
         ...prevState,
         chatMessages: {

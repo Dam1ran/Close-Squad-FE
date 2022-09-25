@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useContext, useState } from 'react';
-import { Player } from '../../../../../../../models/signalR';
+import { ChatPlayer } from '../../../../../../../models/signalR';
 import { fadeIn } from '../../../../../../../styles';
 import { PlayerGroups } from '../../../../../../../support/contexts/signalRContext/signalRContext.state';
 import { SignalRContext } from '../../../../../../../support/contexts/signalRContext/signalRContextProvider';
@@ -9,7 +9,7 @@ import { SocialContainer } from '../socialContainer';
 import { NicknameTag } from './nicknameTag';
 
 export interface PlayerGroupsProps {
-  onSelectPlayer: (player: Player) => void;
+  onSelectPlayer: (player: ChatPlayer) => void;
 }
 
 const tabLabels: { [key in keyof PlayerGroups]: string } = {
@@ -62,7 +62,7 @@ export const PlayerGroupsContainer: React.FC<PlayerGroupsProps> = (props): JSX.E
             <Box sx={{ fontSize: '120px', opacity: 0.2, filter: 'none', WebkitFilter: 'grayscale(60%)' }}>📜</Box>
           </Row>
           <Column sx={{ height: '242px', overflowY: 'auto', position: 'relative', ...fadeIn(0.3) }}>
-            {group.map((p: Player) => (
+            {group.map((p: ChatPlayer) => (
               <NicknameTag key={p.id} player={p} onSelectPlayer={props.onSelectPlayer} />
             ))}
           </Column>

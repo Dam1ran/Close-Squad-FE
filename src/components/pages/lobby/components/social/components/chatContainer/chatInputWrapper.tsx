@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { ChatMessage, ChatMessageType, Player } from '../../../../../../../models/signalR';
+import { ChatMessage, ChatMessageType, ChatPlayer } from '../../../../../../../models/signalR';
 import { Input, LoadingButton, Row, SendIcon } from '../../../../../../elements';
 import { alpha } from '@mui/system';
 import { useContext, useEffect, useRef, useState } from 'react';
@@ -11,13 +11,15 @@ import { InfoPopover } from './infoPopover';
 
 export const ChatInputWrapper: React.FC<{
   tabIndex: number;
-  player?: Player;
+  player?: ChatPlayer;
   onDeselectPlayer: () => void;
   backgroundColor: string;
+  whisperNickname?: string;
 }> = (props) => {
   const [inputValue, setInputValue] = useState('');
   const [flag, setFlag] = useState(false);
   const [nicknames, setNicknames] = useState<string[]>([]);
+  const { currentPlayer } = useContext(SignalRContext);
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -45,6 +47,12 @@ export const ChatInputWrapper: React.FC<{
       setNickname(props.player.nickname);
     }
   }, [props?.player]);
+
+  useEffect(() => {
+    if (isNotEmpty(props.whisperNickname) && props.whisperNickname !== currentPlayer?.nickname) {
+      setNickname(props.whisperNickname!);
+    }
+  }, [props.whisperNickname]);
 
   useEffect(() => {
     switch (props.tabIndex) {
@@ -82,7 +90,6 @@ export const ChatInputWrapper: React.FC<{
   }, [props.tabIndex, flag]);
 
   const { sendChatMessage, sendChatCommand } = useConnection();
-  const { currentPlayer } = useContext(SignalRContext);
   const getChatMessageType = (value: string): ChatMessageType => {
     switch (value.slice(0, 3)) {
       case '/w ': {
@@ -103,26 +110,32 @@ export const ChatInputWrapper: React.FC<{
 
   const [nicknameIndex, setNicknameIndex] = useState(nicknames.length - 1);
   const onChatMessage = (): void => {
+    if (!currentPlayer) {
+      return;
+    }
     const chatMessage = {
-      player: currentPlayer,
+      chatPlayer: currentPlayer,
+      type: getChatMessageType(inputValue),
+      text: inputValue.trim(),
     } as ChatMessage;
 
+    let send = false;
     if (/^(\/[n|p|c|s]) .+$/.test(inputValue)) {
-      chatMessage.text = inputValue;
-      chatMessage.type = getChatMessageType(inputValue);
-      sendChatMessage(chatMessage);
-    } else if (/^(\/w) [A-Za-z0-9]+([_](?!$))?[A-Za-z0-9]+ \S+$/.test(inputValue)) {
-      setNickname(inputValue.split(' ')[1]);
-      chatMessage.text = inputValue;
-      chatMessage.type = getChatMessageType(inputValue);
-      sendChatMessage(chatMessage);
+      send = true;
+    } else if (/^(\/w) [A-Za-z0-9]+([_](?!$))?[A-Za-z0-9]+ \S.*$/.test(inputValue)) {
+      const inputNickname = inputValue.split(' ')[1];
+      if (inputNickname.getNormalized() !== currentPlayer.nickname.getNormalized()) {
+        setNickname(inputNickname);
+        send = true;
+      }
     } else if (/^(\/[a-z]{2,})/.test(inputValue)) {
-      sendChatCommand({ player: currentPlayer!, text: inputValue });
+      sendChatCommand({ chatPlayer: currentPlayer!, text: inputValue });
     } else if (!/^(\/[n|w|p|c|s]).*$/.test(inputValue) && inputValue !== '/') {
-      chatMessage.text = `/n ${inputValue}`;
-      chatMessage.type = getChatMessageType(inputValue);
-      sendChatMessage(chatMessage);
+      chatMessage.text = `/n ${inputValue.trim()}`;
+      send = true;
     }
+
+    send && sendChatMessage(chatMessage);
 
     setNicknameIndex(nicknames.length - 1);
     setFlag((prev) => !prev);
@@ -216,7 +229,11 @@ export const ChatInputWrapper: React.FC<{
             borderBottomLeftRadius: '4px',
           }}
           value={inputValue}
-          onChange={(e): void => setInputValue(e.target.value)}
+          onChange={(e): void => {
+            if (e.target.value?.length < 256) {
+              setInputValue(e.target.value);
+            }
+          }}
           spellCheck="false"
           autoComplete="false"
           disableUnderline

@@ -1,9 +1,9 @@
-import { Player } from './player';
+import { ChatPlayer } from './chatPlayer';
 
 export interface ChatMessage {
   type: ChatMessageType;
   text: string;
-  player: Player;
+  chatPlayer: ChatPlayer;
 }
 
 export enum ChatMessageType {
@@ -25,6 +25,6 @@ export const ChatMessageTypeColorMap: { [key in ChatMessageType]: string } = {
 };
 
 export interface ChatCommand {
-  player: Player;
+  chatPlayer: ChatPlayer;
   text: string;
 }

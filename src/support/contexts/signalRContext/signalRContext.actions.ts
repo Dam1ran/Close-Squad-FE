@@ -1,14 +1,14 @@
 import { HubConnection } from '@microsoft/signalr';
-import { ChatMessage, Player } from '../../../models/signalR';
+import { ChatMessage, ChatPlayer, Player } from '../../../models/signalR';
 
 export type SignalRContextAction =
   | { type: SignalRContextActionEnum.SET_CONNECTION; connection: HubConnection }
   | { type: SignalRContextActionEnum.SET_RETRY_CONNECTION }
   | { type: SignalRContextActionEnum.SET_CURRENT_PLAYER; currentPlayer: Player }
-  | { type: SignalRContextActionEnum.SET_NEARBY_PLAYERS; players: Player[] }
-  | { type: SignalRContextActionEnum.SET_PARTY_PLAYERS; players: Player[] }
-  | { type: SignalRContextActionEnum.SET_CLAN_PLAYERS; players: Player[] }
-  | { type: SignalRContextActionEnum.SET_FRIEND_PLAYERS; players: Player[] }
+  | { type: SignalRContextActionEnum.SET_NEARBY_PLAYERS; players: ChatPlayer[] }
+  | { type: SignalRContextActionEnum.SET_PARTY_PLAYERS; players: ChatPlayer[] }
+  | { type: SignalRContextActionEnum.SET_CLAN_PLAYERS; players: ChatPlayer[] }
+  | { type: SignalRContextActionEnum.SET_FRIEND_PLAYERS; players: ChatPlayer[] }
   | { type: SignalRContextActionEnum.SET_CHAT_MESSAGE; message: ChatMessage };
 
 export enum SignalRContextActionEnum {

@@ -32,3 +32,5 @@ export { default as RateReviewIcon } from '@mui/icons-material/RateReview';
 export { default as ShareLocationIcon } from '@mui/icons-material/ShareLocation';
 export { default as RemoveCircleOutlineIcon } from '@mui/icons-material/RemoveCircleOutline';
 export { default as SendIcon } from '@mui/icons-material/Send';
+export { default as MapIcon } from '@mui/icons-material/Map';
+export { default as SettingsIcon } from '@mui/icons-material/Settings';

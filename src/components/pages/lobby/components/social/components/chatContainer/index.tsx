@@ -2,17 +2,20 @@
 
 import { alpha } from '@mui/system';
 import { useState, useContext, useRef, useEffect } from 'react';
-import { ChatMessage, ChatMessageType, ChatMessageTypeColorMap, Player } from '../../../../../../../models/signalR';
+import { useAudioService } from '../../../../../../../assets/audio/audioService';
+import { ChatMessage, ChatMessageType, ChatMessageTypeColorMap, ChatPlayer } from '../../../../../../../models/signalR';
 import { fadeIn } from '../../../../../../../styles';
+import { AppContext } from '../../../../../../../support/contexts/appContext/appContextProvider';
 import { SignalRContext } from '../../../../../../../support/contexts/signalRContext/signalRContextProvider';
+import { isNotEmpty } from '../../../../../../../support/utils';
 import { Box, Tab, Tabs, a11yProps, TabPanel, Row, Column, Typography } from '../../../../../../elements';
 import { NicknameTag } from '../playerGroupsContainer/nicknameTag';
 import { SocialContainer } from '../socialContainer';
 import { ChatInputWrapper } from './chatInputWrapper';
 
 export interface ChatContainerProps {
-  player?: Player;
-  onSelectPlayer: (player: Player) => void;
+  player?: ChatPlayer;
+  onSelectPlayer: (player: ChatPlayer) => void;
   onDeselectPlayer: () => void;
 }
 
@@ -28,6 +31,25 @@ const tabData: { [key in ChatMessageType]: { label: string; icon: string; backgr
 export const ChatContainer: React.FC<ChatContainerProps> = (props): JSX.Element => {
   const [tabIndex, setTabIndex] = useState(0);
   const { chatMessages, currentPlayer } = useContext(SignalRContext);
+  const {
+    lobbySettings: { soundEnabled },
+  } = useContext(AppContext);
+  const { whisperDing } = useAudioService(soundEnabled);
+
+  const lastWhisperMessagePlayerNickname =
+    chatMessages.whisper.messages[chatMessages.whisper.messages.length - 1]?.chatPlayer?.nickname;
+  const lastWhisperMessageText = chatMessages.whisper.messages[chatMessages.whisper.messages.length - 1]?.text;
+
+  useEffect(() => {
+    if (
+      isNotEmpty(currentPlayer?.nickname) &&
+      isNotEmpty(lastWhisperMessageText) &&
+      lastWhisperMessagePlayerNickname !== currentPlayer?.nickname
+    ) {
+      whisperDing();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [lastWhisperMessageText, currentPlayer?.nickname]);
 
   const chatColumnRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -131,25 +153,30 @@ export const ChatContainer: React.FC<ChatContainerProps> = (props): JSX.Element 
                   minWidth: '310px',
                   border: (theme) => `1px solid ${theme.palette.background.paper}`,
                   paddingLeft: 0.25,
-                  backgroundColor: (theme) => alpha(theme.palette.grey[300], 0.8),
+                  backgroundColor: (theme) =>
+                    gm.chatPlayer?.nickname !== '*System*'
+                      ? alpha(theme.palette.grey[300], i % 2 === 0 ? 0.4 : 0.6)
+                      : alpha(theme.palette.grey[300], 0.1),
                 }}
                 alignItems="center"
               >
-                <NicknameTag player={gm.player} onSelectPlayer={props.onSelectPlayer} small />
-                <Box sx={{ marginLeft: 1 }}>
-                  <Typography
-                    variant="subtitle2"
-                    sx={{
-                      fontWeight: 500,
-                      fontSize: '14px',
-                      letterSpacing: '0px',
-                      color: ChatMessageTypeColorMap[gm.type],
-                      fontFamily: gm.player?.nickname !== '*System*' ? '"Roboto Mono", "monospace"' : 'Roboto',
-                    }}
-                  >
-                    {gm.text}
-                  </Typography>
-                </Box>
+                {gm.chatPlayer?.nickname !== '*System*' && (
+                  <NicknameTag player={gm.chatPlayer} onSelectPlayer={props.onSelectPlayer} small />
+                )}
+                <Typography
+                  variant="subtitle2"
+                  sx={{
+                    marginLeft: gm.chatPlayer?.nickname === '*System*' ? 0.5 : 'unset',
+                    fontWeight: 500,
+                    fontSize: '14px',
+                    letterSpacing: '0px',
+                    color: ChatMessageTypeColorMap[gm.type],
+                    wordBreak: 'break-word',
+                    fontFamily: gm.chatPlayer?.nickname !== '*System*' ? '"Roboto Mono", "monospace"' : 'Roboto',
+                  }}
+                >
+                  {gm.text}
+                </Typography>
               </Row>
             ))}
           </Column>
@@ -159,6 +186,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = (props): JSX.Element 
         tabIndex={tabIndex}
         player={props.player}
         onDeselectPlayer={props.onDeselectPlayer}
+        whisperNickname={lastWhisperMessagePlayerNickname}
         backgroundColor={Object.values(tabData)[tabIndex].backgroundColor}
       />
     </SocialContainer>

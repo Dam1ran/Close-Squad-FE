@@ -1,7 +1,6 @@
-export interface Player {
+export interface ChatPlayer {
   id: number;
   nickname: string;
   clanName?: string;
   clanIcon?: string;
-  quadrantId?: number;
 }

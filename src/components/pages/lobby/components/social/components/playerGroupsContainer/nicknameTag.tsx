@@ -1,11 +1,11 @@
 import { alpha } from '@mui/system';
-import { Player } from '../../../../../../../models/signalR';
+import { ChatPlayer } from '../../../../../../../models/signalR';
 import { Box, Row, Tooltip, Typography } from '../../../../../../elements';
 
 export const NicknameTag: React.FC<{
   small?: boolean;
-  player: Player;
-  onSelectPlayer?: (player: Player) => void;
+  player: ChatPlayer;
+  onSelectPlayer?: (player: ChatPlayer) => void;
 }> = ({ small = false, ...props }) => {
   const isSystem = props.player?.nickname === '*System*';
   return (
@@ -20,7 +20,7 @@ export const NicknameTag: React.FC<{
         borderRadius: small ? '8px' : 1,
         boxShadow: (theme) => (isSystem ? 'none' : small ? `inset 0 0 10px ${theme.palette.grey[200]}` : 'unset'),
         transition: 'text-shadow 0.3s, background-color 0.3s',
-        textShadow: (theme) => (isSystem ? 'none' : small ? `0 0 5px ${theme.palette.grey[600]}` : 'unset'),
+        textShadow: (theme) => (isSystem ? 'none' : small ? `0 0 5px ${theme.palette.grey[400]}` : 'unset'),
         '&:hover': {
           backgroundColor: (theme) =>
             small ? (isSystem ? 'unset' : theme.palette.grey[500]) : alpha(theme.palette.grey[400], 0.5),
@@ -33,8 +33,16 @@ export const NicknameTag: React.FC<{
         }
       }}
     >
-      <Tooltip arrow title={props.player.clanName || ''}>
-        <Box sx={{ marginRight: 0.5, fontSize: small ? '12px' : '16px' }}>{props.player.clanIcon}</Box>
+      <Tooltip arrow title={props.player?.clanName || ''}>
+        <Box
+          sx={{
+            marginRight: 0.5,
+            fontSize: small ? '12px' : '16px',
+            textShadow: (theme) => `0 0 5px ${theme.palette.grey[600]}`,
+          }}
+        >
+          {props.player.clanIcon}
+        </Box>
       </Tooltip>
       <Typography
         fontWeight="500"
@@ -48,6 +56,7 @@ export const NicknameTag: React.FC<{
         }}
       >
         {props.player.nickname}
+        {small ? ':' : ''}
       </Typography>
     </Row>
   );

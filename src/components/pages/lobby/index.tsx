@@ -1,34 +1,32 @@
 import { useState } from 'react';
 import { useSignalR } from '../../../api/signalR/useSignalR';
-import { Player } from '../../../models/signalR';
+import { ChatPlayer } from '../../../models/signalR';
 import { fadeIn } from '../../../styles';
 import { useTitle } from '../../../support/hooks';
-import { Column, Row } from '../../elements';
+import { Box, Row } from '../../elements';
 import { ChatContainer } from './components/social/components/chatContainer';
+import { MenuBar } from './components/social/components/menuBar';
 import { LobbyNavigationPanel } from './components/social/components/navigationPanel';
 import { PlayerGroupsContainer } from './components/social/components/playerGroupsContainer';
 
 export const LobbyPage = (): JSX.Element => {
   useTitle('Lobby');
   useSignalR();
-  const [statePlayer, setStatePlayer] = useState<Player | undefined>();
-
-  const onSelectPlayer = (player: Player): void => {
-    setStatePlayer(player);
-  };
-
-  const onDeselectPlayer = (): void => {
-    setStatePlayer(undefined);
-  };
+  const [statePlayer, setStatePlayer] = useState<ChatPlayer | undefined>();
 
   return (
-    <Column sx={{ height: '100%', ...fadeIn() }}>
-      ads adasd asda dasda sdasd asd
+    <Box sx={{ height: '100%', ...fadeIn() }}>
+      {/* <Box sx={{ height: '480px', width: '480px', backgroundColor: 'gray' }}></Box> */}
+      <MenuBar />
       <Row flexWrap="wrap" justifyContent="center" gap={0.5} p={0.5}>
-        <PlayerGroupsContainer onSelectPlayer={onSelectPlayer} />
-        <ChatContainer player={statePlayer} onSelectPlayer={onSelectPlayer} onDeselectPlayer={onDeselectPlayer} />
+        <PlayerGroupsContainer onSelectPlayer={setStatePlayer} />
+        <ChatContainer
+          player={statePlayer}
+          onSelectPlayer={setStatePlayer}
+          onDeselectPlayer={(): void => setStatePlayer(undefined)}
+        />
         <LobbyNavigationPanel />
       </Row>
-    </Column>
+    </Box>
   );
 };

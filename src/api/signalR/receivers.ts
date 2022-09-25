@@ -1,5 +1,5 @@
 import { useContext } from 'react';
-import { ChatMessage, Player } from '../../models/signalR';
+import { ChatMessage, ChatPlayer, Player } from '../../models/signalR';
 import { SignalRContext } from '../../support/contexts/signalRContext/signalRContextProvider';
 import { useRefreshToken } from '../useRefreshToken';
 
@@ -17,16 +17,16 @@ export const useReceivers = (): Receivers => {
     SetCurrentPlayer: (payload: Player) => {
       setCurrentPlayer(payload);
     },
-    NearbyGroup: (payload: Player[]) => {
+    NearbyGroup: (payload: ChatPlayer[]) => {
       setNearbyPlayers(payload);
     },
-    PartyGroup: (payload: Player[]) => {
+    PartyGroup: (payload: ChatPlayer[]) => {
       setPartyPlayers(payload);
     },
-    ClanGroup: (payload: Player[]) => {
+    ClanGroup: (payload: ChatPlayer[]) => {
       setClanPlayers(payload);
     },
-    FriendGroup: (payload: Player[]) => {
+    FriendGroup: (payload: ChatPlayer[]) => {
       setFriendPlayers(payload);
     },
     ReceiveChatMessage: (message: ChatMessage) => {

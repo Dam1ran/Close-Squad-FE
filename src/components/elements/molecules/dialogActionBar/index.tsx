@@ -47,7 +47,6 @@ export const DialogActionBar: React.FC<DialogActionBarProps> = ({ btnData = [] }
           loading={d.loading}
           disabled={d.disabled}
           caption={d.capture}
-          centered
         />
       ))}
     </Row>

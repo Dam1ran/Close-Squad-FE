@@ -1,5 +1,5 @@
 import { useContext, useEffect, useState } from 'react';
-import { Navigate, Outlet } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useRefreshToken } from '../../../../api/useRefreshToken';
 import { AppContext } from '../../../../support/contexts/appContext/appContextProvider';
 import { SignalRContextProvider } from '../../../../support/contexts/signalRContext/signalRContextProvider';
@@ -14,6 +14,7 @@ export const RequireLoggedIn = (): JSX.Element => {
   const { isLoggedIn, isExpiredBy } = useAuthServiceHelper();
   const isExpired = isExpiredBy();
   const { refresh } = useRefreshToken(true);
+  const location = useLocation();
 
   const [isLoading, setIsLoading] = useState(true);
   const [requesting, setRequesting] = useState(false);
@@ -56,7 +57,7 @@ export const RequireLoggedIn = (): JSX.Element => {
   }, [isLoggedIn]);
 
   return !application.trustThisDevice && (!isLoggedIn || isExpiredBy()) ? (
-    <Navigate to="/login" state={{ from: location }} replace />
+    <Navigate to="/login" state={{ from: location.pathname }} replace />
   ) : isLoading && !requesting ? (
     <ModalBackground sx={{ userSelect: 'none' }}>
       <Column>

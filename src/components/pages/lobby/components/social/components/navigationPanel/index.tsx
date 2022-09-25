@@ -1,8 +1,14 @@
+import { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Column, HomeIcon, LoadingButton } from '../../../../../../elements';
+import { AppContext } from '../../../../../../../support/contexts/appContext/appContextProvider';
+import { Column, HomeIcon, LoadingButton, SettingsIcon } from '../../../../../../elements';
 import { SocialContainer } from '../socialContainer';
 
 export const LobbyNavigationPanel: React.FC = (): JSX.Element => {
+  const {
+    setLobbySettings,
+    lobbySettings: { soundEnabled },
+  } = useContext(AppContext);
   const navigate = useNavigate();
 
   return (
@@ -13,6 +19,16 @@ export const LobbyNavigationPanel: React.FC = (): JSX.Element => {
           caption={<u>Home page</u>}
           sx={{ width: 'unset' }}
           onClick={(): void => navigate('/home')}
+        />
+        <LoadingButton
+          icon={<SettingsIcon />}
+          caption="Settings"
+          sx={{ width: 'unset' }}
+          onClick={(): void => {
+            console.log('not done');
+            // need dialog with settings
+            setLobbySettings({ soundEnabled: !soundEnabled });
+          }}
         />
       </Column>
     </SocialContainer>

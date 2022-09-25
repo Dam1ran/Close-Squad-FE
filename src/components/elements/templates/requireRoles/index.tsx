@@ -9,5 +9,5 @@ export const RequireRoles: React.FC<RequireRoleProps> = ({ roles = [] }): JSX.El
   const { hasAnyOf } = useAuthServiceHelper();
   const location = useLocation();
 
-  return hasAnyOf(roles) ? <Outlet /> : <Navigate to="/unauthorized" state={{ from: location }} replace />;
+  return hasAnyOf(roles) ? <Outlet /> : <Navigate to="/unauthorized" state={{ from: location.pathname }} replace />;
 };

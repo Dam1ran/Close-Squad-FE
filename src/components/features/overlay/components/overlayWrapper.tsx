@@ -17,7 +17,7 @@ export const OverlayWrapper: React.FC<OverlayWrapperProps> = (props) => {
   if (!props.modal) {
     noModalBackgroundStyles = {
       position: 'fixed',
-      top: `calc(30% + ${props.posYOrder * 36}px)`,
+      top: `calc(20% + ${props.posYOrder * 36}px)`,
       transform: 'translate(-50%)',
       left: '50%',
       ...props.sx,
