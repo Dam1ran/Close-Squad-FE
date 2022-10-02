@@ -18,9 +18,12 @@ export interface OverlayIconProps {
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export const overlayUtils = () => {
-  const getIconDescriptionAndColor = (dialogType?: DialogType): { description: string; backgroundColor: string } => {
+  const getIconDescriptionAndColor = (
+    iconDescription?: string,
+    dialogType?: DialogType,
+  ): { description: string; backgroundColor: string } => {
     const result = {
-      description: `${DialogType[dialogType ?? DialogType.Other]} dialogs`,
+      description: iconDescription || `${DialogType[dialogType ?? DialogType.Other]} dialogs`,
       backgroundColor: '#FFFFFF',
     };
     // eslint-disable-next-line react-hooks/rules-of-hooks

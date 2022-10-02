@@ -1,7 +1,7 @@
 import { HubConnection } from '@microsoft/signalr';
 import { createContext, PropsWithChildren, useMemo, useReducer } from 'react';
 import { BrowserRouterProps } from 'react-router-dom';
-import { ChatMessageType, ChatMessage, ChatPlayer, Player } from '../../../models/signalR';
+import { ChatMessageType, ChatMessage, ChatPlayerDto, PlayerDto } from '../../../models/signalR';
 import { SignalRContextActionEnum } from './signalRContext.actions';
 import { signalRContextReducer } from './signalRContext.reducer';
 import { ChatMessages, PlayerGroups, SignalRContextState } from './signalRContext.state';
@@ -30,11 +30,11 @@ const signalRContextInitialState: SignalRContextState = {
 let dispatcher = {
   setConnection: (connection: HubConnection): void => {},
   setRetryConnection: (): void => {},
-  setCurrentPlayer: (currentPlayer: Player): void => {},
-  setNearbyPlayers: (players: ChatPlayer[]): void => {},
-  setPartyPlayers: (players: ChatPlayer[]): void => {},
-  setClanPlayers: (players: ChatPlayer[]): void => {},
-  setFriendPlayers: (players: ChatPlayer[]): void => {},
+  setCurrentPlayer: (currentPlayer: PlayerDto): void => {},
+  setNearbyPlayers: (players: ChatPlayerDto[]): void => {},
+  setPartyPlayers: (players: ChatPlayerDto[]): void => {},
+  setClanPlayers: (players: ChatPlayerDto[]): void => {},
+  setFriendPlayers: (players: ChatPlayerDto[]): void => {},
   setChatMessage: (message: ChatMessage): void => {},
 };
 

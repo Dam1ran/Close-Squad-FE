@@ -1,19 +1,19 @@
 import { HubConnection } from '@microsoft/signalr';
-import { ChatMessage, ChatMessageType, ChatPlayer, Player } from '../../../models/signalR';
+import { ChatMessage, ChatMessageType, ChatPlayerDto, PlayerDto } from '../../../models/signalR';
 
 export interface SignalRContextState {
   connection?: HubConnection;
   retryConnectionFlag: boolean;
-  currentPlayer?: Player;
+  currentPlayer?: PlayerDto;
   playerGroups: PlayerGroups;
   chatMessages: ChatMessages;
 }
 
 export interface PlayerGroups {
-  nearbyPlayers: ChatPlayer[];
-  partyPlayers: ChatPlayer[];
-  clanPlayers: ChatPlayer[];
-  friendPlayers: ChatPlayer[];
+  nearbyPlayers: ChatPlayerDto[];
+  partyPlayers: ChatPlayerDto[];
+  clanPlayers: ChatPlayerDto[];
+  friendPlayers: ChatPlayerDto[];
 }
 
 export interface ChatMessages {

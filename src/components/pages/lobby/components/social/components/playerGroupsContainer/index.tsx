@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { useContext, useState } from 'react';
-import { ChatPlayer } from '../../../../../../../models/signalR';
+import { ChatPlayerDto } from '../../../../../../../models/signalR';
 import { fadeIn } from '../../../../../../../styles';
 import { PlayerGroups } from '../../../../../../../support/contexts/signalRContext/signalRContext.state';
 import { SignalRContext } from '../../../../../../../support/contexts/signalRContext/signalRContextProvider';
@@ -9,7 +9,7 @@ import { SocialContainer } from '../socialContainer';
 import { NicknameTag } from './nicknameTag';
 
 export interface PlayerGroupsProps {
-  onSelectPlayer: (player: ChatPlayer) => void;
+  onSelectPlayer: (player: ChatPlayerDto) => void;
 }
 
 const tabLabels: { [key in keyof PlayerGroups]: string } = {
@@ -24,7 +24,7 @@ export const PlayerGroupsContainer: React.FC<PlayerGroupsProps> = (props): JSX.E
   const { playerGroups } = useContext(SignalRContext);
 
   return (
-    <SocialContainer sx={{ width: '320px', padding: 0, height: '276px' }}>
+    <SocialContainer sx={{ maxWidth: '320px', padding: 0, height: '276px', flexGrow: 2 }}>
       <Box
         sx={{
           borderBottom: 1,
@@ -62,7 +62,7 @@ export const PlayerGroupsContainer: React.FC<PlayerGroupsProps> = (props): JSX.E
             <Box sx={{ fontSize: '120px', opacity: 0.2, filter: 'none', WebkitFilter: 'grayscale(60%)' }}>📜</Box>
           </Row>
           <Column sx={{ height: '242px', overflowY: 'auto', position: 'relative', ...fadeIn(0.3) }}>
-            {group.map((p: ChatPlayer) => (
+            {group.map((p: ChatPlayerDto) => (
               <NicknameTag key={p.id} player={p} onSelectPlayer={props.onSelectPlayer} />
             ))}
           </Column>

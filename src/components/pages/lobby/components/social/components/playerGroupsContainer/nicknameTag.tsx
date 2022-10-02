@@ -1,11 +1,11 @@
 import { alpha } from '@mui/system';
-import { ChatPlayer } from '../../../../../../../models/signalR';
+import { ChatPlayerDto } from '../../../../../../../models/signalR';
 import { Box, Row, Tooltip, Typography } from '../../../../../../elements';
 
 export const NicknameTag: React.FC<{
   small?: boolean;
-  player: ChatPlayer;
-  onSelectPlayer?: (player: ChatPlayer) => void;
+  player: ChatPlayerDto;
+  onSelectPlayer?: (player: ChatPlayerDto) => void;
 }> = ({ small = false, ...props }) => {
   const isSystem = props.player?.nickname === '*System*';
   return (
@@ -41,7 +41,7 @@ export const NicknameTag: React.FC<{
             textShadow: (theme) => `0 0 5px ${theme.palette.grey[600]}`,
           }}
         >
-          {props.player.clanIcon}
+          {props.player?.clanIcon}
         </Box>
       </Tooltip>
       <Typography
@@ -55,7 +55,7 @@ export const NicknameTag: React.FC<{
           color: (theme) => (isSystem ? theme.palette.action.active : theme.palette.common.black),
         }}
       >
-        {props.player.nickname}
+        {props.player?.nickname}
         {small ? ':' : ''}
       </Typography>
     </Row>

@@ -2,9 +2,10 @@ import { useState } from 'react';
 
 export enum OverlayActionType {
   ADD_COMPONENT = 0,
-  REMOVE_COMPONENT = 1,
-  UPDATE_COMPONENT = 2,
-  CLEAR_COMPONENTS = 3,
+  ADD_OR_REMOVE_IF_PRESENT = 1,
+  REMOVE_COMPONENT = 2,
+  UPDATE_COMPONENT = 3,
+  CLEAR_COMPONENTS = 4,
 }
 
 export interface OverlayAction {
@@ -47,6 +48,14 @@ export interface OverlayState {
 let order = 0;
 export const overlayReducer = (prevState: OverlayState, action: OverlayAction): OverlayState => {
   switch (action.type) {
+    case OverlayActionType.ADD_OR_REMOVE_IF_PRESENT: {
+      if (prevState.components.some((c) => c.id === action.component?.id)) {
+        return {
+          ...prevState,
+          components: [...prevState.components.filter((c) => c.id !== action.component?.id)],
+        } as OverlayState;
+      }
+    }
     case OverlayActionType.ADD_COMPONENT: {
       const component = action.component;
       if (prevState.components.length === 0) {

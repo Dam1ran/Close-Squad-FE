@@ -2,6 +2,19 @@ not found page
 unauthorized page
 prepare test page
 
+/// push XV
+
+theme breakpoints
+control bar
+overlay component debug and improvements
+char creation dialog and co
+char thumbnail
+char list
+lobby works
+character creation
+world map works
+register validation small bug
+
 /// push XIV
 
 some sound works

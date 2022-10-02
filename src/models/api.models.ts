@@ -20,6 +20,37 @@ export interface CreateServerAnnouncementViewModel {
     message: string;
 }
 
+export interface CharacterCreationDto {
+    nickname: string;
+    characterRace: CharacterRace;
+    characterClass: CharacterClass;
+    gender: number;
+}
+
+export enum CharacterRace {
+    Divine = 1,
+    Human = 2,
+    Dwarf = 3,
+    Orc = 4,
+    NightElf = 5,
+}
+
+export enum CharacterClass {
+    Assassin = 1,
+    Berserk = 2,
+    Cupid = 3,
+    Doctor = 4,
+    Handyman = 5,
+    Medium = 6,
+    Occultist = 7,
+    Seer = 8,
+    Templar = 9,
+}
+
+export interface CharacterToggleRequestDto {
+    nickname: string;
+}
+
 export interface UserRegisterDto {
     nickname: string;
     email: string;

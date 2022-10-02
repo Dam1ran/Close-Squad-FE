@@ -14,6 +14,7 @@ export interface OverlayOptions {
   iconDescription?: string;
   durationMilliseconds?: number;
   onClose?: () => void;
+  intermittent?: boolean;
 }
 
 const overlay = {
@@ -27,7 +28,7 @@ const overlay = {
       canBeClosed: options.canBeClosed ?? false,
       canBePaused: options.canBePaused ?? true,
       icon: options.icon || overlayUtils().OverlayIcon({ dialogType: options.dialogType }),
-      iconData: overlayUtils().getIconDescriptionAndColor(options.dialogType),
+      iconData: overlayUtils().getIconDescriptionAndColor(options.iconDescription, options.dialogType),
       element,
       durationMilliseconds: options.dialogType === DialogType.Loading ? -1 : options.durationMilliseconds || 0,
       close: false,
@@ -35,15 +36,21 @@ const overlay = {
       onClose: options.onClose,
     } as OverlayComponent;
 
-    overlayDispatch({
-      type: OverlayActionType.REMOVE_COMPONENT,
-      id,
-    });
-
-    overlayDispatch({
-      type: OverlayActionType.ADD_COMPONENT,
-      component,
-    });
+    if (options.intermittent) {
+      overlayDispatch({
+        type: OverlayActionType.REMOVE_COMPONENT,
+        id,
+      });
+      overlayDispatch({
+        type: OverlayActionType.ADD_COMPONENT,
+        component,
+      });
+    } else {
+      overlayDispatch({
+        type: OverlayActionType.ADD_OR_REMOVE_IF_PRESENT,
+        component,
+      });
+    }
 
     return id;
   },

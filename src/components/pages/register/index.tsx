@@ -73,7 +73,7 @@ export const RegisterPage = (): JSX.Element => {
       password.length > 0 &&
       repeatPassword.length > 0
     ) {
-      setInvalid(!nickname || !isEmailValid || !isRepeatEmailValid || !isPasswordValid || !isRepeatPasswordValid);
+      setInvalid(!isNicknameValid || !isEmailValid || !isRepeatEmailValid || !isPasswordValid || !isRepeatPasswordValid);
     }
   }, [
     nickname,

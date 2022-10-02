@@ -13,3 +13,6 @@ export * from './tabs';
 export * from './tabPanel';
 export * from './input';
 export * from './popover';
+export * from './select';
+export * from './slider';
+export * from './formControl';

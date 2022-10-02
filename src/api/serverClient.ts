@@ -5,6 +5,8 @@ import { captchaCheckModalOverlay } from '../components/elements';
 import {
   ChangePasswordDto,
   ChangePasswordEmailDto,
+  CharacterCreationDto,
+  CharacterToggleRequestDto,
   ConfirmEmailDto,
   CreateServerAnnouncementViewModel,
   ResendConfirmationDto,
@@ -148,6 +150,12 @@ export const ServerClient = (incomeAbortSignal?: AbortSignal) => {
 
   const deleteAnnouncement = async (id: number) => instance.delete(`announcement/delete/${id}`, { signal });
 
+  const createCharacter = async (characterCreationDto: CharacterCreationDto) =>
+    instance.post('character/create', { ...characterCreationDto }, { signal });
+
+  const toggleCharacter = async (characterToggleRequestDto: CharacterToggleRequestDto) =>
+    instance.patch('character/toggle', { ...characterToggleRequestDto }, { signal });
+
   const test1 = () => instance.get('tryout/test1', { signal });
   const test2 = () => instance.get('tryout/test2', { signal });
   const test3 = () => instance.get('tryout/test3', { signal });
@@ -169,6 +177,8 @@ export const ServerClient = (incomeAbortSignal?: AbortSignal) => {
     getAnnouncements,
     createAnnouncement,
     deleteAnnouncement,
+    createCharacter,
+    toggleCharacter,
     test1,
     test2,
     test3,

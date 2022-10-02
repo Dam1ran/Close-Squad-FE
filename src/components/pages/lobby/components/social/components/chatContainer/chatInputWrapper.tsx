@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable react-hooks/exhaustive-deps */
-import { ChatMessage, ChatMessageType, ChatPlayer } from '../../../../../../../models/signalR';
+import { ChatMessage, ChatMessageType, ChatPlayerDto } from '../../../../../../../models/signalR';
 import { Input, LoadingButton, Row, SendIcon } from '../../../../../../elements';
 import { alpha } from '@mui/system';
 import { useContext, useEffect, useRef, useState } from 'react';
@@ -11,7 +11,7 @@ import { InfoPopover } from './infoPopover';
 
 export const ChatInputWrapper: React.FC<{
   tabIndex: number;
-  player?: ChatPlayer;
+  player?: ChatPlayerDto;
   onDeselectPlayer: () => void;
   backgroundColor: string;
   whisperNickname?: string;
@@ -114,7 +114,7 @@ export const ChatInputWrapper: React.FC<{
       return;
     }
     const chatMessage = {
-      chatPlayer: currentPlayer,
+      chatPlayerDto: currentPlayer,
       type: getChatMessageType(inputValue),
       text: inputValue.trim(),
     } as ChatMessage;
@@ -124,12 +124,12 @@ export const ChatInputWrapper: React.FC<{
       send = true;
     } else if (/^(\/w) [A-Za-z0-9]+([_](?!$))?[A-Za-z0-9]+ \S.*$/.test(inputValue)) {
       const inputNickname = inputValue.split(' ')[1];
-      if (inputNickname.getNormalized() !== currentPlayer.nickname.getNormalized()) {
+      if (inputNickname.getNormalized() !== currentPlayer?.nickname.getNormalized()) {
         setNickname(inputNickname);
         send = true;
       }
     } else if (/^(\/[a-z]{2,})/.test(inputValue)) {
-      sendChatCommand({ chatPlayer: currentPlayer!, text: inputValue });
+      sendChatCommand({ chatPlayerDto: currentPlayer!, text: inputValue });
     } else if (!/^(\/[n|w|p|c|s]).*$/.test(inputValue) && inputValue !== '/') {
       chatMessage.text = `/n ${inputValue.trim()}`;
       send = true;

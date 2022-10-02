@@ -7,3 +7,4 @@ export * from './box';
 export * from './requireRoles';
 export * from './requireNotLoggedIn';
 export * from './requireLoggedIn';
+export * from './grid';

@@ -12,7 +12,7 @@ export const LobbyNavigationPanel: React.FC = (): JSX.Element => {
   const navigate = useNavigate();
 
   return (
-    <SocialContainer sx={{ flex: 1, maxWidth: '320px' }}>
+    <SocialContainer sx={{ maxWidth: '320px', flexGrow: 2 }}>
       <Column sx={{ '& Button': { margin: (theme) => theme.spacing(1) } }}>
         <LoadingButton
           icon={<HomeIcon />}

@@ -34,3 +34,8 @@ export { default as RemoveCircleOutlineIcon } from '@mui/icons-material/RemoveCi
 export { default as SendIcon } from '@mui/icons-material/Send';
 export { default as MapIcon } from '@mui/icons-material/Map';
 export { default as SettingsIcon } from '@mui/icons-material/Settings';
+export { default as AddCircleOutlineIcon } from '@mui/icons-material/AddCircleOutline';
+export { default as SettingsApplicationsIcon } from '@mui/icons-material/SettingsApplications';
+export { default as MaleIcon } from '@mui/icons-material/Male';
+export { default as FemaleIcon } from '@mui/icons-material/Female';
+export { default as TransgenderIcon } from '@mui/icons-material/Transgender';

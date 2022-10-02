@@ -1,5 +1,6 @@
 import { useContext } from 'react';
-import { ChatMessage, ChatPlayer, Player } from '../../models/signalR';
+import { CharacterDto, ChatMessage, ChatPlayerDto, PlayerDto } from '../../models/signalR';
+import { CharacterContext } from '../../support/contexts/characterContext/characterContextProvider';
 import { SignalRContext } from '../../support/contexts/signalRContext/signalRContextProvider';
 import { useRefreshToken } from '../useRefreshToken';
 
@@ -9,24 +10,33 @@ export interface Receivers {
 }
 
 export const useReceivers = (): Receivers => {
-  const { setCurrentPlayer, setNearbyPlayers, setPartyPlayers, setClanPlayers, setFriendPlayers, setChatMessage } =
-    useContext(SignalRContext);
+  const {
+    setCurrentPlayer,
+    setNearbyPlayers,
+    setPartyPlayers,
+    setClanPlayers,
+    setFriendPlayers,
+    setChatMessage,
+    setRetryConnection,
+  } = useContext(SignalRContext);
+  const { setCharacters, updateCharacter } = useContext(CharacterContext);
   const { refresh } = useRefreshToken();
 
   const receivers: Receivers = {
-    SetCurrentPlayer: (payload: Player) => {
+    SetCurrentPlayer: (payload: PlayerDto) => {
+      console.log(payload);
       setCurrentPlayer(payload);
     },
-    NearbyGroup: (payload: ChatPlayer[]) => {
+    SetNearbyGroup: (payload: ChatPlayerDto[]) => {
       setNearbyPlayers(payload);
     },
-    PartyGroup: (payload: ChatPlayer[]) => {
+    PartyGroup: (payload: ChatPlayerDto[]) => {
       setPartyPlayers(payload);
     },
-    ClanGroup: (payload: ChatPlayer[]) => {
+    ClanGroup: (payload: ChatPlayerDto[]) => {
       setClanPlayers(payload);
     },
-    FriendGroup: (payload: ChatPlayer[]) => {
+    FriendGroup: (payload: ChatPlayerDto[]) => {
       setFriendPlayers(payload);
     },
     ReceiveChatMessage: (message: ChatMessage) => {
@@ -34,6 +44,15 @@ export const useReceivers = (): Receivers => {
     },
     OnSessionExpired: async () => {
       await refresh();
+    },
+    SetCharacters: (payload: CharacterDto[]) => {
+      setCharacters(payload);
+    },
+    UpdateCharacter: (characterDto: CharacterDto) => {
+      updateCharacter(characterDto);
+    },
+    Reconnect: () => {
+      setRetryConnection();
     },
   };
 

@@ -1,3 +1,4 @@
-export * from './chatPlayer';
-export * from './player';
+export * from './chatPlayerDto';
+export * from './playerDto';
 export * from './message';
+export * from './characterDto';

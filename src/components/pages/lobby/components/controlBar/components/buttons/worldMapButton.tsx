@@ -1,8 +1,8 @@
-import { MapIcon } from '../../../../../../../../elements';
-import { worldMapDialogOverlay } from '../../../../../../../../elements/organisms/overlay';
+import { MapIcon } from '../../../../../../elements';
+import { worldMapDialogOverlay } from '../../../../../../elements/organisms/overlay';
 import { MenuBarButton } from './menuBarButton';
 
-export const MapButton: React.FC = () => {
+export const WorldMapButton: React.FC = () => {
   return (
     <MenuBarButton
       icon={

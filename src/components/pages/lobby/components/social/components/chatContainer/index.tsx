@@ -3,7 +3,7 @@
 import { alpha } from '@mui/system';
 import { useState, useContext, useRef, useEffect } from 'react';
 import { useAudioService } from '../../../../../../../assets/audio/audioService';
-import { ChatMessage, ChatMessageType, ChatMessageTypeColorMap, ChatPlayer } from '../../../../../../../models/signalR';
+import { ChatMessage, ChatMessageType, ChatMessageTypeColorMap, ChatPlayerDto } from '../../../../../../../models/signalR';
 import { fadeIn } from '../../../../../../../styles';
 import { AppContext } from '../../../../../../../support/contexts/appContext/appContextProvider';
 import { SignalRContext } from '../../../../../../../support/contexts/signalRContext/signalRContextProvider';
@@ -14,8 +14,8 @@ import { SocialContainer } from '../socialContainer';
 import { ChatInputWrapper } from './chatInputWrapper';
 
 export interface ChatContainerProps {
-  player?: ChatPlayer;
-  onSelectPlayer: (player: ChatPlayer) => void;
+  player?: ChatPlayerDto;
+  onSelectPlayer: (player: ChatPlayerDto) => void;
   onDeselectPlayer: () => void;
 }
 
@@ -37,7 +37,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = (props): JSX.Element 
   const { whisperDing } = useAudioService(soundEnabled);
 
   const lastWhisperMessagePlayerNickname =
-    chatMessages.whisper.messages[chatMessages.whisper.messages.length - 1]?.chatPlayer?.nickname;
+    chatMessages.whisper.messages[chatMessages.whisper.messages.length - 1]?.chatPlayerDto?.nickname;
   const lastWhisperMessageText = chatMessages.whisper.messages[chatMessages.whisper.messages.length - 1]?.text;
 
   useEffect(() => {
@@ -64,7 +64,7 @@ export const ChatContainer: React.FC<ChatContainerProps> = (props): JSX.Element 
   }, [chatMessages, tabIndex]);
 
   return (
-    <SocialContainer sx={{ flex: 2, padding: 0 }}>
+    <SocialContainer sx={{ padding: 0, flexGrow: 4 }}>
       <Box
         sx={{
           '& .MuiTabs-root': {
@@ -154,25 +154,25 @@ export const ChatContainer: React.FC<ChatContainerProps> = (props): JSX.Element 
                   border: (theme) => `1px solid ${theme.palette.background.paper}`,
                   paddingLeft: 0.25,
                   backgroundColor: (theme) =>
-                    gm.chatPlayer?.nickname !== '*System*'
+                    gm.chatPlayerDto?.nickname !== '*System*'
                       ? alpha(theme.palette.grey[300], i % 2 === 0 ? 0.4 : 0.6)
                       : alpha(theme.palette.grey[300], 0.1),
                 }}
                 alignItems="center"
               >
-                {gm.chatPlayer?.nickname !== '*System*' && (
-                  <NicknameTag player={gm.chatPlayer} onSelectPlayer={props.onSelectPlayer} small />
+                {gm.chatPlayerDto?.nickname !== '*System*' && (
+                  <NicknameTag player={gm.chatPlayerDto} onSelectPlayer={props.onSelectPlayer} small />
                 )}
                 <Typography
                   variant="subtitle2"
                   sx={{
-                    marginLeft: gm.chatPlayer?.nickname === '*System*' ? 0.5 : 'unset',
+                    marginLeft: gm.chatPlayerDto?.nickname === '*System*' ? 0.5 : 'unset',
                     fontWeight: 500,
                     fontSize: '14px',
                     letterSpacing: '0px',
                     color: ChatMessageTypeColorMap[gm.type],
                     wordBreak: 'break-word',
-                    fontFamily: gm.chatPlayer?.nickname !== '*System*' ? '"Roboto Mono", "monospace"' : 'Roboto',
+                    fontFamily: gm.chatPlayerDto?.nickname !== '*System*' ? '"Roboto Mono", "monospace"' : 'Roboto',
                   }}
                 >
                   {gm.text}
