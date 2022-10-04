@@ -1,5 +1,6 @@
 import {
   AddCircleOutlineIcon,
+  ArrowForwardIosIcon,
   AutorenewIcon,
   Box,
   BubbleChartIcon,
@@ -87,6 +88,7 @@ export const IconsPage = () => {
       <MaleIcon />
       <FemaleIcon />
       <TransgenderIcon />
+      <ArrowForwardIosIcon />
     </Box>
   );
 };

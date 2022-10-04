@@ -46,14 +46,7 @@ export const Main = (): JSX.Element => {
         <Route element={<RequireLoggedIn />}>
           <Route element={<RequireRoles roles={[AuthRole.USR, AuthRole.ADM, AuthRole.GMA]} />}>
             <Route path="" element={<Navigate to="lobby" replace />} />
-            <Route
-              path="lobby"
-              element={
-                <CharacterContextProvider>
-                  <LobbyPage />
-                </CharacterContextProvider>
-              }
-            />
+            <Route path="lobby" element={<LobbyPage />} />
           </Route>
 
           <Route path="administration" element={<RequireRoles roles={[AuthRole.ADM, AuthRole.GMA]} />}>

@@ -1,42 +1,88 @@
+/* eslint-disable @typescript-eslint/naming-convention */
 import { Box, Grid, Row, Typography } from '../../../../elements';
 import { WorldMapButton } from './components/buttons/worldMapButton';
-import { useContext, useEffect } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { fadeIn } from '../../../../../styles';
 import { SignalRContext } from '../../../../../support/contexts/signalRContext/signalRContextProvider';
 import { CreateCharButton } from './components/buttons/createCharButton';
 import { CharacterContext } from '../../../../../support/contexts/characterContext/characterContextProvider';
 import { CharacterThumbnail } from './components/CharacterThumbnail';
 import { useConnection } from '../../../../../api/signalR/useConnection';
+import { CharacterStatus } from '../../../../../models/enums';
+import { CharacterDto } from '../../../../../models/signalR';
 
 export const ControlBar: React.FC = () => {
   const { currentPlayer } = useContext(SignalRContext);
   const { characters, setActiveCharacterId, activeCharacterId } = useContext(CharacterContext);
-  const { playerJumpTo, playerLeaveQuadrant } = useConnection();
-  // eslint-disable-next-line @typescript-eslint/naming-convention
-  const _setActiveCharacterId = async (characterId?: number): Promise<void> => {
-    if (characterId && characterId > 0) {
-      if (characterId !== activeCharacterId) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        playerJumpTo(characters.find((c) => c.id === characterId)!.nickname);
-        setActiveCharacterId(characterId);
-      }
-    } else {
-      playerLeaveQuadrant();
-      setActiveCharacterId(undefined);
+  const { playerJumpTo, toggleCharacter } = useConnection();
+
+  const _setActiveCharacter = async (character: CharacterDto): Promise<void> => {
+    if (character.id !== activeCharacterId && character.characterStatus !== CharacterStatus.Astray) {
+      playerJumpTo(character.nickname);
+      setActiveCharacterId(character.id);
     }
   };
 
-  useEffect(() => {
-    if (characters.length === 1 && characters[0].isAwake) {
-      _setActiveCharacterId(characters[0].id);
-    } else if (characters.length > 1) {
-      const aliveAndAwakeCharacter = characters.find((c) => c.hp !== 0 && c.isAwake);
-      if (aliveAndAwakeCharacter) {
-        _setActiveCharacterId(aliveAndAwakeCharacter.id);
+  const [loadingId, setLoadingId] = useState(0);
+
+  const onAwakeClick = async (character: CharacterDto): Promise<void> => {
+    setLoadingId(character.id);
+
+    const isOff = character.characterStatus === CharacterStatus.Astray;
+    let characterToActivate: CharacterDto | undefined = undefined;
+    if (isOff) {
+      characterToActivate = character;
+    } else if (activeCharacterId === character.id) {
+      const otherAliveAndAwakeCharacter = characters.find(
+        (c) => c.hp > 0 && c.characterStatus !== CharacterStatus.Astray && character.id !== c.id,
+      );
+      if (otherAliveAndAwakeCharacter) {
+        characterToActivate = otherAliveAndAwakeCharacter;
       } else {
-        const awakeCharacter = characters.find((c) => c.isAwake);
-        if (awakeCharacter) {
-          _setActiveCharacterId(awakeCharacter?.id);
+        const otherAwakeCharacter = characters.find(
+          (c) => c.characterStatus !== CharacterStatus.Astray && character.id !== c.id,
+        );
+        if (otherAwakeCharacter) {
+          characterToActivate = otherAwakeCharacter;
+        }
+      }
+    }
+    await toggleCharacter(character.nickname)
+      ?.then(() => {
+        if (characterToActivate) {
+          setTimeout(() => {
+            characterToActivate && _setActiveCharacter(characterToActivate);
+          }, 200);
+        } else {
+          activeCharacterId === character.id && setActiveCharacterId(undefined);
+        }
+      })
+      .finally(() => setLoadingId(0));
+  };
+
+  useEffect(() => {
+    const characterCount = characters.length;
+    if (characterCount === 1) {
+      if (characters[0].characterStatus === CharacterStatus.Astray) {
+        onAwakeClick(characters[0]);
+      } else {
+        _setActiveCharacter(characters[0]);
+      }
+    } else if (characterCount > 1) {
+      const selectedAliveAndAwakeCharacter = characters.find(
+        (c) => c.hp !== 0 && c.characterStatus === CharacterStatus.Awake && c.id === activeCharacterId,
+      );
+      if (selectedAliveAndAwakeCharacter) {
+        _setActiveCharacter(selectedAliveAndAwakeCharacter);
+      } else {
+        const aliveAndAwakeCharacter = characters.find((c) => c.hp !== 0 && c.characterStatus === CharacterStatus.Awake);
+        if (aliveAndAwakeCharacter) {
+          _setActiveCharacter(aliveAndAwakeCharacter);
+        } else {
+          const onlineCharacter = characters.find((c) => c.characterStatus !== CharacterStatus.Astray);
+          if (onlineCharacter) {
+            _setActiveCharacter(onlineCharacter);
+          }
         }
       }
     }
@@ -68,7 +114,7 @@ export const ControlBar: React.FC = () => {
           <Row
             sx={{
               display: 'flex',
-              gap: 0.5,
+              gap: 1,
               paddingLeft: 0.5,
               paddingRight: 0.5,
               overflowX: 'auto',
@@ -77,7 +123,13 @@ export const ControlBar: React.FC = () => {
           >
             <Box sx={{ flex: 1 }}></Box>
             {characters.map((c) => (
-              <CharacterThumbnail key={c.id} id={c.id} setActiveCharacterId={_setActiveCharacterId} />
+              <CharacterThumbnail
+                key={c.id}
+                character={c}
+                setActiveCharacter={_setActiveCharacter}
+                onAwakeClick={onAwakeClick}
+                isToggleLoading={c.id === loadingId}
+              />
             ))}
             <Box sx={{ flex: 1 }}></Box>
           </Row>

@@ -35,6 +35,7 @@ export const characterRContextReducer = (
     }
     case CharacterContextActionEnum.SET_CHARACTERS: {
       return {
+        ...prevState,
         characters: action.characters,
       } as CharacterContextState;
     }

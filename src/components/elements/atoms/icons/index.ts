@@ -39,3 +39,4 @@ export { default as SettingsApplicationsIcon } from '@mui/icons-material/Setting
 export { default as MaleIcon } from '@mui/icons-material/Male';
 export { default as FemaleIcon } from '@mui/icons-material/Female';
 export { default as TransgenderIcon } from '@mui/icons-material/Transgender';
+export { default as ArrowForwardIosIcon } from '@mui/icons-material/ArrowForwardIos';

@@ -21,11 +21,8 @@ import {
 } from '../../..';
 import { useServerClient } from '../../../../../api/useServerClient';
 import { CharacterClass, CharacterRace } from '../../../../../models/api.models';
+import { CharacterClassIconMap, CharacterRaceClassesMap } from '../../../../../models/character';
 import { CreateCharacterResponseErrors } from '../../../../../models/response';
-import {
-  CharacterClassIconMap,
-  CharacterRaceClassesMap,
-} from '../../../../../support/contexts/characterContext/characterContext.state';
 import { useNickname } from '../../../../../support/hooks';
 import { isAnyEmpty } from '../../../../../support/utils';
 import { RegisterInputField } from '../../../../pages/register/registerInputField';

@@ -2,6 +2,13 @@ not found page
 unauthorized page
 prepare test page
 
+/// push XVI
+
+viewport movement ui
+character thumbnail improvements
+character selection logics
+bug with reconnect
+
 /// push XV
 
 theme breakpoints

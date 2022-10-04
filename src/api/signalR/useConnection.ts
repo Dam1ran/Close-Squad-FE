@@ -1,4 +1,5 @@
 import { useContext } from 'react';
+import { TravelDirection } from '../../models/enums';
 import { ChatCommand, ChatMessage, ChatPlayerDto } from '../../models/signalR';
 import { SignalRContext } from '../../support/contexts/signalRContext/signalRContextProvider';
 
@@ -27,14 +28,23 @@ export const useConnection = () => {
     connection?.send('PlayerJumpTo', characterNickname);
   };
 
+  const toggleCharacter = (characterNickname: string) => connection?.invoke('CharacterToggle', characterNickname);
+
   const playerLeaveQuadrant = () => {
     connection?.send('PlayerLeaveQuadrant');
+  };
+
+  const characterTravelTo = (characterNickname: string, travelDirection: TravelDirection) => {
+    console.log(characterNickname + ' is traveling hard to: ' + travelDirection);
+    connection?.send('CharacterTravelTo', { characterNickname, travelDirection });
   };
 
   return {
     sendChatMessage,
     sendChatCommand,
+    toggleCharacter,
     playerJumpTo,
     playerLeaveQuadrant,
+    characterTravelTo,
   };
 };

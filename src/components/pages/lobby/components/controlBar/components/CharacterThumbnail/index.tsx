@@ -1,64 +1,40 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 /* eslint-disable @typescript-eslint/naming-convention */
-import { useContext, useState } from 'react';
+import { useContext } from 'react';
 import { CharacterContext } from '../../../../../../../support/contexts/characterContext/characterContextProvider';
 import { Box, CircularProgress, CircularProgressWithChildren, Column, Row, Tooltip } from '../../../../../../elements';
 import { alpha } from '@mui/system';
 import { CharacterClass } from '../../../../../../../models/api.models';
-import { CharacterClassIconMap } from '../../../../../../../support/contexts/characterContext/characterContext.state';
-import { useServerClient } from '../../../../../../../api/useServerClient';
+import { CharacterStatus } from '../../../../../../../models/enums';
+import { CharacterClassIconMap, CharacterStatusIconMap } from '../../../../../../../models/character';
+import { CharacterDto } from '../../../../../../../models/signalR';
 
-export const CharacterThumbnail: React.FC<{ id: number; setActiveCharacterId: (characterId?: number) => void }> = ({
-  id,
-  setActiveCharacterId,
-}) => {
-  const { characters, activeCharacterId } = useContext(CharacterContext);
+export const CharacterThumbnail: React.FC<{
+  character: CharacterDto;
+  setActiveCharacter: (character: CharacterDto) => void;
+  onAwakeClick: (character: CharacterDto) => void;
+  isToggleLoading: boolean;
+}> = ({ character, setActiveCharacter, onAwakeClick, isToggleLoading }) => {
+  const { activeCharacterId } = useContext(CharacterContext);
 
-  const character = characters.find((c) => c.id === id);
+  const hpPercent = character.hp !== 0 && character.maxHP !== 0 ? (character.hp / character.maxHP) * 100.0 : 0;
+  const mpPercent = character.mp !== 0 && character.maxMP !== 0 ? (character.mp / character.maxMP) * 100.0 : 0;
 
-  const hpPercent = character?.hp && character?.maxHP ? (character?.hp / character?.maxHP) * 100.0 : 0;
-  const mpPercent = character?.mp && character?.maxMP ? (character?.mp / character?.maxMP) * 100.0 : 0;
+  const isActive = activeCharacterId === character.id && activeCharacterId !== undefined;
 
-  const isActive = activeCharacterId === character?.id && activeCharacterId !== undefined;
-  const isDead = character?.hp === 0;
-  const isAwake = character?.isAwake === true;
-
-  const { toggleCharacter } = useServerClient();
-
-  const [isAwakeRequestLoading, setIsAwakeRequestLoading] = useState(false);
+  const isDead = character.characterStatus === CharacterStatus.Dead;
+  const isOnline = character.characterStatus !== CharacterStatus.Astray;
+  const canToggle =
+    character.characterStatus === CharacterStatus.Astray ||
+    character.characterStatus === CharacterStatus.Awake ||
+    character.characterStatus === CharacterStatus.Dead;
 
   const onAwakeButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Promise<void> => {
+    if (!canToggle || isToggleLoading) {
+      return;
+    }
     e.stopPropagation();
-    if (character?.nickname) {
-      setIsAwakeRequestLoading(true);
-      await toggleCharacter({ nickname: character.nickname }).then(() => {
-        setIsAwakeRequestLoading(false);
-        if (!isAwake || isActive) {
-          const aliveAndAwakeCharacter = characters.find((c) => c.hp !== 0 && c.isAwake && character.id !== c.id);
-          if (aliveAndAwakeCharacter) {
-            setActiveCharacterId(aliveAndAwakeCharacter?.id);
-          } else {
-            const awakeCharacter = characters.find((c) => c.isAwake && character.id === c.id);
-            if (awakeCharacter) {
-              setActiveCharacterId(awakeCharacter?.id);
-            } else {
-              const awakedCharacter = characters.find((c) => c.isAwake);
-              if (awakedCharacter) {
-                setActiveCharacterId(awakedCharacter.id);
-              } else {
-                setActiveCharacterId(undefined);
-              }
-            }
-          }
-        }
-      });
-    }
-  };
-
-  const onCharacterClick = async (): Promise<void> => {
-    if (character?.isAwake) {
-      setActiveCharacterId(character?.id);
-    }
+    onAwakeClick(character);
   };
 
   return (
@@ -66,7 +42,7 @@ export const CharacterThumbnail: React.FC<{ id: number; setActiveCharacterId: (c
       arrow
       enterDelay={600}
       title={
-        isAwake ? (
+        isOnline ? (
           <Box>
             <Box sx={{ fontStyle: 'italic', color: (theme) => theme.palette.grey[800] }}>{character.nickname}</Box>
             <Box sx={{ fontStyle: 'italic', color: (theme) => theme.palette.grey[800] }}>
@@ -98,10 +74,12 @@ export const CharacterThumbnail: React.FC<{ id: number; setActiveCharacterId: (c
           overflow: 'none',
           minHeight: '80px',
           minWidth: '80px',
-          border: (theme) => (isActive ? `1px dashed ${theme.palette.grey[800]}` : `1px solid ${theme.palette.grey[300]}`),
+          border: (theme) =>
+            isActive ? `2px solid ${alpha(theme.palette.secondary.main, 0.75)}` : `2px solid ${theme.palette.grey[300]}`,
+
           borderRadius: 1,
           position: 'relative',
-          cursor: isActive || !isAwake ? 'unset' : 'pointer',
+          cursor: isActive || !isOnline ? 'unset' : 'pointer',
           transition: 'box-shadow 0.4s, border 0.4s',
           boxShadow: (theme) =>
             isActive && isDead
@@ -111,12 +89,13 @@ export const CharacterThumbnail: React.FC<{ id: number; setActiveCharacterId: (c
               : isDead
               ? `inset 0 0 8px ${theme.palette.error.main}`
               : 'unset',
-          filter: character?.isAwake ? 'none' : 'unset',
-          WebkitFilter: isAwake ? 'unset' : 'grayscale(85%)',
+          filter: isOnline ? 'none' : 'unset',
+          WebkitFilter: isOnline ? 'unset' : 'grayscale(85%)',
           zIndex: 1,
-          opacity: isAwake ? 1 : 0.6,
+          opacity: isOnline ? 1 : 0.6,
+          userSelect: 'none',
         }}
-        onClick={onCharacterClick}
+        onClick={(): void => setActiveCharacter(character)}
       >
         <Row
           alignItems="center"
@@ -135,16 +114,15 @@ export const CharacterThumbnail: React.FC<{ id: number; setActiveCharacterId: (c
               height: '20px',
               width: '20px',
               lineHeight: '20px',
-              backgroundColor: (theme) => alpha(theme.palette.grey[400], 0.5),
               textAlign: 'center',
               borderBottomRightRadius: '8px',
               borderTopLeftRadius: '3px',
               fontSize: '14px',
             }}
           >
-            TL
+            {CharacterStatusIconMap[character.characterStatus as CharacterStatus]}
           </Box>
-          <Tooltip title={isAwake ? 'Send to astray' : 'Wake up'} placement="right" arrow>
+          {canToggle && (
             <Box
               sx={{
                 height: '20px',
@@ -154,20 +132,18 @@ export const CharacterThumbnail: React.FC<{ id: number; setActiveCharacterId: (c
                 borderBottomLeftRadius: '8px',
                 borderTopRightRadius: '3px',
                 fontSize: '14px',
-                cursor: isAwakeRequestLoading ? 'unset' : 'pointer',
+                cursor: isToggleLoading ? 'unset' : 'pointer',
+                transition: 'background-color 0.3s',
                 zIndex: 10,
+                '&:hover': {
+                  backgroundColor: (theme) => alpha(theme.palette.grey[400], 0.5),
+                },
               }}
               onClick={onAwakeButtonClick}
             >
-              {isAwakeRequestLoading ? (
-                <CircularProgress variant="indeterminate" size={12} />
-              ) : character?.isAwake ? (
-                '🔅'
-              ) : (
-                '💤'
-              )}
+              {isToggleLoading ? <CircularProgress variant="indeterminate" size={12} /> : isOnline ? '🔹' : '🔆'}
             </Box>
-          </Tooltip>
+          )}
         </Row>
         <Row
           alignItems="center"
@@ -248,7 +224,6 @@ export const CharacterThumbnail: React.FC<{ id: number; setActiveCharacterId: (c
                   border: (theme) => `1px solid ${theme.palette.grey[800]}`,
                   boxShadow: (theme) => `0 0 3px ${theme.palette.grey[400]}, inset 0 0 5px ${theme.palette.grey[800]}`,
                   textShadow: (theme) => `0 0 2px ${theme.palette.grey[800]}`,
-                  userSelect: 'none',
                 }}
               >
                 {character?.characterClass && CharacterClassIconMap[character?.characterClass]}

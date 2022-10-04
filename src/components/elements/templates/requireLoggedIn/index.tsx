@@ -2,12 +2,11 @@ import { useContext, useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useRefreshToken } from '../../../../api/useRefreshToken';
 import { AppContext } from '../../../../support/contexts/appContext/appContextProvider';
+import { CharacterContextProvider } from '../../../../support/contexts/characterContext/characterContextProvider';
 import { SignalRContextProvider } from '../../../../support/contexts/signalRContext/signalRContextProvider';
 import { useAuthServiceHelper } from '../../../../support/services';
 import { addSeconds } from '../../../../support/utils';
-import { CircularProgress } from '../../atoms';
-import { ModalBackground, Typography } from '../../molecules';
-import { Column } from '../column';
+import { LoadingModal } from './components/loadingModal';
 
 export const RequireLoggedIn = (): JSX.Element => {
   const { application } = useContext(AppContext);
@@ -58,18 +57,9 @@ export const RequireLoggedIn = (): JSX.Element => {
 
   return !application.trustThisDevice && (!isLoggedIn || isExpiredBy()) ? (
     <Navigate to="/login" state={{ from: location.pathname }} replace />
-  ) : isLoading && !requesting ? (
-    <ModalBackground sx={{ userSelect: 'none' }}>
-      <Column>
-        <CircularProgress color="secondary" size={40} thickness={5} sx={{ margin: 'auto', opacity: 0.7 }} />
-        <Typography mt={4} ml={4} variant="h4" sx={{ fontWeight: 700, opacity: 0.4 }}>
-          LOADING...
-        </Typography>
-      </Column>
-    </ModalBackground>
   ) : (
     <SignalRContextProvider>
-      <Outlet />
+      <CharacterContextProvider>{isLoading && !requesting ? <LoadingModal /> : <Outlet />}</CharacterContextProvider>
     </SignalRContextProvider>
   );
 };

@@ -47,10 +47,6 @@ export enum CharacterClass {
     Templar = 9,
 }
 
-export interface CharacterToggleRequestDto {
-    nickname: string;
-}
-
 export interface UserRegisterDto {
     nickname: string;
     email: string;
