@@ -1,7 +1,6 @@
 import { Navigate, Route, Routes, useNavigate } from 'react-router-dom';
 import { useServerClient } from '../../../api/useServerClient';
 import { AuthRole } from '../../../models/auth';
-import { CharacterContextProvider } from '../../../support/contexts/characterContext/characterContextProvider';
 import { useAuthServiceHelper, useSession } from '../../../support/services';
 import { ClearAuthHandler, NavigateHandler } from '../../../support/utils';
 import { Layout, RequireLoggedIn, RequireNotLoggedIn, RequireRoles } from '../../elements/templates';

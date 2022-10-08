@@ -14,11 +14,15 @@ import { CharacterDto } from '../../../../../models/signalR';
 export const ControlBar: React.FC = () => {
   const { currentPlayer } = useContext(SignalRContext);
   const { characters, setActiveCharacterId, activeCharacterId } = useContext(CharacterContext);
-  const { playerJumpTo, toggleCharacter } = useConnection();
+  const { playerJumpTo, toggleCharacter, isConnected } = useConnection();
 
+  const [reactivateSameCharacter, setReactivateSameCharacter] = useState(false);
   const _setActiveCharacter = async (character: CharacterDto): Promise<void> => {
-    if (character.id !== activeCharacterId && character.characterStatus !== CharacterStatus.Astray) {
-      playerJumpTo(character.nickname);
+    if (
+      (reactivateSameCharacter || (isConnected && character.id !== activeCharacterId)) &&
+      character.characterStatus !== CharacterStatus.Astray
+    ) {
+      playerJumpTo({ characterId: character.id });
       setActiveCharacterId(character.id);
     }
   };
@@ -26,6 +30,9 @@ export const ControlBar: React.FC = () => {
   const [loadingId, setLoadingId] = useState(0);
 
   const onAwakeClick = async (character: CharacterDto): Promise<void> => {
+    if (!isConnected) {
+      return;
+    }
     setLoadingId(character.id);
 
     const isOff = character.characterStatus === CharacterStatus.Astray;
@@ -47,7 +54,7 @@ export const ControlBar: React.FC = () => {
         }
       }
     }
-    await toggleCharacter(character.nickname)
+    await toggleCharacter({ characterId: character.id })
       ?.then(() => {
         if (characterToActivate) {
           setTimeout(() => {
@@ -61,33 +68,38 @@ export const ControlBar: React.FC = () => {
   };
 
   useEffect(() => {
-    const characterCount = characters.length;
-    if (characterCount === 1) {
-      if (characters[0].characterStatus === CharacterStatus.Astray) {
-        onAwakeClick(characters[0]);
-      } else {
-        _setActiveCharacter(characters[0]);
-      }
-    } else if (characterCount > 1) {
-      const selectedAliveAndAwakeCharacter = characters.find(
-        (c) => c.hp !== 0 && c.characterStatus === CharacterStatus.Awake && c.id === activeCharacterId,
-      );
-      if (selectedAliveAndAwakeCharacter) {
-        _setActiveCharacter(selectedAliveAndAwakeCharacter);
-      } else {
-        const aliveAndAwakeCharacter = characters.find((c) => c.hp !== 0 && c.characterStatus === CharacterStatus.Awake);
-        if (aliveAndAwakeCharacter) {
-          _setActiveCharacter(aliveAndAwakeCharacter);
+    if (isConnected) {
+      setReactivateSameCharacter(false);
+      const characterCount = characters.length;
+      if (characterCount === 1) {
+        if (characters[0].characterStatus === CharacterStatus.Astray) {
+          onAwakeClick(characters[0]);
         } else {
-          const onlineCharacter = characters.find((c) => c.characterStatus !== CharacterStatus.Astray);
-          if (onlineCharacter) {
-            _setActiveCharacter(onlineCharacter);
+          _setActiveCharacter(characters[0]);
+        }
+      } else if (characterCount > 1) {
+        const selectedAliveAndAwakeCharacter = characters.find(
+          (c) => c.hp !== 0 && c.characterStatus === CharacterStatus.Awake && c.id === activeCharacterId,
+        );
+        if (selectedAliveAndAwakeCharacter) {
+          _setActiveCharacter(selectedAliveAndAwakeCharacter);
+        } else {
+          const aliveAndAwakeCharacter = characters.find((c) => c.hp !== 0 && c.characterStatus === CharacterStatus.Awake);
+          if (aliveAndAwakeCharacter) {
+            _setActiveCharacter(aliveAndAwakeCharacter);
+          } else {
+            const onlineCharacter = characters.find((c) => c.characterStatus !== CharacterStatus.Astray);
+            if (onlineCharacter) {
+              _setActiveCharacter(onlineCharacter);
+            }
           }
         }
       }
+    } else {
+      setReactivateSameCharacter(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [characters.length]);
+  }, [characters.length, isConnected]);
 
   return (
     <Grid container sx={{ padding: 0.5, minHeight: '90px' }}>
@@ -149,8 +161,8 @@ export const ControlBar: React.FC = () => {
           minHeight: { xs: '41px', md: '82px' },
         }}
       >
-        {currentPlayer && <WorldMapButton />}
-        {characters.length < 9 && <CreateCharButton />}
+        {characters.length > 0 && <WorldMapButton />}
+        {currentPlayer && characters.length < 9 && <CreateCharButton />}
       </Grid>
     </Grid>
   );

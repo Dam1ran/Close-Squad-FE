@@ -1,5 +1,4 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import { useAudioService } from '../../../assets/audio/audioService';
 import { ChatMessageType } from '../../../models/signalR';
 import { SignalRContextAction, SignalRContextActionEnum } from './signalRContext.actions';
 import { ChatMessages, SignalRContextState } from './signalRContext.state';
@@ -11,6 +10,18 @@ export const signalRContextReducer = (prevState: SignalRContextState, action: Si
       return {
         ...prevState,
         connection: action.connection,
+      } as SignalRContextState;
+    }
+    case SignalRContextActionEnum.SET_CONNECTION_STATE: {
+      return {
+        ...prevState,
+        connectionState: action.connectionState,
+      } as SignalRContextState;
+    }
+    case SignalRContextActionEnum.SET_GAME_SETTINGS: {
+      return {
+        ...prevState,
+        gameSettings: action.gameSettings,
       } as SignalRContextState;
     }
     case SignalRContextActionEnum.SET_RETRY_CONNECTION: {

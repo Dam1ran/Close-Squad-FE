@@ -11,11 +11,14 @@ import { useRefreshToken } from '../useRefreshToken';
 import { useReceivers } from './receivers';
 
 export const useSignalR = () => {
-  const { setConnection, connection, retryConnectionFlag } = useContext(SignalRContext);
+  const { setConnection, connection, setConnectionState, retryConnectionFlag } = useContext(SignalRContext);
   const { refresh } = useRefreshToken();
 
-  const token = AuthService().getToken();
+  useEffect(() => {
+    setConnectionState(connection?.state);
+  }, [connection?.state]);
 
+  const token = AuthService().getToken();
   const receivers = useReceivers();
 
   useEffect(() => {
@@ -28,10 +31,8 @@ export const useSignalR = () => {
         .configureLogging(LogLevel.Warning)
         .build();
 
-      setConnection(conn);
-
       for (const [key, value] of Object.entries(receivers)) {
-        conn.on(key, value);
+        conn?.on(key, value);
       }
 
       const start = async () => {
@@ -45,7 +46,10 @@ export const useSignalR = () => {
         });
       };
       start();
+
+      setConnection(conn);
     }
+
     return () => {
       for (const key of Object.keys(receivers)) {
         connection?.off(key);

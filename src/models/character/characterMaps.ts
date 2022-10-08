@@ -1,5 +1,6 @@
-import { CharacterClass, CharacterRace } from '../api.models';
+import { CharacterClass } from '../api.models';
 import { CharacterStatus } from '../enums';
+import { CharacterRace } from '../enums/characterRace';
 
 export const CharacterRaceClassesMap: { [key in CharacterRace]: CharacterClass[] } = {
   [CharacterRace.Divine]: [CharacterClass.Cupid, CharacterClass.Doctor],

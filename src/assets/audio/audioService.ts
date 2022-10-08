@@ -5,7 +5,7 @@ export const useAudioService = (isSoundEnabled: boolean) => {
   const whisperDing = (): void => {
     if (isSoundEnabled) {
       const dingAudio = new Audio(ding);
-      dingAudio.volume = 0.35;
+      dingAudio.volume = 0.4;
       dingAudio.play();
     }
   };

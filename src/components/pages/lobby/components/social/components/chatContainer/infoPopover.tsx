@@ -4,8 +4,8 @@ import { SignalRContext } from '../../../../../../../support/contexts/signalRCon
 import { Box, Popover, Tooltip, Typography } from '../../../../../../elements';
 
 export const InfoPopover: React.FC = () => {
-  const { connection, setRetryConnection } = useContext(SignalRContext);
-  const connected = connection?.state === HubConnectionState.Connected;
+  const { connectionState, setRetryConnection } = useContext(SignalRContext);
+  const connected = connectionState === HubConnectionState.Connected;
   const [retryFlag, setRetryFlag] = useState(false);
   const [titleText, setTitleText] = useState('Disconnected, click to retry connection.');
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);

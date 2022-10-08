@@ -89,7 +89,7 @@ export const ChatInputWrapper: React.FC<{
     }
   }, [props.tabIndex, flag]);
 
-  const { sendChatMessage, sendChatCommand } = useConnection();
+  const { sendChatMessage, sendChatCommand, isConnected } = useConnection();
   const getChatMessageType = (value: string): ChatMessageType => {
     switch (value.slice(0, 3)) {
       case '/w ': {
@@ -110,7 +110,7 @@ export const ChatInputWrapper: React.FC<{
 
   const [nicknameIndex, setNicknameIndex] = useState(nicknames.length - 1);
   const onChatMessage = (): void => {
-    if (!currentPlayer) {
+    if (!isConnected || !currentPlayer?.quadrantIndex === undefined) {
       return;
     }
     const chatMessage = {

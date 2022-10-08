@@ -2,6 +2,15 @@ not found page
 unauthorized page
 prepare test page
 
+/// push XVII
+
+game settings infra
+character creation small refactor
+quadrants logics
+player on disconnect
+rerender conn indicator
+reconnect optimizations
+
 /// push XVI
 
 viewport movement ui

@@ -1,11 +1,13 @@
+import { HubConnectionState } from '@microsoft/signalr';
 import { useContext } from 'react';
-import { TravelDirection } from '../../models/enums';
 import { ChatCommand, ChatMessage, ChatPlayerDto } from '../../models/signalR';
+import { CharacterCall } from '../../models/signalR/characterCall';
+import { CharacterTravelCall } from '../../models/signalR/characterTravelCall';
 import { SignalRContext } from '../../support/contexts/signalRContext/signalRContextProvider';
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
 export const useConnection = () => {
-  const { connection } = useContext(SignalRContext);
+  const { connection, connectionState } = useContext(SignalRContext);
   const sendChatMessage = (chatMessage: ChatMessage): void => {
     connection?.send('SendChatMessage', { ...chatMessage });
   };
@@ -24,22 +26,22 @@ export const useConnection = () => {
     sendBanPlayer(chatCommand.chatPlayerDto);
   };
 
-  const playerJumpTo = (characterNickname: string) => {
-    connection?.send('PlayerJumpTo', characterNickname);
+  const playerJumpTo = (characterCall: CharacterCall) => {
+    connection?.send('PlayerJumpTo', { ...characterCall });
   };
 
-  const toggleCharacter = (characterNickname: string) => connection?.invoke('CharacterToggle', characterNickname);
+  const toggleCharacter = (characterCall: CharacterCall) => connection?.invoke('CharacterToggle', { ...characterCall });
 
   const playerLeaveQuadrant = () => {
     connection?.send('PlayerLeaveQuadrant');
   };
 
-  const characterTravelTo = (characterNickname: string, travelDirection: TravelDirection) => {
-    console.log(characterNickname + ' is traveling hard to: ' + travelDirection);
-    connection?.send('CharacterTravelTo', { characterNickname, travelDirection });
+  const characterTravelTo = (characterTravelCall: CharacterTravelCall) => {
+    connection?.send('CharacterTravelTo', { ...characterTravelCall });
   };
 
   return {
+    isConnected: connectionState === HubConnectionState.Connected,
     sendChatMessage,
     sendChatCommand,
     toggleCharacter,

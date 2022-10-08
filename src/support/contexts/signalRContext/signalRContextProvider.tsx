@@ -1,15 +1,17 @@
-import { HubConnection } from '@microsoft/signalr';
+import { HubConnection, HubConnectionState } from '@microsoft/signalr';
 import { createContext, PropsWithChildren, useMemo, useReducer } from 'react';
 import { BrowserRouterProps } from 'react-router-dom';
 import { ChatMessageType, ChatMessage, ChatPlayerDto, PlayerDto } from '../../../models/signalR';
 import { SignalRContextActionEnum } from './signalRContext.actions';
 import { signalRContextReducer } from './signalRContext.reducer';
-import { ChatMessages, PlayerGroups, SignalRContextState } from './signalRContext.state';
+import { ChatMessages, GameSettings, PlayerGroups, SignalRContextState } from './signalRContext.state';
 
 const signalRContextInitialState: SignalRContextState = {
   connection: undefined,
+  connectionState: undefined,
   currentPlayer: undefined,
   retryConnectionFlag: false,
+  gameSettings: undefined,
   playerGroups: {
     nearbyPlayers: [],
     partyPlayers: [],
@@ -29,6 +31,8 @@ const signalRContextInitialState: SignalRContextState = {
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function*/
 let dispatcher = {
   setConnection: (connection: HubConnection): void => {},
+  setConnectionState: (connectionState?: HubConnectionState): void => {},
+  setGameSettings: (gameSettings: GameSettings): void => {},
   setRetryConnection: (): void => {},
   setCurrentPlayer: (currentPlayer: PlayerDto): void => {},
   setNearbyPlayers: (players: ChatPlayerDto[]): void => {},
@@ -52,6 +56,16 @@ export const SignalRContextProvider = ({ children }: PropsWithChildren<BrowserRo
         dispatch({
           type: SignalRContextActionEnum.SET_CONNECTION,
           connection,
+        }),
+      setConnectionState: (connectionState) =>
+        dispatch({
+          type: SignalRContextActionEnum.SET_CONNECTION_STATE,
+          connectionState,
+        }),
+      setGameSettings: (gameSettings) =>
+        dispatch({
+          type: SignalRContextActionEnum.SET_GAME_SETTINGS,
+          gameSettings,
         }),
       setRetryConnection: () =>
         dispatch({

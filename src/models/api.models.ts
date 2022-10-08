@@ -10,29 +10,10 @@
 
 
 
-export interface ServerAnnouncementDto {
-    id: number;
-    createdAt: Date;
-    message: string;
-}
-
-export interface CreateServerAnnouncementViewModel {
-    message: string;
-}
-
 export interface CharacterCreationDto {
     nickname: string;
-    characterRace: CharacterRace;
     characterClass: CharacterClass;
     gender: number;
-}
-
-export enum CharacterRace {
-    Divine = 1,
-    Human = 2,
-    Dwarf = 3,
-    Orc = 4,
-    NightElf = 5,
 }
 
 export enum CharacterClass {
@@ -45,6 +26,21 @@ export enum CharacterClass {
     Occultist = 7,
     Seer = 8,
     Templar = 9,
+}
+
+export interface GameSettings {
+    nrOfCols: number;
+    nrOfRows: number;
+}
+
+export interface ServerAnnouncementDto {
+    id: number;
+    createdAt: Date;
+    message: string;
+}
+
+export interface CreateServerAnnouncementViewModel {
+    message: string;
 }
 
 export interface UserRegisterDto {

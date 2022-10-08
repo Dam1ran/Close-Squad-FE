@@ -1,14 +1,16 @@
-import { useSignalR } from '../../../api/signalR/useSignalR';
 import { fadeIn } from '../../../styles';
 import { useTitle } from '../../../support/hooks';
 import { Box, Column } from '../../elements';
 import { ControlBar } from './components/controlBar';
 import { SocialSection } from './components/socialSection';
 import { GameSection } from './components/gameSection';
+import { useSignalR } from '../../../api/signalR/useSignalR';
+import { useLoadGameSettings } from './components/useLoadGameSettings';
 
 export const LobbyPage = (): JSX.Element => {
   useTitle('Lobby');
   useSignalR();
+  useLoadGameSettings();
 
   return (
     <Column

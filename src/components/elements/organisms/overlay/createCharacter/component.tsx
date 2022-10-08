@@ -20,8 +20,9 @@ import {
   Typography,
 } from '../../..';
 import { useServerClient } from '../../../../../api/useServerClient';
-import { CharacterClass, CharacterRace } from '../../../../../models/api.models';
+import { CharacterClass } from '../../../../../models/api.models';
 import { CharacterClassIconMap, CharacterRaceClassesMap } from '../../../../../models/character';
+import { CharacterRace } from '../../../../../models/enums/characterRace';
 import { CreateCharacterResponseErrors } from '../../../../../models/response';
 import { useNickname } from '../../../../../support/hooks';
 import { isAnyEmpty } from '../../../../../support/utils';
@@ -41,10 +42,9 @@ export const CharacterCreation: React.FC<{ onCreated: () => void }> = ({ onCreat
 
   const initialErrors = {
     Nickname: [],
-    CharacterRace: [],
     CharacterClass: [],
     Gender: [],
-    Combination: [],
+    Creation: [],
   } as CreateCharacterResponseErrors;
   const [responseErrors, setResponseErrors] = useState<CreateCharacterResponseErrors>(initialErrors);
   const handleRaceChange = (event: SelectChangeEvent<unknown>, child: React.ReactNode) => {
@@ -70,7 +70,7 @@ export const CharacterCreation: React.FC<{ onCreated: () => void }> = ({ onCreat
     }
     setLoading(true);
     setResponseErrors(initialErrors);
-    await createCharacter({ nickname, characterRace, characterClass, gender })
+    await createCharacter({ nickname, characterClass, gender })
       .then(() => {
         onCreated();
       })
@@ -105,7 +105,6 @@ export const CharacterCreation: React.FC<{ onCreated: () => void }> = ({ onCreat
           margin: 1,
         }}
         required
-        error={responseErrors?.CharacterRace?.length > 0}
         size="small"
       >
         <InputLabel id="race-select-label">Race</InputLabel>
@@ -130,10 +129,6 @@ export const CharacterCreation: React.FC<{ onCreated: () => void }> = ({ onCreat
           <MenuItem value={4}>Orc</MenuItem>
           <MenuItem value={5}>NightElf</MenuItem>
         </Select>
-        {responseErrors?.Combination?.length > 0 && (
-          <FormHelperText sx={{ color: (theme) => theme.palette.error.light }}>Wrong combination</FormHelperText>
-        )}
-        {responseErrors?.CharacterRace?.length > 0 && <FormHelperText>Required</FormHelperText>}
       </FormControl>
       <FormControl
         sx={{
@@ -174,9 +169,6 @@ export const CharacterCreation: React.FC<{ onCreated: () => void }> = ({ onCreat
             </MenuItem>
           ))}
         </Select>
-        {responseErrors?.Combination?.length > 0 && (
-          <FormHelperText sx={{ color: (theme) => theme.palette.error.light }}>Wrong combination</FormHelperText>
-        )}
         {responseErrors?.CharacterClass?.length > 0 && <FormHelperText>Required</FormHelperText>}
       </FormControl>
       <Column
@@ -212,6 +204,20 @@ export const CharacterCreation: React.FC<{ onCreated: () => void }> = ({ onCreat
           <FormHelperText sx={{ color: (theme) => theme.palette.error.light, marginTop: '-16px' }}>Required</FormHelperText>
         )}
       </Column>
+      {responseErrors?.Creation?.length > 0 &&
+        responseErrors?.Creation.map((ce, i) => (
+          <FormHelperText
+            key={i}
+            sx={{
+              border: (theme) => `1px solid ${theme.palette.grey[300]}`,
+              borderRadius: 1,
+              color: (theme) => theme.palette.error.light,
+              textAlign: 'center',
+            }}
+          >
+            {ce}
+          </FormHelperText>
+        ))}
       <LoadingButton
         onClick={onSubmit}
         icon={<DoneOutlineIcon />}

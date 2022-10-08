@@ -1,8 +1,11 @@
-import { HubConnection } from '@microsoft/signalr';
+import { HubConnection, HubConnectionState } from '@microsoft/signalr';
 import { ChatMessage, ChatPlayerDto, PlayerDto } from '../../../models/signalR';
+import { GameSettings } from './signalRContext.state';
 
 export type SignalRContextAction =
   | { type: SignalRContextActionEnum.SET_CONNECTION; connection: HubConnection }
+  | { type: SignalRContextActionEnum.SET_CONNECTION_STATE; connectionState?: HubConnectionState }
+  | { type: SignalRContextActionEnum.SET_GAME_SETTINGS; gameSettings: GameSettings }
   | { type: SignalRContextActionEnum.SET_RETRY_CONNECTION }
   | { type: SignalRContextActionEnum.SET_CURRENT_PLAYER; currentPlayer: PlayerDto }
   | { type: SignalRContextActionEnum.SET_NEARBY_PLAYERS; players: ChatPlayerDto[] }
@@ -13,11 +16,13 @@ export type SignalRContextAction =
 
 export enum SignalRContextActionEnum {
   SET_CONNECTION = 0,
-  SET_RETRY_CONNECTION = 1,
-  SET_CURRENT_PLAYER = 2,
-  SET_NEARBY_PLAYERS = 3,
-  SET_PARTY_PLAYERS = 4,
-  SET_CLAN_PLAYERS = 5,
-  SET_FRIEND_PLAYERS = 6,
-  SET_CHAT_MESSAGE = 7,
+  SET_CONNECTION_STATE = 1,
+  SET_GAME_SETTINGS = 2,
+  SET_RETRY_CONNECTION = 3,
+  SET_CURRENT_PLAYER = 4,
+  SET_NEARBY_PLAYERS = 5,
+  SET_PARTY_PLAYERS = 6,
+  SET_CLAN_PLAYERS = 7,
+  SET_FRIEND_PLAYERS = 8,
+  SET_CHAT_MESSAGE = 9,
 }

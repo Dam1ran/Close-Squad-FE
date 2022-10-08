@@ -13,6 +13,7 @@ import {
   UserLoginDto,
   UserRegisterDto,
 } from '../models/api.models';
+import { GameSettings } from '../support/contexts/signalRContext/signalRContext.state';
 import { AuthService, CaptchaService, SessionService } from '../support/services';
 import { ClearAuthHandler, Constants, getCookieToken, NavigateHandler } from '../support/utils';
 import { serverClientUtils } from './serverClientUtils';
@@ -152,6 +153,8 @@ export const ServerClient = (incomeAbortSignal?: AbortSignal) => {
   const createCharacter = async (characterCreationDto: CharacterCreationDto) =>
     instance.post('character/create', { ...characterCreationDto }, { signal });
 
+  const getGameSettings = async () => instance.get<GameSettings>('settings/game', { signal });
+
   const test1 = () => instance.get('tryout/test1', { signal });
   const test2 = () => instance.get('tryout/test2', { signal });
   const test3 = () => instance.get('tryout/test3', { signal });
@@ -174,6 +177,7 @@ export const ServerClient = (incomeAbortSignal?: AbortSignal) => {
     createAnnouncement,
     deleteAnnouncement,
     createCharacter,
+    getGameSettings,
     test1,
     test2,
     test3,
