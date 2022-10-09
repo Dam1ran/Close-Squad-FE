@@ -162,7 +162,7 @@ export const ControlBar: React.FC = () => {
         }}
       >
         {characters.length > 0 && <WorldMapButton />}
-        {currentPlayer && characters.length < 9 && <CreateCharButton />}
+        {characters.length < 9 && <CreateCharButton />}
       </Grid>
     </Grid>
   );

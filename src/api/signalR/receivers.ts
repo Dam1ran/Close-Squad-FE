@@ -1,7 +1,8 @@
 import { useContext } from 'react';
-import { scoutQuadrantReportDialogOverlay } from '../../components/elements/organisms/overlay/quadrantInfo';
+import { scoutQuadrantReportDialogOverlay, serverDialogOverlay } from '../../components/elements/organisms/overlay';
 import { CharacterDto, ChatMessage, ChatPlayerDto, PlayerDto } from '../../models/signalR';
 import { ScoutQuadrantReport } from '../../models/signalR';
+import { ServerDialog } from '../../models/signalR/serverDialog';
 import { CharacterContext } from '../../support/contexts/characterContext/characterContextProvider';
 import { SignalRContext } from '../../support/contexts/signalRContext/signalRContextProvider';
 import { useRefreshToken } from '../useRefreshToken';
@@ -61,6 +62,9 @@ export const useReceivers = (): Receivers => {
     },
     SendScoutQuadrantReport: (payload: ScoutQuadrantReport) => {
       scoutQuadrantReportDialogOverlay(payload);
+    },
+    SendServerDialog: (payload: ServerDialog) => {
+      serverDialogOverlay(payload);
     },
   };
 

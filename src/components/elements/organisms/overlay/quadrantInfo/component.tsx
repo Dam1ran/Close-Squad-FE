@@ -9,7 +9,7 @@ export const ScoutReport: React.FC<{ onClose: () => void; report: ScoutQuadrantR
   return (
     <Box textAlign={'center'} sx={{ userSelect: 'none', borderBottomLeftRadius: '4px', borderBottomRightRadius: '4px' }}>
       <Box p={1} sx={{ overflowY: 'auto', maxHeight: '320px', maxWidth: '320px', width: '320px' }}>
-        <Row sx={{ justifyContent: 'space-between', width: '100%' }}>
+        <Row sx={{ justifyContent: 'space-around', width: '100%' }}>
           {report.area.length > 0 && <Typography>Area:&nbsp;{report.area}</Typography>}
           {report.name.length > 0 && <Typography>Name:&nbsp;{report.name}</Typography>}
         </Row>

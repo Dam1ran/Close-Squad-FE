@@ -1,26 +1,25 @@
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useContext } from 'react';
 import { useConnection } from '../../../../../api/signalR/useConnection';
 import { CharacterStatus, TravelDirection } from '../../../../../models/enums';
 import { CharacterContext } from '../../../../../support/contexts/characterContext/characterContextProvider';
+import { useCharacterService } from '../../../../../support/services/useCharacterService';
 import { Row } from '../../../../elements';
 import { TravelArrow } from './components/travelArrow';
 import { TravelingLayer } from './components/travelingLayer';
 
 export const Viewport: React.FC = () => {
-  const { activeCharacterId, characters } = useContext(CharacterContext);
+  const { activeCharacterId } = useContext(CharacterContext);
   const { characterTravelTo } = useConnection();
+  const isTravelDisabled = useCharacterService().isTravelDisabled();
+  const activeCharacter = useCharacterService().getActiveCharacter();
 
   const onTravelClick = async (travelDirection: TravelDirection): Promise<void> => {
-    if (!activeCharacterId) {
+    if (isTravelDisabled) {
       return;
     }
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    characterTravelTo({ characterId: activeCharacterId, travelDirection });
+    characterTravelTo({ characterId: activeCharacterId!, travelDirection });
   };
-
-  const activeCharacter = characters.find((c) => c.id === activeCharacterId);
-  const arrowsDisabled =
-    !activeCharacterId || activeCharacter?.characterStatus !== CharacterStatus.Awake || activeCharacter?.hp === 0;
 
   return (
     <Row
@@ -37,7 +36,12 @@ export const Viewport: React.FC = () => {
       {Object.values(TravelDirection)
         .filter((v) => !isNaN(Number(v)))
         .map((e, v) => (
-          <TravelArrow disabled={/*+e % 2 === 0 || */ arrowsDisabled} key={v} travelDirection={+e} onClick={onTravelClick} />
+          <TravelArrow
+            disabled={/*+e % 2 === 0 || */ isTravelDisabled}
+            key={v}
+            travelDirection={+e}
+            onClick={onTravelClick}
+          />
         ))}
       {activeCharacter?.characterStatus === CharacterStatus.Traveling && <TravelingLayer />}
     </Row>
