@@ -27,7 +27,7 @@ export const useSignalR = () => {
         .withUrl(process.env.REACT_APP_SIGNALR_URL!, {
           accessTokenFactory: () => token!,
         })
-        .withAutomaticReconnect()
+        .withAutomaticReconnect([2, 10, 60])
         .configureLogging(LogLevel.Warning)
         .build();
 

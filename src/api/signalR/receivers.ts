@@ -1,5 +1,7 @@
 import { useContext } from 'react';
+import { scoutQuadrantReportDialogOverlay } from '../../components/elements/organisms/overlay/quadrantInfo';
 import { CharacterDto, ChatMessage, ChatPlayerDto, PlayerDto } from '../../models/signalR';
+import { ScoutQuadrantReport } from '../../models/signalR';
 import { CharacterContext } from '../../support/contexts/characterContext/characterContextProvider';
 import { SignalRContext } from '../../support/contexts/signalRContext/signalRContextProvider';
 import { useRefreshToken } from '../useRefreshToken';
@@ -28,6 +30,8 @@ export const useReceivers = (): Receivers => {
       setCurrentPlayer(payload);
     },
     SetNearbyGroup: (payload: ChatPlayerDto[]) => {
+      console.log(payload);
+
       setNearbyPlayers(payload);
     },
     PartyGroup: (payload: ChatPlayerDto[]) => {
@@ -39,8 +43,8 @@ export const useReceivers = (): Receivers => {
     FriendGroup: (payload: ChatPlayerDto[]) => {
       setFriendPlayers(payload);
     },
-    ReceiveChatMessage: (message: ChatMessage) => {
-      setChatMessage(message);
+    ReceiveChatMessage: (payload: ChatMessage) => {
+      setChatMessage(payload);
     },
     OnSessionExpired: async () => {
       await refresh();
@@ -48,11 +52,15 @@ export const useReceivers = (): Receivers => {
     SetCharacters: (payload: CharacterDto[]) => {
       setCharacters(payload);
     },
-    UpdateCharacter: (characterDto: CharacterDto) => {
-      updateCharacter(characterDto);
+    UpdateCharacter: (payload: CharacterDto) => {
+      console.log(payload);
+      updateCharacter(payload);
     },
     Reconnect: () => {
       setRetryConnection();
+    },
+    SendScoutQuadrantReport: (payload: ScoutQuadrantReport) => {
+      scoutQuadrantReportDialogOverlay(payload);
     },
   };
 

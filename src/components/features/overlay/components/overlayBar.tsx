@@ -129,6 +129,7 @@ export const OverlayBar: React.FC<OverlayBarProps> = (props) => {
         variant={props.durationMilliseconds >= 0 ? 'determinate' : 'indeterminate'}
         value={props.durationMilliseconds === 0 ? 0 : 100 - percentage}
         thickness={props.canBeClosed || props.durationMilliseconds < 0 ? 4 : 22}
+        onClose={props.canBeClosed ? onClose : undefined}
       >
         {props.canBeClosed && (
           <CloseIcon
@@ -140,7 +141,6 @@ export const OverlayBar: React.FC<OverlayBarProps> = (props) => {
                 transform: 'rotate(-90deg)',
               },
             }}
-            onClick={onClose}
           />
         )}
       </CircularProgressWithChildren>

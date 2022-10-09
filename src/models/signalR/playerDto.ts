@@ -3,5 +3,5 @@ export interface PlayerDto {
   nickname: string;
   clanName: string;
   clanIcon: string;
-  quadrantIndex: number;
+  quadrantIndex?: number;
 }

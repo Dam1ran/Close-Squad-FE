@@ -1,8 +1,13 @@
 import { HubConnectionState } from '@microsoft/signalr';
 import { useContext } from 'react';
-import { ChatCommand, ChatMessage, ChatPlayerDto } from '../../models/signalR';
-import { CharacterCall } from '../../models/signalR/characterCall';
-import { CharacterTravelCall } from '../../models/signalR/characterTravelCall';
+import {
+  CharacterCall,
+  CharacterScoutCall,
+  CharacterTravelCall,
+  ChatCommand,
+  ChatMessage,
+  ChatPlayerDto,
+} from '../../models/signalR';
 import { SignalRContext } from '../../support/contexts/signalRContext/signalRContextProvider';
 
 /* eslint-disable @typescript-eslint/explicit-function-return-type */
@@ -40,6 +45,10 @@ export const useConnection = () => {
     connection?.send('CharacterTravelTo', { ...characterTravelCall });
   };
 
+  const scoutQuadrantCall = (scoutCall: CharacterScoutCall) => {
+    connection?.send('ScoutQuadrant', { ...scoutCall });
+  };
+
   return {
     isConnected: connectionState === HubConnectionState.Connected,
     sendChatMessage,
@@ -48,5 +57,6 @@ export const useConnection = () => {
     playerJumpTo,
     playerLeaveQuadrant,
     characterTravelTo,
+    scoutQuadrantCall,
   };
 };

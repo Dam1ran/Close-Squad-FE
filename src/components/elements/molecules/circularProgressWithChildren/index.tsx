@@ -12,6 +12,7 @@ export interface CircularProgressWithChildrenProps {
   variant?: 'determinate' | 'indeterminate';
   onMouseEnter?: React.MouseEventHandler<HTMLDivElement> | undefined;
   onMouseLeave?: React.MouseEventHandler<HTMLDivElement> | undefined;
+  onClose?: () => void;
 }
 
 export const CircularProgressWithChildren: React.FC<CircularProgressWithChildrenProps> = (props) => {
@@ -20,6 +21,7 @@ export const CircularProgressWithChildren: React.FC<CircularProgressWithChildren
       onMouseEnter={props.onMouseEnter}
       onMouseLeave={props.onMouseLeave}
       sx={{ position: 'relative', display: 'inline-flex', ...props.sx }}
+      onClick={props.onClose}
     >
       <CircularProgress
         variant={props.variant}

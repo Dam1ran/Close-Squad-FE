@@ -2,6 +2,12 @@ not found page
 unauthorized page
 prepare test page
 
+/// push XVIII
+
+some polishings
+quadrant scout report feature part 1 of 2?
+solved quadrant img overflow issue
+
 /// push XVII
 
 game settings infra
