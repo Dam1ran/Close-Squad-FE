@@ -10,5 +10,5 @@ export const getNormalized = (totalValue: number, currentValue: number, normaliz
     return normalizeValue;
   }
 
-  return normalizeValue / (totalValue / currentValue);
+  return +(normalizeValue / (totalValue / currentValue)).toFixed(3);
 };

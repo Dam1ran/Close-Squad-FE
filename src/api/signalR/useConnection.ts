@@ -2,6 +2,7 @@ import { HubConnectionState } from '@microsoft/signalr';
 import { useContext } from 'react';
 import {
   CharacterCall,
+  CharacterMoveCall,
   CharacterScoutCall,
   CharacterTravelCall,
   ChatCommand,
@@ -49,6 +50,10 @@ export const useConnection = () => {
     connection?.send('ScoutQuadrant', { ...scoutCall });
   };
 
+  const characterMove = (characterMoveCall: CharacterMoveCall) => {
+    connection?.send('CharacterMove', { ...characterMoveCall });
+  };
+
   return {
     isConnected: connectionState === HubConnectionState.Connected,
     sendChatMessage,
@@ -58,5 +63,6 @@ export const useConnection = () => {
     playerLeaveQuadrant,
     characterTravelTo,
     scoutQuadrantCall,
+    characterMove,
   };
 };

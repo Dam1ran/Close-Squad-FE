@@ -42,7 +42,8 @@ export const TravelArrow: React.FC<{
         borderBottomLeftRadius:
           travelDirection === 1 || travelDirection === 2 || travelDirection === 3 || travelDirection === 3 ? '50%' : 'unset',
       }}
-      onClick={(): void => {
+      onClick={(e): void => {
+        e.stopPropagation();
         !disabled && onClick(travelDirection);
       }}
     >

@@ -33,6 +33,26 @@ export const characterRContextReducer = (
         ...prevState,
       } as CharacterContextState;
     }
+    case CharacterContextActionEnum.UPDATE_CHARACTERS: {
+      action.characters.forEach(cl => {
+        const character = prevState.characters.find((c) => c.id === cl.id);
+
+        if (character) {
+          const objKeys = Object.keys(cl)?.filter(
+            (k) => k.getNormalized() !== 'id',
+          ) as (keyof CharacterDto)[];
+
+          for (const objKey of objKeys) {
+            (character[objKey] as unknown) = cl[objKey];
+          }
+        }
+
+      });
+
+      return {
+        ...prevState,
+      } as CharacterContextState;
+    }
     case CharacterContextActionEnum.SET_CHARACTERS: {
       return {
         ...prevState,

@@ -6,11 +6,13 @@ import { SocialSection } from './components/socialSection';
 import { GameSection } from './components/gameSection';
 import { useSignalR } from '../../../api/signalR/useSignalR';
 import { useLoadGameSettings } from './components/useLoadGameSettings';
+// import { useTicker } from './components/useTicker';
 
 export const LobbyPage = (): JSX.Element => {
   useTitle('Lobby');
   useSignalR();
   useLoadGameSettings();
+  // useTicker();
 
   return (
     <Column

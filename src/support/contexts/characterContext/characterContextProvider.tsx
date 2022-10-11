@@ -13,6 +13,7 @@ const characterContextInitialState: CharacterContextState = {
 let dispatcher = {
   setCharacter: (character: CharacterDto): void => {},
   updateCharacter: (character: Partial<CharacterDto>): void => {},
+  updateCharacters: (characters: Partial<CharacterDto>[]): void => {},
   setCharacters: (characters: CharacterDto[]): void => {},
   setActiveCharacterId: (id?: number): void => {},
 };
@@ -36,6 +37,11 @@ export const CharacterContextProvider = ({ children }: PropsWithChildren<Browser
         dispatch({
           type: CharacterContextActionEnum.UPDATE_CHARACTER,
           character,
+        }),
+      updateCharacters: (characters) =>
+        dispatch({
+          type: CharacterContextActionEnum.UPDATE_CHARACTERS,
+          characters,
         }),
       setCharacters: (characters) =>
         dispatch({

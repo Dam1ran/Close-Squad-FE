@@ -13,4 +13,8 @@ export interface CharacterDto {
   maxMP: number;
   mp: number;
   xp_percent: number;
+  x: number;
+  y: number;
+  xDestination: number;
+  yDestination: number;
 }

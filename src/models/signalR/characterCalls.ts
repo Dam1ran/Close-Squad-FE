@@ -11,3 +11,8 @@ export interface CharacterTravelCall extends CharacterCall {
 export interface CharacterScoutCall extends CharacterCall {
   quadrantIndex: number;
 }
+
+export interface CharacterMoveCall extends CharacterCall {
+  x: number;
+  y: number;
+}

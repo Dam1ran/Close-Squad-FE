@@ -22,7 +22,7 @@ export const useReceivers = (): Receivers => {
     setChatMessage,
     setRetryConnection,
   } = useContext(SignalRContext);
-  const { setCharacters, updateCharacter } = useContext(CharacterContext);
+  const { setCharacters, updateCharacter, updateCharacters } = useContext(CharacterContext);
   const { refresh } = useRefreshToken();
 
   const receivers: Receivers = {
@@ -53,9 +53,12 @@ export const useReceivers = (): Receivers => {
     SetCharacters: (payload: CharacterDto[]) => {
       setCharacters(payload);
     },
-    UpdateCharacter: (payload: CharacterDto) => {
+    UpdateCharacter: (payload: Partial<CharacterDto>) => {
       console.log(payload);
       updateCharacter(payload);
+    },
+    UpdateCharacters: (payload: Partial<CharacterDto>[]) => {
+      updateCharacters(payload);
     },
     Reconnect: () => {
       setRetryConnection();
