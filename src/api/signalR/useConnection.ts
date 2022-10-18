@@ -5,6 +5,7 @@ import {
   CharacterMoveCall,
   CharacterScoutCall,
   CharacterTravelCall,
+  CharacterUseActionCall,
   ChatCommand,
   ChatMessage,
   ChatPlayerDto,
@@ -46,12 +47,20 @@ export const useConnection = () => {
     connection?.send('CharacterTravelTo', { ...characterTravelCall });
   };
 
+  const characterTeleportToNearest = (characterCall: CharacterCall) => {
+    connection?.send('CharacterTeleportToNearest', { ...characterCall });
+  };
+
   const scoutQuadrantCall = (scoutCall: CharacterScoutCall) => {
     connection?.send('ScoutQuadrant', { ...scoutCall });
   };
 
   const characterMove = (characterMoveCall: CharacterMoveCall) => {
     connection?.send('CharacterMove', { ...characterMoveCall });
+  };
+
+  const actionCall = (characterUseActionCall: CharacterUseActionCall) => {
+    connection?.send('UseAction', { ...characterUseActionCall });
   };
 
   return {
@@ -64,5 +73,7 @@ export const useConnection = () => {
     characterTravelTo,
     scoutQuadrantCall,
     characterMove,
+    characterTeleportToNearest,
+    actionCall,
   };
 };

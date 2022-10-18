@@ -1,12 +1,13 @@
 import { createContext, PropsWithChildren, useMemo, useReducer } from 'react';
 import { BrowserRouterProps } from 'react-router-dom';
-import { CharacterDto } from '../../../models/signalR';
+import { CharacterDto, CharacterSimpleDto } from '../../../models/signalR';
 import { CharacterContextActionEnum } from './characterContext.actions';
-import { characterRContextReducer } from './characterContext.reducer';
+import { characterContextReducer } from './characterContext.reducer';
 import { CharacterContextState } from './characterContext.state';
 
 const characterContextInitialState: CharacterContextState = {
   characters: [],
+  quadrantCharacters: [],
 } as CharacterContextState;
 
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function*/
@@ -15,6 +16,7 @@ let dispatcher = {
   updateCharacter: (character: Partial<CharacterDto>): void => {},
   updateCharacters: (characters: Partial<CharacterDto>[]): void => {},
   setCharacters: (characters: CharacterDto[]): void => {},
+  setQuadrantCharacters: (quadrantCharacters: CharacterSimpleDto[]): void => {},
   setActiveCharacterId: (id?: number): void => {},
 };
 
@@ -24,7 +26,7 @@ export const CharacterContext = createContext({
 });
 
 export const CharacterContextProvider = ({ children }: PropsWithChildren<BrowserRouterProps>): JSX.Element => {
-  const [characterContextState, dispatch] = useReducer(characterRContextReducer, characterContextInitialState);
+  const [characterContextState, dispatch] = useReducer(characterContextReducer, characterContextInitialState);
 
   dispatcher = useMemo(
     () => ({
@@ -47,6 +49,11 @@ export const CharacterContextProvider = ({ children }: PropsWithChildren<Browser
         dispatch({
           type: CharacterContextActionEnum.SET_CHARACTERS,
           characters,
+        }),
+      setQuadrantCharacters: (quadrantCharacters) =>
+        dispatch({
+          type: CharacterContextActionEnum.SET_QUADRANT_CHARACTERS,
+          quadrantCharacters,
         }),
       setActiveCharacterId: (id) =>
         dispatch({

@@ -8,11 +8,11 @@ export interface CharacterDto {
   level: number;
   characterClass: CharacterClass;
   characterStatus: CharacterStatus;
-  maxHP: number;
+  maxHp: number;
   hp: number;
-  maxMP: number;
+  maxMp: number;
   mp: number;
-  xp_percent: number;
+  xpPercent: number;
   x: number;
   y: number;
   xDestination: number;

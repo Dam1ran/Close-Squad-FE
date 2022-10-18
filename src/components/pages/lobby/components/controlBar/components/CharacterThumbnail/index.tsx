@@ -17,8 +17,8 @@ export const CharacterThumbnail: React.FC<{
 }> = ({ character, setActiveCharacter, onAwakeClick, isToggleLoading }) => {
   const { activeCharacterId } = useContext(CharacterContext);
 
-  const hpPercent = character.hp !== 0 && character.maxHP !== 0 ? (character.hp / character.maxHP) * 100.0 : 0;
-  const mpPercent = character.mp !== 0 && character.maxMP !== 0 ? (character.mp / character.maxMP) * 100.0 : 0;
+  const hpPercent = character.hp !== 0 && character.maxHp !== 0 ? (character.hp / character.maxHp) * 100.0 : 0;
+  const mpPercent = character.mp !== 0 && character.maxMp !== 0 ? (character.mp / character.maxMp) * 100.0 : 0;
 
   const isActive = activeCharacterId === character.id && activeCharacterId !== undefined;
 
@@ -49,10 +49,10 @@ export const CharacterThumbnail: React.FC<{
               {CharacterClass[character.characterClass]}
             </Box>
             <Box sx={{ color: '#CC5050DD' }}>
-              HP: {character.hp}/{character.maxHP}
+              HP: {character.hp.toFixed(0)}/{character.maxHp.toFixed(0)}
             </Box>
             <Box sx={{ color: '#5050CC' }}>
-              MP: {character.mp}/{character.maxMP}
+              MP: {character.mp.toFixed(0)}/{character.maxMp.toFixed(0)}
             </Box>
           </Box>
         ) : (

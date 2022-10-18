@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import { useRefreshToken } from '../../../../api/useRefreshToken';
 import { AppContext } from '../../../../support/contexts/appContext/appContextProvider';
+import { BarShortcutsContextProvider } from '../../../../support/contexts/barShortcutContext/barShortcutsProvider';
 import { CharacterContextProvider } from '../../../../support/contexts/characterContext/characterContextProvider';
 import { SignalRContextProvider } from '../../../../support/contexts/signalRContext/signalRContextProvider';
 import { useAuthServiceHelper } from '../../../../support/services';
@@ -59,7 +60,9 @@ export const RequireLoggedIn = (): JSX.Element => {
     <Navigate to="/login" state={{ from: location.pathname }} replace />
   ) : (
     <SignalRContextProvider>
-      <CharacterContextProvider>{isLoading && !requesting ? <LoadingModal /> : <Outlet />}</CharacterContextProvider>
+      <CharacterContextProvider>
+        <BarShortcutsContextProvider>{isLoading && !requesting ? <LoadingModal /> : <Outlet />}</BarShortcutsContextProvider>
+      </CharacterContextProvider>
     </SignalRContextProvider>
   );
 };

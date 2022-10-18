@@ -14,6 +14,7 @@ export const useCharacterService = () => {
     characters.find(
       (c) =>
         c.quadrantIndex === playerQuadrantIndex &&
+        c.characterStatus === CharacterStatus.Awake &&
         c.characterClass === CharacterClass.Assassin /* && c.inventory.some(i => i.name === 'Magic Powder') */,
     );
 

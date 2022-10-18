@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Box, Grid, Row, Typography } from '../../../../elements';
+import { Box, Grid, questionDialogOverlay, Row, Typography } from '../../../../elements';
 import { WorldMapButton } from './components/buttons/worldMapButton';
 import { useContext, useEffect, useState } from 'react';
 import { fadeIn } from '../../../../../styles';
@@ -14,9 +14,10 @@ import { CharacterDto } from '../../../../../models/signalR';
 export const ControlBar: React.FC = () => {
   const { currentPlayer } = useContext(SignalRContext);
   const { characters, setActiveCharacterId, activeCharacterId } = useContext(CharacterContext);
-  const { playerJumpTo, toggleCharacter, isConnected } = useConnection();
+  const { playerJumpTo, toggleCharacter, isConnected, characterTeleportToNearest } = useConnection();
 
   const [reactivateSameCharacter, setReactivateSameCharacter] = useState(false);
+
   const _setActiveCharacter = async (character: CharacterDto): Promise<void> => {
     if (
       (reactivateSameCharacter || (isConnected && character.id !== activeCharacterId)) &&
@@ -24,6 +25,13 @@ export const ControlBar: React.FC = () => {
     ) {
       playerJumpTo({ characterId: character.id });
       setActiveCharacterId(character.id);
+      if (character.characterStatus === CharacterStatus.Dead) {
+        questionDialogOverlay(
+          () => characterTeleportToNearest({ characterId: character.id }),
+          'Ready to...',
+          `Teleport ${character.nickname} to nearest spawn location?`,
+        );
+      }
     }
   };
 

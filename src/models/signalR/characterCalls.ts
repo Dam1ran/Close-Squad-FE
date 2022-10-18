@@ -1,4 +1,4 @@
-import { TravelDirection } from '../enums';
+import { CharacterAction, TravelDirection } from '../enums';
 
 export interface CharacterCall {
   characterId: number;
@@ -15,4 +15,8 @@ export interface CharacterScoutCall extends CharacterCall {
 export interface CharacterMoveCall extends CharacterCall {
   x: number;
   y: number;
+}
+
+export interface CharacterUseActionCall extends CharacterCall {
+  action: CharacterAction;
 }

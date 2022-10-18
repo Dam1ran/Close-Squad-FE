@@ -7,7 +7,7 @@ export const QuestionDialogComponent: React.FC<{ onClose: () => void; onAccept: 
 }) => {
   return (
     <Column p={1} alignItems="center" sx={{ overflowY: 'auto', maxHeight: '320px', maxWidth: '320px', width: '320px' }}>
-      <Typography p={1} sx={{ textShadow: (theme) => `0 0 3px ${theme.palette.grey[500]}` }}>
+      <Typography p={1} sx={{ textShadow: (theme) => `0 0 3px ${theme.palette.grey[500]}`, textAlign: 'center' }}>
         {question}
       </Typography>
       <DialogActionBar

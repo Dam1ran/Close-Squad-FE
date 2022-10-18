@@ -94,6 +94,6 @@ export const signalRContextReducer = (prevState: SignalRContextState, action: Si
       } as SignalRContextState;
     }
     default:
-      throw new Error(`App context state action: ${SignalRContextActionEnum[actionType]} not handled in switch.`);
+      throw new Error(`SignalR context state action: ${SignalRContextActionEnum[actionType]} not handled in switch.`);
   }
 };

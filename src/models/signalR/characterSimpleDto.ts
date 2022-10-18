@@ -7,5 +7,7 @@ export interface CharacterSimpleDto {
   nickname: string;
   characterClass: CharacterClass;
   characterStatus: CharacterStatus;
+  x: number;
+  y: number;
   // equipment
 }

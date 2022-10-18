@@ -1,8 +1,9 @@
 import { useContext } from 'react';
 import { scoutQuadrantReportDialogOverlay, serverDialogOverlay } from '../../components/elements/organisms/overlay';
-import { CharacterDto, ChatMessage, ChatPlayerDto, PlayerDto } from '../../models/signalR';
+import { AggregatedDataDto, BarShortcut, CharacterDto, ChatMessage, ChatPlayerDto, PlayerDto } from '../../models/signalR';
 import { ScoutQuadrantReport } from '../../models/signalR';
 import { ServerDialog } from '../../models/signalR/serverDialog';
+import { BarShortcutsContext } from '../../support/contexts/barShortcutContext/barShortcutsProvider';
 import { CharacterContext } from '../../support/contexts/characterContext/characterContextProvider';
 import { SignalRContext } from '../../support/contexts/signalRContext/signalRContextProvider';
 import { useRefreshToken } from '../useRefreshToken';
@@ -21,8 +22,10 @@ export const useReceivers = (): Receivers => {
     setFriendPlayers,
     setChatMessage,
     setRetryConnection,
+    connection,
   } = useContext(SignalRContext);
-  const { setCharacters, updateCharacter, updateCharacters } = useContext(CharacterContext);
+  const { setCharacters, updateCharacter, updateCharacters, setQuadrantCharacters } = useContext(CharacterContext);
+  const { setBarShortcuts } = useContext(BarShortcutsContext);
   const { refresh } = useRefreshToken();
 
   const receivers: Receivers = {
@@ -57,8 +60,9 @@ export const useReceivers = (): Receivers => {
       console.log(payload);
       updateCharacter(payload);
     },
-    UpdateCharacters: (payload: Partial<CharacterDto>[]) => {
-      updateCharacters(payload);
+    SendAggregatedData: (payload: AggregatedDataDto) => {
+      updateCharacters(payload.clientCharacters);
+      setQuadrantCharacters(payload.charactersInActiveQuadrant);
     },
     Reconnect: () => {
       setRetryConnection();
@@ -68,6 +72,13 @@ export const useReceivers = (): Receivers => {
     },
     SendServerDialog: (payload: ServerDialog) => {
       serverDialogOverlay(payload);
+    },
+    Disconnect: async () => {
+      connection?.stop();
+      await refresh();
+    },
+    SetBarShortcuts: (payload: BarShortcut[]) => {
+      setBarShortcuts(payload);
     },
   };
 

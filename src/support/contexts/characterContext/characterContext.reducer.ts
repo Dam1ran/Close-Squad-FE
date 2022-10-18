@@ -2,7 +2,7 @@ import { CharacterDto } from '../../../models/signalR';
 import { CharacterContextAction, CharacterContextActionEnum } from './characterContext.actions';
 import { CharacterContextState } from './characterContext.state';
 
-export const characterRContextReducer = (
+export const characterContextReducer = (
   prevState: CharacterContextState,
   action: CharacterContextAction,
 ): CharacterContextState => {
@@ -34,19 +34,16 @@ export const characterRContextReducer = (
       } as CharacterContextState;
     }
     case CharacterContextActionEnum.UPDATE_CHARACTERS: {
-      action.characters.forEach(cl => {
+      action.characters.forEach((cl) => {
         const character = prevState.characters.find((c) => c.id === cl.id);
 
         if (character) {
-          const objKeys = Object.keys(cl)?.filter(
-            (k) => k.getNormalized() !== 'id',
-          ) as (keyof CharacterDto)[];
+          const objKeys = Object.keys(cl)?.filter((k) => k.getNormalized() !== 'id') as (keyof CharacterDto)[];
 
           for (const objKey of objKeys) {
             (character[objKey] as unknown) = cl[objKey];
           }
         }
-
       });
 
       return {
@@ -59,6 +56,12 @@ export const characterRContextReducer = (
         characters: action.characters,
       } as CharacterContextState;
     }
+    case CharacterContextActionEnum.SET_QUADRANT_CHARACTERS: {
+      return {
+        ...prevState,
+        quadrantCharacters: action.quadrantCharacters,
+      } as CharacterContextState;
+    }
     case CharacterContextActionEnum.SET_ACTIVE_CHAR_ID: {
       return {
         ...prevState,
@@ -67,6 +70,6 @@ export const characterRContextReducer = (
     }
 
     default:
-      throw new Error(`App context state action: ${CharacterContextActionEnum[actionType]} not handled in switch.`);
+      throw new Error(`Character context state action: ${CharacterContextActionEnum[actionType]} not handled in switch.`);
   }
 };

@@ -6,3 +6,5 @@ export * from './characterCalls';
 export * from './scoutQuadrantReport';
 export * from './characterSimpleDto';
 export * from './serverDialog';
+export * from './aggregatedDataDto';
+export * from './barShortcut';

@@ -1,6 +1,18 @@
 not found page
 unauthorized page
 
+/// push XXIII
+
+shortcuts infra part I
+send other players characters to active quadrant
+
+/// push XXII
+
+some small refactors
+died teleport dialog
+prevent same user login on signalR
+added image to viewport and polishings
+
 /// push XXI
 
 movement part I
