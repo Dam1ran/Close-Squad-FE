@@ -2,6 +2,7 @@ import {
   AddCircleOutlineIcon,
   ArrowForwardIosIcon,
   AutorenewIcon,
+  BlurOnIcon,
   Box,
   BubbleChartIcon,
   CachedIcon,
@@ -13,6 +14,7 @@ import {
   CrisisAlertIcon,
   DirectionsIcon,
   DoneOutlineIcon,
+  DoubleArrowIcon,
   DragHandleIcon,
   EnhancedEncryptionIcon,
   FemaleIcon,
@@ -89,6 +91,8 @@ export const IconsPage = () => {
       <FemaleIcon />
       <TransgenderIcon />
       <ArrowForwardIosIcon />
+      <BlurOnIcon />
+      <DoubleArrowIcon />
     </Box>
   );
 };

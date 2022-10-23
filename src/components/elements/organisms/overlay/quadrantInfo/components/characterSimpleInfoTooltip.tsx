@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { Box, Tooltip } from '../../../..';
-import { CharacterClass } from '../../../../../../models/api.models';
+import { CsEntityClass } from '../../../../../../models/api.models';
 import { CharacterSimpleDto } from '../../../../../../models/signalR';
 
 export const CharacterSimpleInfoTooltip: React.FC<{
@@ -15,7 +15,7 @@ export const CharacterSimpleInfoTooltip: React.FC<{
       title={
         <Box>
           <Box sx={{ fontStyle: 'italic', color: (theme) => theme.palette.grey[800] }}>
-            {CharacterClass[character.characterClass]}
+            {CsEntityClass[character.characterClass]}
           </Box>
         </Box>
       }

@@ -25,7 +25,11 @@ export const characterContextReducer = (
       if (character) {
         const objKeys = Object.keys(action.character)?.filter((k) => k.getNormalized() !== 'id') as (keyof CharacterDto)[];
         for (const objKey of objKeys) {
-          (character[objKey] as unknown) = action.character[objKey];
+          if (objKey !== 'target') {
+            (character[objKey] as unknown) = action.character[objKey];
+          } else {
+            character.target = action.character.target;
+          }
         }
       }
 
@@ -41,7 +45,11 @@ export const characterContextReducer = (
           const objKeys = Object.keys(cl)?.filter((k) => k.getNormalized() !== 'id') as (keyof CharacterDto)[];
 
           for (const objKey of objKeys) {
-            (character[objKey] as unknown) = cl[objKey];
+            if (objKey !== 'target') {
+              (character[objKey] as unknown) = cl[objKey];
+            } else {
+              character.target = cl.target;
+            }
           }
         }
       });

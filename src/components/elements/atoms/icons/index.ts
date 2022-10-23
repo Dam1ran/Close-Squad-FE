@@ -40,3 +40,5 @@ export { default as MaleIcon } from '@mui/icons-material/Male';
 export { default as FemaleIcon } from '@mui/icons-material/Female';
 export { default as TransgenderIcon } from '@mui/icons-material/Transgender';
 export { default as ArrowForwardIosIcon } from '@mui/icons-material/ArrowForwardIos';
+export { default as BlurOnIcon } from '@mui/icons-material/BlurOn';
+export { default as DoubleArrowIcon } from '@mui/icons-material/DoubleArrow';

@@ -1,4 +1,4 @@
-import { CharacterClassIconMap, CharacterStatusIconMap } from '../../../../../models/character';
+import { CsEntityClassIconMap, CharacterStatusIconMap } from '../../../../../models/character';
 import { ScoutQuadrantReport } from '../../../../../models/signalR';
 import { CheckIcon, Divider } from '../../../atoms';
 import { DialogActionBar, Typography } from '../../../molecules';
@@ -32,7 +32,7 @@ export const ScoutReport: React.FC<{ onClose: () => void; report: ScoutQuadrantR
                   }}
                 >
                   <Typography sx={{ textShadow: (theme) => `0 0 3px ${theme.palette.grey[100]}` }}>
-                    {CharacterClassIconMap[c.characterClass]}
+                    {CsEntityClassIconMap[c.characterClass]}
                   </Typography>
                   <Typography> {c.nickname}</Typography>
                   <Typography sx={{ textShadow: (theme) => `0 0 3px ${theme.palette.grey[100]}` }}>

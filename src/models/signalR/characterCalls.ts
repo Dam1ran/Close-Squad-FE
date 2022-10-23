@@ -20,3 +20,7 @@ export interface CharacterMoveCall extends CharacterCall {
 export interface CharacterUseActionCall extends CharacterCall {
   action: CharacterAction;
 }
+
+export interface CharacterTargetCall extends CharacterCall {
+  instanceId: string;
+}

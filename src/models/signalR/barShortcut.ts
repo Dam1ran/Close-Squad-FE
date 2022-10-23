@@ -6,4 +6,5 @@ export interface BarShortcut {
   type: BarShortcutType;
   usingId: number;
   characterId: number;
+  isActive: boolean;
 }

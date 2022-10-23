@@ -13,6 +13,22 @@ export const barShortcutsContextReducer = (
         barShortcuts: action.barShortcuts,
       } as BarShortcutsContextState;
     }
+    case BarShortcutsContextActionEnum.UPDATE_BAR_SHORTCUT: {
+      let barShortcut = prevState.barShortcuts.find((bs) => bs.id === action.barShortcut.id);
+      if (!barShortcut) {
+        return prevState;
+      }
+
+      barShortcut = {
+        ...barShortcut,
+        ...action.barShortcut,
+      };
+
+      return {
+        ...prevState,
+        barShortcuts: [...prevState.barShortcuts.filter((bs) => bs.id !== action.barShortcut.id), barShortcut],
+      } as BarShortcutsContextState;
+    }
     default:
       throw new Error(
         `BarShortcuts context state action: ${BarShortcutsContextActionEnum[actionType]} not handled in switch.`,

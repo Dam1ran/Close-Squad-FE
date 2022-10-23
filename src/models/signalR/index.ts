@@ -8,3 +8,4 @@ export * from './characterSimpleDto';
 export * from './serverDialog';
 export * from './aggregatedDataDto';
 export * from './barShortcut';
+export * from './targetDto';

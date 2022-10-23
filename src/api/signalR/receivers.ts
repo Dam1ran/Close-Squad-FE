@@ -25,7 +25,7 @@ export const useReceivers = (): Receivers => {
     connection,
   } = useContext(SignalRContext);
   const { setCharacters, updateCharacter, updateCharacters, setQuadrantCharacters } = useContext(CharacterContext);
-  const { setBarShortcuts } = useContext(BarShortcutsContext);
+  const { setBarShortcuts, updateBarShortcut } = useContext(BarShortcutsContext);
   const { refresh } = useRefreshToken();
 
   const receivers: Receivers = {
@@ -62,6 +62,7 @@ export const useReceivers = (): Receivers => {
     },
     SendAggregatedData: (payload: AggregatedDataDto) => {
       updateCharacters(payload.clientCharacters);
+      // setCharacters(payload.clientCharacters);
       setQuadrantCharacters(payload.charactersInActiveQuadrant);
     },
     Reconnect: () => {
@@ -79,6 +80,11 @@ export const useReceivers = (): Receivers => {
     },
     SetBarShortcuts: (payload: BarShortcut[]) => {
       setBarShortcuts(payload);
+    },
+    UpdateBarShortcuts: (payload: BarShortcut[]) => {
+      payload.forEach((bs) => {
+        updateBarShortcut(bs);
+      });
     },
   };
 

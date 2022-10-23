@@ -76,13 +76,13 @@ export const signalRContextReducer = (prevState: SignalRContextState, action: Si
       const keyOfMessageGroup = ChatMessageType[action.message.type].getNormalized() as keyof ChatMessages;
       const messageGroup = prevState.chatMessages[keyOfMessageGroup];
       messageGroup.messages.push(action.message);
-      if (messageGroup?.messages?.length > 5) {
+      if (messageGroup?.messages?.length > 20) {
         messageGroup?.messages?.shift();
       }
 
       if (action.message.type !== ChatMessageType.General) {
         prevState.chatMessages['general'].messages.push(action.message);
-        if (prevState?.chatMessages['general']?.messages?.length > 20) {
+        if (prevState?.chatMessages['general']?.messages?.length > 100) {
           prevState?.chatMessages['general']?.messages?.shift();
         }
       }

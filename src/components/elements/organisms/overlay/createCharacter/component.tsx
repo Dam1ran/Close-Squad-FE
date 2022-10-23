@@ -20,9 +20,9 @@ import {
   Typography,
 } from '../../..';
 import { useServerClient } from '../../../../../api/useServerClient';
-import { CharacterClass } from '../../../../../models/api.models';
-import { CharacterClassIconMap, CharacterRaceClassesMap } from '../../../../../models/character';
-import { CharacterRace } from '../../../../../models/enums/characterRace';
+import { CsEntityClass } from '../../../../../models/api.models';
+import { CsEntityClassIconMap, CharacterRaceClassesMap } from '../../../../../models/character';
+import { CharacterRace } from '../../../../../models/enums';
 import { CreateCharacterResponseErrors } from '../../../../../models/response';
 import { useNickname } from '../../../../../support/hooks';
 import { isAnyEmpty } from '../../../../../support/utils';
@@ -32,7 +32,7 @@ export const CharacterCreation: React.FC<{ onCreated: () => void }> = ({ onCreat
   const { nickname, setNickname, isNicknameValid, nicknameErrorText } = useNickname(4, 20);
   const [characterRace, setCharacterRace] = useState(0);
   const [characterClass, setCharacterClass] = useState(0);
-  const [availableCharacterClass, setAvailableCharacterClass] = useState<CharacterClass[]>([]);
+  const [availableCharacterClass, setAvailableCharacterClass] = useState<CsEntityClass[]>([]);
   const [gender, setGender] = useState(50);
 
   useEffect(() => {
@@ -148,8 +148,8 @@ export const CharacterCreation: React.FC<{ onCreated: () => void }> = ({ onCreat
           renderValue={(v) => (
             <Row>
               {v === 0 && '--Pick type--'}
-              <Box sx={{ marginRight: 1 }}>{CharacterClassIconMap[v as CharacterRace]}</Box>
-              {CharacterClass[v as number]}
+              <Box sx={{ marginRight: 1 }}>{CsEntityClassIconMap[v as CharacterRace]}</Box>
+              {CsEntityClass[v as number]}
             </Row>
           )}
           MenuProps={{
@@ -164,8 +164,8 @@ export const CharacterCreation: React.FC<{ onCreated: () => void }> = ({ onCreat
           <MenuItem value={0}>--Pick type--</MenuItem>
           {availableCharacterClass.map((acc, i) => (
             <MenuItem key={i} value={acc}>
-              <Box sx={{ marginRight: 1 }}>{CharacterClassIconMap[acc]}</Box>
-              {CharacterClass[acc]}
+              <Box sx={{ marginRight: 1 }}>{CsEntityClassIconMap[acc]}</Box>
+              {CsEntityClass[acc]}
             </MenuItem>
           ))}
         </Select>

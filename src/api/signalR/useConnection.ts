@@ -4,6 +4,7 @@ import {
   CharacterCall,
   CharacterMoveCall,
   CharacterScoutCall,
+  CharacterTargetCall,
   CharacterTravelCall,
   CharacterUseActionCall,
   ChatCommand,
@@ -63,6 +64,18 @@ export const useConnection = () => {
     connection?.send('UseAction', { ...characterUseActionCall });
   };
 
+  const targetSelf = (characterCall: CharacterCall) => {
+    connection?.send('TargetSelf', { ...characterCall });
+  };
+
+  const targetCharacter = (characterTargetCall: CharacterTargetCall) => {
+    connection?.send('TargetByInstanceId', { ...characterTargetCall });
+  };
+
+  const cancelTarget = (characterCall: CharacterCall) => {
+    connection?.send('CancelTarget', { ...characterCall });
+  };
+
   return {
     isConnected: connectionState === HubConnectionState.Connected,
     sendChatMessage,
@@ -75,5 +88,8 @@ export const useConnection = () => {
     characterMove,
     characterTeleportToNearest,
     actionCall,
+    targetSelf,
+    targetCharacter,
+    cancelTarget,
   };
 };

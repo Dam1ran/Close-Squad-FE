@@ -12,11 +12,11 @@
 
 export interface CharacterCreationDto {
     nickname: string;
-    characterClass: CharacterClass;
+    characterClass: CsEntityClass;
     gender: number;
 }
 
-export enum CharacterClass {
+export enum CsEntityClass {
     Assassin = 1,
     Berserk = 2,
     Cupid = 3,

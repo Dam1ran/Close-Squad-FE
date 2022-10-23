@@ -1,83 +1,33 @@
-import { useConnection } from '../../../../../api/signalR/useConnection';
-import { BarShortcutType } from '../../../../../models/enums';
-import { BarShortcut } from '../../../../../models/signalR';
-import { useCharacterShortcuts } from '../../../../../support/hooks';
-import { useCharacterService } from '../../../../../support/services/useCharacterService';
-import { Box, Column, Row } from '../../../../elements';
-import { WorldMapButton } from '../controlBar/components/buttons/worldMapButton';
+import { useState } from 'react';
+import { Row } from '../../../../elements';
+import { ButtonColumn } from './components/buttonColumn';
+import { CharacterTabs } from './components/characterTabs';
 
 export const CharacterContainer: React.FC = () => {
-  const { getActiveCharacterBarShortcuts } = useCharacterShortcuts();
-  const { getActiveCharacter } = useCharacterService();
-  const activeCharacter = getActiveCharacter();
-  const { actionCall } = useConnection();
-
-  const onShortcutClick = (barShortcut: BarShortcut): void => {
-    if (!activeCharacter) {
-      return;
-    }
-    switch (barShortcut.type) {
-      case BarShortcutType.Action: {
-        actionCall({ characterId: activeCharacter.id, action: barShortcut.usingId });
-        break;
+  const [buttonColumns, setButtonColumns] = useState(1);
+  const addButtonColumn = (): void => {
+    setButtonColumns((prev) => {
+      if (prev === 4) {
+        return 1;
       }
-      case BarShortcutType.Skill: {
-        break;
-      }
-      case BarShortcutType.Item: {
-        break;
-      }
-    }
+      return ++prev;
+    });
   };
-
   return (
-    <Column
+    <Row
       sx={{
-        border: '1px solid black',
+        border: (theme) => `1px solid ${theme.palette.grey[500]}`,
         height: '500px',
         minWidth: '500px',
-        alignItems: 'center',
-        justifyContent: 'center',
+        maxWidth: '500px',
         borderRadius: 1,
         marginRight: 'auto',
       }}
     >
-      {/* quick actions */}
-      {getActiveCharacterBarShortcuts().map((bs) => (
-        <Box
-          key={bs.id}
-          sx={{ width: '20px', height: '20px', backgroundColor: 'aqua' }}
-          onClick={(): void => onShortcutClick(bs)}
-        >
-          {bs.orderNumber}
-        </Box>
+      {Array.from(Array(buttonColumns).keys()).map((k) => (
+        <ButtonColumn key={k} addButtonColumn={addButtonColumn} index={k} />
       ))}
-      {/* <Row
-        sx={{
-          marginTop: 'auto',
-          border: '1px solid black',
-          width: '100%',
-          padding: 0.25,
-          gap: 0.25,
-          flexWrap: 'wrap',
-          justifyContent: 'space-around',
-        }}
-      >
-        <WorldMapButton />
-        <WorldMapButton />
-        <WorldMapButton />
-        <WorldMapButton />
-
-        <WorldMapButton />
-        <WorldMapButton />
-        <WorldMapButton />
-        <WorldMapButton />
-
-        <WorldMapButton />
-        <WorldMapButton />
-        <WorldMapButton />
-        <WorldMapButton />
-      </Row> */}
-    </Column>
+      <CharacterTabs buttonColumns={buttonColumns} />
+    </Row>
   );
 };

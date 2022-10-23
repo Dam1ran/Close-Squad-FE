@@ -1,31 +1,31 @@
-import { CharacterClass } from '../api.models';
-import { CharacterStatus } from '../enums';
-import { CharacterRace } from '../enums/characterRace';
+import { CsEntityClass } from '../api.models';
+import { CsEntityStatus, CharacterRace } from '../enums';
 
-export const CharacterRaceClassesMap: { [key in CharacterRace]: CharacterClass[] } = {
-  [CharacterRace.Divine]: [CharacterClass.Cupid, CharacterClass.Doctor],
-  [CharacterRace.Human]: [CharacterClass.Medium, CharacterClass.Templar],
-  [CharacterRace.Dwarf]: [CharacterClass.Handyman],
-  [CharacterRace.Orc]: [CharacterClass.Berserk, CharacterClass.Seer],
-  [CharacterRace.NightElf]: [CharacterClass.Assassin, CharacterClass.Occultist],
+export const CharacterRaceClassesMap: { [key in CharacterRace]: CsEntityClass[] } = {
+  [CharacterRace.Divine]: [CsEntityClass.Cupid, CsEntityClass.Doctor],
+  [CharacterRace.Human]: [CsEntityClass.Medium, CsEntityClass.Templar],
+  [CharacterRace.Dwarf]: [CsEntityClass.Handyman],
+  [CharacterRace.Orc]: [CsEntityClass.Berserk, CsEntityClass.Seer],
+  [CharacterRace.NightElf]: [CsEntityClass.Assassin, CsEntityClass.Occultist],
 };
 
-export const CharacterClassIconMap: { [key in CharacterClass]: string } = {
-  [CharacterClass.Assassin]: '🗡',
-  [CharacterClass.Berserk]: '💪',
-  [CharacterClass.Cupid]: '🏹',
-  [CharacterClass.Doctor]: '✨',
-  [CharacterClass.Handyman]: '🛠',
-  [CharacterClass.Medium]: '💥',
-  [CharacterClass.Occultist]: '🔯',
-  [CharacterClass.Seer]: '🍥',
-  [CharacterClass.Templar]: '🛡',
+export const CsEntityClassIconMap: { [key in CsEntityClass]: string } = {
+  [CsEntityClass.Assassin]: '🗡',
+  [CsEntityClass.Berserk]: '💪',
+  [CsEntityClass.Cupid]: '🏹',
+  [CsEntityClass.Doctor]: '✨',
+  [CsEntityClass.Handyman]: '🛠',
+  [CsEntityClass.Medium]: '💥',
+  [CsEntityClass.Occultist]: '🔯',
+  [CsEntityClass.Seer]: '🍥',
+  [CsEntityClass.Templar]: '🛡',
 };
 
-export const CharacterStatusIconMap: { [key in CharacterStatus]: string } = {
-  [CharacterStatus.Astray]: '💤',
-  [CharacterStatus.Awake]: '🔅',
-  [CharacterStatus.Traveling]: '👣',
-  [CharacterStatus.Engaged]: '💢',
-  [CharacterStatus.Dead]: '🖤',
+export const CharacterStatusIconMap: { [key in CsEntityStatus]: string } = {
+  [CsEntityStatus.Astray]: '💤',
+  [CsEntityStatus.Awake]: '🔅',
+  [CsEntityStatus.Sitting]: '🏵',
+  [CsEntityStatus.Traveling]: '👣',
+  [CsEntityStatus.Engaged]: '💢',
+  [CsEntityStatus.Dead]: '🖤',
 };

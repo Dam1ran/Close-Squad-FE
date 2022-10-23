@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import { useConnection } from '../../api/signalR/useConnection';
-import { CharacterClass } from '../../models/api.models';
-import { CharacterStatus } from '../../models/enums';
+import { CsEntityClass } from '../../models/api.models';
+import { CsEntityStatus } from '../../models/enums';
 import { CharacterDto } from '../../models/signalR';
 import { CharacterContext } from '../contexts/characterContext/characterContextProvider';
 
@@ -14,29 +14,27 @@ export const useCharacterService = () => {
     characters.find(
       (c) =>
         c.quadrantIndex === playerQuadrantIndex &&
-        c.characterStatus === CharacterStatus.Awake &&
-        c.characterClass === CharacterClass.Assassin /* && c.inventory.some(i => i.name === 'Magic Powder') */,
+        c.characterStatus === CsEntityStatus.Awake &&
+        c.characterClass === CsEntityClass.Assassin /* && c.inventory.some(i => i.name === 'Magic Powder') */,
     );
 
   const getActiveCharacter = (): CharacterDto | undefined => characters.find((c) => c.id === activeCharacterId);
 
   const isTravelDisabled = () => {
     const activeCharacter = getActiveCharacter();
-    return !activeCharacterId || activeCharacter?.characterStatus !== CharacterStatus.Awake || activeCharacter?.hp === 0;
+    return !activeCharacterId || activeCharacter?.characterStatus !== CsEntityStatus.Awake || activeCharacter?.hp === 0;
   };
 
   const getCharactersInViewPort = () => {
     const activeCharacter = getActiveCharacter();
     return characters.filter(
       (c) =>
-        c.quadrantIndex === activeCharacter?.quadrantIndex &&
-        activeCharacter &&
-        c.characterStatus !== CharacterStatus.Astray,
+        c.quadrantIndex === activeCharacter?.quadrantIndex && activeCharacter && c.characterStatus !== CsEntityStatus.Astray,
     );
   };
 
   const setActiveCharacter = async (character: CharacterDto): Promise<void> => {
-    if (isConnected && character.id !== activeCharacterId && character.characterStatus !== CharacterStatus.Astray) {
+    if (isConnected && character.id !== activeCharacterId && character.characterStatus !== CsEntityStatus.Astray) {
       playerJumpTo({ characterId: character.id });
       setActiveCharacterId(character.id);
     }

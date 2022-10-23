@@ -4,9 +4,9 @@ import { useContext } from 'react';
 import { CharacterContext } from '../../../../../../../support/contexts/characterContext/characterContextProvider';
 import { Box, CircularProgress, CircularProgressWithChildren, Column, Row, Tooltip } from '../../../../../../elements';
 import { alpha } from '@mui/system';
-import { CharacterClass } from '../../../../../../../models/api.models';
-import { CharacterStatus } from '../../../../../../../models/enums';
-import { CharacterClassIconMap, CharacterStatusIconMap } from '../../../../../../../models/character';
+import { CsEntityClass } from '../../../../../../../models/api.models';
+import { CsEntityStatus } from '../../../../../../../models/enums';
+import { CsEntityClassIconMap, CharacterStatusIconMap } from '../../../../../../../models/character';
 import { CharacterDto } from '../../../../../../../models/signalR';
 
 export const CharacterThumbnail: React.FC<{
@@ -22,12 +22,12 @@ export const CharacterThumbnail: React.FC<{
 
   const isActive = activeCharacterId === character.id && activeCharacterId !== undefined;
 
-  const isDead = character.characterStatus === CharacterStatus.Dead;
-  const isOnline = character.characterStatus !== CharacterStatus.Astray;
+  const isDead = character.characterStatus === CsEntityStatus.Dead;
+  const isOnline = character.characterStatus !== CsEntityStatus.Astray;
   const canToggle =
-    character.characterStatus === CharacterStatus.Astray ||
-    character.characterStatus === CharacterStatus.Awake ||
-    character.characterStatus === CharacterStatus.Dead;
+    character.characterStatus === CsEntityStatus.Astray ||
+    character.characterStatus === CsEntityStatus.Awake ||
+    character.characterStatus === CsEntityStatus.Dead;
 
   const onAwakeButtonClick = async (e: React.MouseEvent<HTMLDivElement, MouseEvent>): Promise<void> => {
     if (!canToggle || isToggleLoading) {
@@ -46,7 +46,7 @@ export const CharacterThumbnail: React.FC<{
           <Box>
             <Box sx={{ fontStyle: 'italic', color: (theme) => theme.palette.grey[800] }}>{character.nickname}</Box>
             <Box sx={{ fontStyle: 'italic', color: (theme) => theme.palette.grey[800] }}>
-              {CharacterClass[character.characterClass]}
+              {CsEntityClass[character.characterClass]}
             </Box>
             <Box sx={{ color: '#CC5050DD' }}>
               HP: {character.hp.toFixed(0)}/{character.maxHp.toFixed(0)}
@@ -76,7 +76,6 @@ export const CharacterThumbnail: React.FC<{
           minWidth: '80px',
           border: (theme) =>
             isActive ? `2px solid ${alpha(theme.palette.secondary.main, 0.75)}` : `2px solid ${theme.palette.grey[300]}`,
-
           borderRadius: 1,
           position: 'relative',
           cursor: isActive || !isOnline ? 'unset' : 'pointer',
@@ -120,7 +119,7 @@ export const CharacterThumbnail: React.FC<{
               fontSize: '14px',
             }}
           >
-            {CharacterStatusIconMap[character.characterStatus as CharacterStatus]}
+            {CharacterStatusIconMap[character.characterStatus as CsEntityStatus]}
           </Box>
           {canToggle && (
             <Box
@@ -226,7 +225,7 @@ export const CharacterThumbnail: React.FC<{
                   textShadow: (theme) => `0 0 2px ${theme.palette.grey[800]}`,
                 }}
               >
-                {character?.characterClass && CharacterClassIconMap[character?.characterClass]}
+                {character?.characterClass && CsEntityClassIconMap[character?.characterClass]}
               </Box>
             </CircularProgressWithChildren>
           </Box>

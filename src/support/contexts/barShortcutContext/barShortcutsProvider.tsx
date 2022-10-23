@@ -11,7 +11,8 @@ const barShortcutsContextInitialState: BarShortcutsContextState = {
 
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function*/
 let dispatcher = {
-  setBarShortcuts: (barShortcut: BarShortcut[]): void => {},
+  setBarShortcuts: (barShortcuts: BarShortcut[]): void => {},
+  updateBarShortcut: (barShortcut: BarShortcut): void => {},
 };
 
 export const BarShortcutsContext = createContext({
@@ -28,6 +29,11 @@ export const BarShortcutsContextProvider = ({ children }: PropsWithChildren<Brow
         dispatch({
           type: BarShortcutsContextActionEnum.SET_BAR_SHORTCUTS,
           barShortcuts,
+        }),
+      updateBarShortcut: (barShortcut) =>
+        dispatch({
+          type: BarShortcutsContextActionEnum.UPDATE_BAR_SHORTCUT,
+          barShortcut,
         }),
     }),
     [],

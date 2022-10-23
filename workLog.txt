@@ -1,6 +1,14 @@
 not found page
 unauthorized page
 
+/// push XIV
+
+take asterisk out on follow/attack
+targeting infra part I
+character tabs
+started to work on actions buttons
+shortcuts infra part II - bars and logics
+
 /// push XXIII
 
 shortcuts infra part I

@@ -6,10 +6,11 @@ import { fadeIn } from '../../../../../styles';
 import { SignalRContext } from '../../../../../support/contexts/signalRContext/signalRContextProvider';
 import { CreateCharButton } from './components/buttons/createCharButton';
 import { CharacterContext } from '../../../../../support/contexts/characterContext/characterContextProvider';
-import { CharacterThumbnail } from './components/CharacterThumbnail';
+import { CharacterThumbnail } from './components/characterThumbnail';
 import { useConnection } from '../../../../../api/signalR/useConnection';
-import { CharacterStatus } from '../../../../../models/enums';
+import { CsEntityStatus } from '../../../../../models/enums';
 import { CharacterDto } from '../../../../../models/signalR';
+import { TargetThumbnail } from './components/targetThumbnail';
 
 export const ControlBar: React.FC = () => {
   const { currentPlayer } = useContext(SignalRContext);
@@ -21,11 +22,11 @@ export const ControlBar: React.FC = () => {
   const _setActiveCharacter = async (character: CharacterDto): Promise<void> => {
     if (
       (reactivateSameCharacter || (isConnected && character.id !== activeCharacterId)) &&
-      character.characterStatus !== CharacterStatus.Astray
+      character.characterStatus !== CsEntityStatus.Astray
     ) {
       playerJumpTo({ characterId: character.id });
       setActiveCharacterId(character.id);
-      if (character.characterStatus === CharacterStatus.Dead) {
+      if (character.characterStatus === CsEntityStatus.Dead) {
         questionDialogOverlay(
           () => characterTeleportToNearest({ characterId: character.id }),
           'Ready to...',
@@ -43,19 +44,19 @@ export const ControlBar: React.FC = () => {
     }
     setLoadingId(character.id);
 
-    const isOff = character.characterStatus === CharacterStatus.Astray;
+    const isOff = character.characterStatus === CsEntityStatus.Astray;
     let characterToActivate: CharacterDto | undefined = undefined;
     if (isOff) {
       characterToActivate = character;
     } else if (activeCharacterId === character.id) {
       const otherAliveAndAwakeCharacter = characters.find(
-        (c) => c.hp > 0 && c.characterStatus !== CharacterStatus.Astray && character.id !== c.id,
+        (c) => c.hp > 0 && c.characterStatus !== CsEntityStatus.Astray && character.id !== c.id,
       );
       if (otherAliveAndAwakeCharacter) {
         characterToActivate = otherAliveAndAwakeCharacter;
       } else {
         const otherAwakeCharacter = characters.find(
-          (c) => c.characterStatus !== CharacterStatus.Astray && character.id !== c.id,
+          (c) => c.characterStatus !== CsEntityStatus.Astray && character.id !== c.id,
         );
         if (otherAwakeCharacter) {
           characterToActivate = otherAwakeCharacter;
@@ -80,23 +81,23 @@ export const ControlBar: React.FC = () => {
       setReactivateSameCharacter(false);
       const characterCount = characters.length;
       if (characterCount === 1) {
-        if (characters[0].characterStatus === CharacterStatus.Astray) {
+        if (characters[0].characterStatus === CsEntityStatus.Astray) {
           onAwakeClick(characters[0]);
         } else {
           _setActiveCharacter(characters[0]);
         }
       } else if (characterCount > 1) {
         const selectedAliveAndAwakeCharacter = characters.find(
-          (c) => c.hp !== 0 && c.characterStatus === CharacterStatus.Awake && c.id === activeCharacterId,
+          (c) => c.hp !== 0 && c.characterStatus === CsEntityStatus.Awake && c.id === activeCharacterId,
         );
         if (selectedAliveAndAwakeCharacter) {
           _setActiveCharacter(selectedAliveAndAwakeCharacter);
         } else {
-          const aliveAndAwakeCharacter = characters.find((c) => c.hp !== 0 && c.characterStatus === CharacterStatus.Awake);
+          const aliveAndAwakeCharacter = characters.find((c) => c.hp !== 0 && c.characterStatus === CsEntityStatus.Awake);
           if (aliveAndAwakeCharacter) {
             _setActiveCharacter(aliveAndAwakeCharacter);
           } else {
-            const onlineCharacter = characters.find((c) => c.characterStatus !== CharacterStatus.Astray);
+            const onlineCharacter = characters.find((c) => c.characterStatus !== CsEntityStatus.Astray);
             if (onlineCharacter) {
               _setActiveCharacter(onlineCharacter);
             }
@@ -142,15 +143,31 @@ export const ControlBar: React.FC = () => {
             }}
           >
             <Box sx={{ flex: 1 }}></Box>
-            {characters.map((c) => (
-              <CharacterThumbnail
-                key={c.id}
-                character={c}
-                setActiveCharacter={_setActiveCharacter}
-                onAwakeClick={onAwakeClick}
-                isToggleLoading={c.id === loadingId}
-              />
-            ))}
+            {characters.map(
+              (c, i) =>
+                i % 2 === 0 && (
+                  <CharacterThumbnail
+                    key={c.id}
+                    character={c}
+                    setActiveCharacter={_setActiveCharacter}
+                    onAwakeClick={onAwakeClick}
+                    isToggleLoading={c.id === loadingId}
+                  />
+                ),
+            )}
+            <TargetThumbnail />
+            {characters.map(
+              (c, i) =>
+                i % 2 === 1 && (
+                  <CharacterThumbnail
+                    key={c.id}
+                    character={c}
+                    setActiveCharacter={_setActiveCharacter}
+                    onAwakeClick={onAwakeClick}
+                    isToggleLoading={c.id === loadingId}
+                  />
+                ),
+            )}
             <Box sx={{ flex: 1 }}></Box>
           </Row>
         )}

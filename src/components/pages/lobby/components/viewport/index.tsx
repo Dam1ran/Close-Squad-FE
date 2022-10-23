@@ -1,20 +1,21 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { useContext } from 'react';
 import { useConnection } from '../../../../../api/signalR/useConnection';
-import { CharacterClassIconMap } from '../../../../../models/character';
-import { CharacterStatus, TravelDirection, TravelDirectionMap } from '../../../../../models/enums';
-import { CharacterDto } from '../../../../../models/signalR';
+import { CsEntityClassIconMap } from '../../../../../models/character';
+import { CsEntityStatus, TravelDirection, TravelDirectionMap } from '../../../../../models/enums';
+import { CharacterDto, CharacterSimpleDto } from '../../../../../models/signalR';
 import { CharacterContext } from '../../../../../support/contexts/characterContext/characterContextProvider';
 import { useCharacterService } from '../../../../../support/services/useCharacterService';
 import { getNormalized } from '../../../../../support/utils';
 import { Box, Img, questionDialogOverlay, Row } from '../../../../elements';
 import { TravelArrow } from './components/travelArrow';
 import defaultQuadrantImage from '../../../../../assets/images/quadrant_default.png';
+import { alpha } from '@mui/system';
 
 export const Viewport: React.FC = () => {
   const { activeCharacterId, updateCharacter, quadrantCharacters } = useContext(CharacterContext);
-  const { characterTravelTo, characterMove } = useConnection();
-  const { isTravelDisabled, getCharactersInViewPort, getActiveCharacter, setActiveCharacter } = useCharacterService();
+  const { characterTravelTo, characterMove, targetSelf, targetCharacter } = useConnection();
+  const { isTravelDisabled, getCharactersInViewPort, getActiveCharacter } = useCharacterService();
   const activeCharacter = getActiveCharacter();
   const charactersInViewPort = getCharactersInViewPort();
 
@@ -29,16 +30,27 @@ export const Viewport: React.FC = () => {
     );
   };
 
-  const onCharacterClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, character: CharacterDto): void => {
+  const onMyCharacterClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, character: CharacterDto): void => {
     e.stopPropagation();
-    setActiveCharacter(character);
+    if (activeCharacterId === character.id) {
+      targetSelf({ characterId: activeCharacterId });
+    } else if (activeCharacterId !== undefined) {
+      targetCharacter({ characterId: activeCharacterId, instanceId: character.instanceId });
+    }
+  };
+
+  const onCharacterClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>, character: CharacterSimpleDto): void => {
+    e.stopPropagation();
+    if (activeCharacter) {
+      targetCharacter({ characterId: activeCharacter.id, instanceId: character.instanceId });
+    }
   };
 
   const onViewportClick = (e: React.MouseEvent<HTMLDivElement, MouseEvent>): void => {
     if (
       activeCharacter &&
-      (activeCharacter.characterStatus === CharacterStatus.Awake ||
-        activeCharacter.characterStatus === CharacterStatus.Engaged)
+      (activeCharacter.characterStatus === CsEntityStatus.Awake ||
+        activeCharacter.characterStatus === CsEntityStatus.Engaged)
     ) {
       const rect = e.currentTarget.getBoundingClientRect();
       const x = getNormalized(500, e.clientX - rect.left);
@@ -100,22 +112,25 @@ export const Viewport: React.FC = () => {
             top: `${c.y}%`,
             transform: 'translate(-10px, -10px)',
             transition: 'box-shadow 0.3s, border-radius 0.3s',
-            border: (theme) => `1px solid ${theme.palette.grey[800]}`,
+            border: (theme) =>
+              activeCharacter?.target?.instanceId === c.instanceId
+                ? `1px dashed ${theme.palette.grey[200]}`
+                : `1px solid ${theme.palette.grey[800]}`,
             boxShadow: (theme) =>
               activeCharacter?.id === c.id
                 ? `0 0 5px ${theme.palette.secondary.main}, inset 0 0 3px 1px ${theme.palette.grey[300]}`
                 : `0 0 4px ${theme.palette.grey[800]}`,
-            cursor: activeCharacter?.id !== c.id ? 'pointer' : 'unset',
+            cursor: 'pointer',
             zIndex: activeCharacter?.id === c.id ? 10 : 5,
             fontSize: '12px',
             textAlign: 'center',
             lineHeight: '20px',
-            textShadow: (theme) => `0 0 3px ${theme.palette.grey[700]}`,
-            opacity: c.characterStatus === CharacterStatus.Traveling ? 0.5 : 1,
+            textShadow: (theme) => `0 0 3px ${theme.palette.grey[900]}`,
+            opacity: c.characterStatus === CsEntityStatus.Traveling ? 0.5 : 1,
           }}
-          onClick={(e): void => onCharacterClick(e, c)}
+          onClick={(e): void => onMyCharacterClick(e, c)}
         >
-          {c.characterStatus === CharacterStatus.Dead ? '🖤' : CharacterClassIconMap[c.characterClass]}
+          {c.characterStatus === CsEntityStatus.Dead ? '🖤' : CsEntityClassIconMap[c.characterClass]}
         </Box>
       ))}
       {charactersInViewPort.map((c) => (
@@ -136,7 +151,7 @@ export const Viewport: React.FC = () => {
             lineHeight: '10px',
             zIndex: 1,
             pointerEvents: 'none',
-            opacity: c.characterStatus === CharacterStatus.Traveling ? 0.5 : 1,
+            opacity: c.characterStatus === CsEntityStatus.Traveling ? 0.5 : 1,
           }}
         >
           ✴
@@ -150,21 +165,27 @@ export const Viewport: React.FC = () => {
             position: 'absolute',
             width: '20px',
             height: '20px',
-            borderRadius: activeCharacter && activeCharacter?.id === c.id ? 0.5 : '50%',
+            borderRadius: '50%',
             left: `${c.x}%`,
             top: `${c.y}%`,
             transform: 'translate(-10px, -10px)',
             transition: 'box-shadow 0.3s, border-radius 0.3s',
-            border: (theme) => `1px solid ${theme.palette.grey[800]}`,
+            border: (theme) =>
+              activeCharacter?.target?.instanceId === c.instanceId
+                ? `1px dashed ${theme.palette.common.white}`
+                : `1px solid ${theme.palette.grey[800]}`,
             zIndex: 4,
             fontSize: '12px',
             textAlign: 'center',
             lineHeight: '20px',
-            textShadow: (theme) => `0 0 3px ${theme.palette.grey[700]}`,
-            opacity: c.characterStatus === CharacterStatus.Traveling ? 0.5 : 1,
+            textShadow: (theme) => `0 0 3px ${theme.palette.grey[900]}`,
+            opacity: c.characterStatus === CsEntityStatus.Traveling ? 0.5 : 1,
+            cursor: 'pointer',
+            backgroundColor: (theme) => alpha(theme.palette.warning.main, 0.3),
           }}
+          onClick={(e): void => onCharacterClick(e, c)}
         >
-          {c.characterStatus === CharacterStatus.Dead ? '🖤' : CharacterClassIconMap[c.characterClass]}
+          {c.characterStatus === CsEntityStatus.Dead ? '🖤' : CsEntityClassIconMap[c.characterClass]}
         </Box>
       ))}
     </Row>
