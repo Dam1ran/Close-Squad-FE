@@ -1,11 +1,12 @@
 import { alpha } from '@mui/system';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useConnection } from '../../../../../../api/signalR/useConnection';
 import { AiAction, BarShortcutType, CharacterAction, CsEntityStatus } from '../../../../../../models/enums';
 import { CharacterContext } from '../../../../../../support/contexts/characterContext/characterContextProvider';
 import { useCharacterShortcuts } from '../../../../../../support/hooks';
 import { useCharacterService } from '../../../../../../support/services/useCharacterService';
-import { BlurOnIcon, Box } from '../../../../../elements';
+import { BlurOnIcon, Box, Menu } from '../../../../../elements';
+import { BarMenuContent } from './barMenuContent';
 import { CharacterActionIconMap } from './buttonMaps/actionButtonMap';
 
 export const ShortcutBarButton: React.FC<{ order: number }> = ({ order }) => {
@@ -22,7 +23,11 @@ export const ShortcutBarButton: React.FC<{ order: number }> = ({ order }) => {
 
     switch (respectiveShortcut.type) {
       case BarShortcutType.Action: {
-        if (respectiveShortcut.usingId === CharacterAction.Sit || respectiveShortcut.usingId === CharacterAction.Attack) {
+        if (
+          respectiveShortcut.usingId === CharacterAction.Sit ||
+          respectiveShortcut.usingId === CharacterAction.Attack ||
+          respectiveShortcut.usingId === CharacterAction.Follow
+        ) {
           updateCharacter({ id: activeCharacter.id, xDestination: undefined, yDestination: undefined });
         }
         actionCall({ characterId: activeCharacter.id, action: respectiveShortcut.usingId });
@@ -58,6 +63,8 @@ export const ShortcutBarButton: React.FC<{ order: number }> = ({ order }) => {
     }
   };
 
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
   return (
     <Box
       sx={{
@@ -65,7 +72,7 @@ export const ShortcutBarButton: React.FC<{ order: number }> = ({ order }) => {
         height: '36px',
         width: '36px',
         borderRadius: 1,
-        transition: 'border 0.2s',
+        transition: 'border 0.1s',
         border: (theme) =>
           respectiveShortcut?.isActive
             ? `1px solid ${theme.palette.secondary.dark}`
@@ -85,7 +92,13 @@ export const ShortcutBarButton: React.FC<{ order: number }> = ({ order }) => {
         },
         userSelect: 'none',
       }}
-      onClick={onShortcutClick}
+      onContextMenu={(e): void => {
+        e.stopPropagation();
+        e.preventDefault();
+        if (respectiveShortcut) {
+          setAnchorEl(e.currentTarget);
+        }
+      }}
     >
       <Box
         sx={{
@@ -107,10 +120,13 @@ export const ShortcutBarButton: React.FC<{ order: number }> = ({ order }) => {
         {order + 1}
       </Box>
       {respectiveShortcut ? (
-        <Box sx={{ pointerEvents: 'none' }}>{getIconForShortcut()}</Box>
+        <Box onClick={onShortcutClick}>{getIconForShortcut()}</Box>
       ) : (
         <BlurOnIcon sx={{ zIndex: 1, opacity: 0.4, fontSize: '36px', marginTop: '-1px', marginLeft: '-1px' }} />
       )}
+      <Menu open={!!anchorEl} onClose={(): void => setAnchorEl(null)} anchorEl={anchorEl}>
+        <BarMenuContent shortcutIndex={order} onClose={(): void => setAnchorEl(null)} />
+      </Menu>
     </Box>
   );
 };

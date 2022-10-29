@@ -1,12 +1,15 @@
 import { HubConnectionState } from '@microsoft/signalr';
 import { useContext } from 'react';
 import {
+  CharacterAssignShortcutCall,
   CharacterCall,
+  CharacterClearShortcutCall,
   CharacterMoveCall,
   CharacterScoutCall,
   CharacterTargetCall,
   CharacterTravelCall,
   CharacterUseActionCall,
+  CharacterUseSkillCall,
   ChatCommand,
   ChatMessage,
   ChatPlayerDto,
@@ -64,6 +67,10 @@ export const useConnection = () => {
     connection?.send('UseAction', { ...characterUseActionCall });
   };
 
+  const skillCall = (characterUseSkillCall: CharacterUseSkillCall) => {
+    connection?.send('UseSkill', { ...characterUseSkillCall });
+  };
+
   const targetSelf = (characterCall: CharacterCall) => {
     connection?.send('TargetSelf', { ...characterCall });
   };
@@ -74,6 +81,14 @@ export const useConnection = () => {
 
   const cancelTarget = (characterCall: CharacterCall) => {
     connection?.send('CancelTarget', { ...characterCall });
+  };
+
+  const assignShortcut = (characterAssignShortcutCall: CharacterAssignShortcutCall) => {
+    connection?.send('AssignShortcut', { ...characterAssignShortcutCall });
+  };
+
+  const clearShortcut = (characterClearShortcutCall: CharacterClearShortcutCall) => {
+    connection?.send('ClearShortcut', { ...characterClearShortcutCall });
   };
 
   return {
@@ -91,5 +106,8 @@ export const useConnection = () => {
     targetSelf,
     targetCharacter,
     cancelTarget,
+    assignShortcut,
+    clearShortcut,
+    skillCall,
   };
 };

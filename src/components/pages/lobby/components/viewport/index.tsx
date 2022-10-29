@@ -113,9 +113,13 @@ export const Viewport: React.FC = () => {
             transform: 'translate(-10px, -10px)',
             transition: 'box-shadow 0.3s, border-radius 0.3s',
             border: (theme) =>
-              activeCharacter?.target?.instanceId === c.instanceId
-                ? `1px dashed ${theme.palette.grey[200]}`
-                : `1px solid ${theme.palette.grey[800]}`,
+              `1px ${activeCharacter?.target?.instanceId === c.instanceId ? 'dashed' : 'solid'} ${
+                activeCharacter?.target?.instanceId === c.instanceId || activeCharacter?.instanceId === c.instanceId
+                  ? c.characterStatus === CsEntityStatus.Engaged
+                    ? theme.palette.error.main
+                    : theme.palette.grey[200]
+                  : theme.palette.grey[800]
+              }`,
             boxShadow: (theme) =>
               activeCharacter?.id === c.id
                 ? `0 0 5px ${theme.palette.secondary.main}, inset 0 0 3px 1px ${theme.palette.grey[300]}`
@@ -171,9 +175,13 @@ export const Viewport: React.FC = () => {
             transform: 'translate(-10px, -10px)',
             transition: 'box-shadow 0.3s, border-radius 0.3s',
             border: (theme) =>
-              activeCharacter?.target?.instanceId === c.instanceId
-                ? `1px dashed ${theme.palette.common.white}`
-                : `1px solid ${theme.palette.grey[800]}`,
+              `1px ${activeCharacter?.target?.instanceId === c.instanceId ? 'dashed' : 'solid'} ${
+                activeCharacter?.target?.instanceId === c.instanceId
+                  ? c.characterStatus === CsEntityStatus.Engaged
+                    ? theme.palette.error.main
+                    : theme.palette.grey[200]
+                  : theme.palette.grey[800]
+              }`,
             zIndex: 4,
             fontSize: '12px',
             textAlign: 'center',

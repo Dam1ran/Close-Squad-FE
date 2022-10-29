@@ -1,5 +1,6 @@
 import { CsEntityClass } from '../api.models';
 import { AiAction, CsEntityStatus } from '../enums';
+import { Stat } from './stats';
 import { TargetDto } from './targetDto';
 
 export interface CharacterDto {
@@ -20,5 +21,7 @@ export interface CharacterDto {
   y: number;
   xDestination: number;
   yDestination: number;
+  stats: Stat[];
+  skillIds: number[];
   target?: TargetDto;
 }

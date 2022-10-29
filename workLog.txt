@@ -1,7 +1,14 @@
 not found page
 unauthorized page
 
-/// push XIV
+/// push XXV
+
+skill work startup
+some stats work
+status tab
+shortcuts crud menu
+
+/// push XXIV
 
 take asterisk out on follow/attack
 targeting infra part I

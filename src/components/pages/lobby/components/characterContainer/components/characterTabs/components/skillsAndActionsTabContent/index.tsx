@@ -1,22 +1,32 @@
 import { alpha } from '@mui/system';
-import { useContext } from 'react';
+import { useContext, useState } from 'react';
 import { useConnection } from '../../../../../../../../../api/signalR/useConnection';
-import { AiAction, CharacterAction, CsEntityStatus } from '../../../../../../../../../models/enums';
+import { AiAction, BarShortcutType, CharacterAction, CsEntityStatus } from '../../../../../../../../../models/enums';
 import { CharacterContext } from '../../../../../../../../../support/contexts/characterContext/characterContextProvider';
 import { useCharacterService } from '../../../../../../../../../support/services/useCharacterService';
-import { Box, Row } from '../../../../../../../../elements';
+import { Box, Menu, Row } from '../../../../../../../../elements';
 import { CharacterActionIconMap } from '../../../buttonMaps/actionButtonMap';
+import { MenuContent } from './components/menuContent';
 
 export const SkillsAndActionsTabContent: React.FC = () => {
   const { actionCall } = useConnection();
   const activeCharacter = useCharacterService().getActiveCharacter();
   const { updateCharacter } = useContext(CharacterContext);
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [menuContextShortcut, setMenuContextShortcut] = useState<{ type: BarShortcutType; usingId: number }>({
+    type: 0,
+    usingId: -1,
+  });
 
   const onActionClick = (characterAction: CharacterAction): void => {
     if (!activeCharacter) {
       return;
     }
-    if (characterAction === CharacterAction.Sit || characterAction === CharacterAction.Attack) {
+    if (
+      characterAction === CharacterAction.Sit ||
+      characterAction === CharacterAction.Follow ||
+      characterAction === CharacterAction.Attack
+    ) {
       updateCharacter({ id: activeCharacter.id, xDestination: undefined, yDestination: undefined });
     }
     actionCall({ characterId: activeCharacter.id, action: characterAction });
@@ -97,11 +107,24 @@ export const SkillsAndActionsTabContent: React.FC = () => {
               }}
               key={ca}
               onClick={(): void => onActionClick(ca as CharacterAction)}
+              onContextMenu={(e): void => {
+                e.stopPropagation();
+                e.preventDefault();
+                setMenuContextShortcut({ type: BarShortcutType.Action, usingId: ca as CharacterAction });
+                setAnchorEl(e.currentTarget);
+              }}
             >
               {CharacterActionIconMap[ca as CharacterAction]}
             </Box>
           ))}
       </Row>
+      <Menu open={!!anchorEl} onClose={(): void => setAnchorEl(null)} anchorEl={anchorEl}>
+        <MenuContent
+          type={menuContextShortcut.type}
+          usingId={menuContextShortcut.usingId}
+          onClose={(): void => setAnchorEl(null)}
+        />
+      </Menu>
     </Box>
   );
 };

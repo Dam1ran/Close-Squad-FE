@@ -25,10 +25,13 @@ export const characterContextReducer = (
       if (character) {
         const objKeys = Object.keys(action.character)?.filter((k) => k.getNormalized() !== 'id') as (keyof CharacterDto)[];
         for (const objKey of objKeys) {
-          if (objKey !== 'target') {
+          if (objKey !== 'target' && objKey !== 'stats') {
             (character[objKey] as unknown) = action.character[objKey];
           } else {
             character.target = action.character.target;
+            if (action.character.stats) {
+              character.stats = action.character.stats;
+            }
           }
         }
       }
@@ -45,10 +48,13 @@ export const characterContextReducer = (
           const objKeys = Object.keys(cl)?.filter((k) => k.getNormalized() !== 'id') as (keyof CharacterDto)[];
 
           for (const objKey of objKeys) {
-            if (objKey !== 'target') {
+            if (objKey !== 'target' && objKey !== 'stats') {
               (character[objKey] as unknown) = cl[objKey];
             } else {
               character.target = cl.target;
+              if (cl.stats) {
+                character.stats = cl.stats;
+              }
             }
           }
         }

@@ -12,7 +12,8 @@ const barShortcutsContextInitialState: BarShortcutsContextState = {
 /* eslint-disable @typescript-eslint/no-unused-vars, @typescript-eslint/no-empty-function*/
 let dispatcher = {
   setBarShortcuts: (barShortcuts: BarShortcut[]): void => {},
-  updateBarShortcut: (barShortcut: BarShortcut): void => {},
+  setBarShortcut: (barShortcut: BarShortcut): void => {},
+  removeShortcutByIndex: (index: number): void => {},
 };
 
 export const BarShortcutsContext = createContext({
@@ -30,10 +31,15 @@ export const BarShortcutsContextProvider = ({ children }: PropsWithChildren<Brow
           type: BarShortcutsContextActionEnum.SET_BAR_SHORTCUTS,
           barShortcuts,
         }),
-      updateBarShortcut: (barShortcut) =>
+      setBarShortcut: (barShortcut) =>
         dispatch({
-          type: BarShortcutsContextActionEnum.UPDATE_BAR_SHORTCUT,
+          type: BarShortcutsContextActionEnum.SET_BAR_SHORTCUT,
           barShortcut,
+        }),
+      removeShortcutByIndex: (index) =>
+        dispatch({
+          type: BarShortcutsContextActionEnum.REMOVE_BY_INDEX,
+          index,
         }),
     }),
     [],

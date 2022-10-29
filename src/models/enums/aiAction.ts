@@ -5,4 +5,5 @@ export enum AiAction {
   Following = 3,
   Approaching = 4,
   Attacking = 5,
+  SkillApply = 6,
 }

@@ -9,3 +9,4 @@ export * from './serverDialog';
 export * from './aggregatedDataDto';
 export * from './barShortcut';
 export * from './targetDto';
+export * from './stats';

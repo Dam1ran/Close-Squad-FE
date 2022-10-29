@@ -108,9 +108,9 @@ export const TargetThumbnail: React.FC = () => {
               transition: 'background-color 0.3s',
               zIndex: 10,
               opacity: 0.6,
-              cursor: 'pointer',
+              cursor: target ? 'pointer' : 'unset',
               '&:active': {
-                backgroundColor: (theme) => alpha(theme.palette.grey[600], 0.6),
+                backgroundColor: (theme) => alpha(theme.palette.grey[600], target ? 0.6 : 0),
               },
             }}
             onClick={onCancelTarget}
@@ -135,7 +135,6 @@ export const TargetThumbnail: React.FC = () => {
               height: '20px',
               width: '20px',
               lineHeight: '20px',
-              // backgroundColor: (theme) => alpha(theme.palette.grey[400], 0.5),
               textAlign: 'center',
               borderTopRightRadius: '8px',
               borderBottomLeftRadius: '3px',
@@ -149,7 +148,6 @@ export const TargetThumbnail: React.FC = () => {
               height: '20px',
               width: '20px',
               lineHeight: '20px',
-              // backgroundColor: (theme) => alpha(theme.palette.grey[400], 0.5),
               textAlign: 'center',
               borderTopLeftRadius: '8px',
               borderBottomRightRadius: '3px',

@@ -1,4 +1,4 @@
-import { CharacterAction, TravelDirection } from '../enums';
+import { BarShortcutType, CharacterAction, TravelDirection } from '../enums';
 
 export interface CharacterCall {
   characterId: number;
@@ -23,4 +23,18 @@ export interface CharacterUseActionCall extends CharacterCall {
 
 export interface CharacterTargetCall extends CharacterCall {
   instanceId: string;
+}
+
+export interface CharacterAssignShortcutCall extends CharacterCall {
+  barShortcutType: BarShortcutType;
+  usingId: number;
+  shortcutIndex: number;
+}
+
+export interface CharacterClearShortcutCall extends CharacterCall {
+  shortcutIndex: number;
+}
+
+export interface CharacterUseSkillCall extends CharacterCall {
+  skillKeyId: number;
 }

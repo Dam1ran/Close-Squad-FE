@@ -13,6 +13,7 @@ Router-Dom
 Axios
 RxJs
 Typescript
+Atomic design pattern
 EsLint
 Prettier
 Hot Toast

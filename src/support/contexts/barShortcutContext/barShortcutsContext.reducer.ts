@@ -13,20 +13,16 @@ export const barShortcutsContextReducer = (
         barShortcuts: action.barShortcuts,
       } as BarShortcutsContextState;
     }
-    case BarShortcutsContextActionEnum.UPDATE_BAR_SHORTCUT: {
-      let barShortcut = prevState.barShortcuts.find((bs) => bs.id === action.barShortcut.id);
-      if (!barShortcut) {
-        return prevState;
-      }
-
-      barShortcut = {
-        ...barShortcut,
-        ...action.barShortcut,
-      };
-
+    case BarShortcutsContextActionEnum.SET_BAR_SHORTCUT: {
       return {
         ...prevState,
-        barShortcuts: [...prevState.barShortcuts.filter((bs) => bs.id !== action.barShortcut.id), barShortcut],
+        barShortcuts: [...prevState.barShortcuts.filter((bs) => bs.id !== action.barShortcut.id), action.barShortcut],
+      } as BarShortcutsContextState;
+    }
+    case BarShortcutsContextActionEnum.REMOVE_BY_INDEX: {
+      return {
+        ...prevState,
+        barShortcuts: [...prevState.barShortcuts.filter((bs) => bs.orderNumber !== action.index)],
       } as BarShortcutsContextState;
     }
     default:

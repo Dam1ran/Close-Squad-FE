@@ -25,7 +25,7 @@ export const useReceivers = (): Receivers => {
     connection,
   } = useContext(SignalRContext);
   const { setCharacters, updateCharacter, updateCharacters, setQuadrantCharacters } = useContext(CharacterContext);
-  const { setBarShortcuts, updateBarShortcut } = useContext(BarShortcutsContext);
+  const { setBarShortcuts, setBarShortcut, removeShortcutByIndex } = useContext(BarShortcutsContext);
   const { refresh } = useRefreshToken();
 
   const receivers: Receivers = {
@@ -34,8 +34,6 @@ export const useReceivers = (): Receivers => {
       setCurrentPlayer(payload);
     },
     SetNearbyGroup: (payload: ChatPlayerDto[]) => {
-      console.log(payload);
-
       setNearbyPlayers(payload);
     },
     PartyGroup: (payload: ChatPlayerDto[]) => {
@@ -57,12 +55,10 @@ export const useReceivers = (): Receivers => {
       setCharacters(payload);
     },
     UpdateCharacter: (payload: Partial<CharacterDto>) => {
-      console.log(payload);
       updateCharacter(payload);
     },
     SendAggregatedData: (payload: AggregatedDataDto) => {
       updateCharacters(payload.clientCharacters);
-      // setCharacters(payload.clientCharacters);
       setQuadrantCharacters(payload.charactersInActiveQuadrant);
     },
     Reconnect: () => {
@@ -82,9 +78,12 @@ export const useReceivers = (): Receivers => {
       setBarShortcuts(payload);
     },
     UpdateBarShortcuts: (payload: BarShortcut[]) => {
-      payload.forEach((bs) => {
-        updateBarShortcut(bs);
-      });
+      for (const shortcut of payload) {
+        setBarShortcut(shortcut);
+      }
+    },
+    RemoveBarShortcut: (shortcutIndex: number) => {
+      removeShortcutByIndex(shortcutIndex);
     },
   };
 
